@@ -138,16 +138,16 @@
         .action-button {
             display: flex; align-items: center; justify-content: center; gap: 10px;
             padding: 16px 24px; border-radius: var(--radius-button);
-            font-size: 16px; font-weight: 600; cursor: pointer; color: white;
+            font-size: 16px; font-weight: 600; cursor: pointer; color: white; border: none; width: 100%;
         }
         .action-button.primary { background: var(--gradient-main); box-shadow: 0 8px 24px rgba(102,126,234,0.3); }
         .action-button.secondary { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .action-button:active { transform: scale(0.98); }
+        .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
         .footer {
             text-align: center; color: var(--text-secondary); font-size: 13px;
             padding: 30px 0 calc(10px + env(safe-area-inset-bottom));
         }
-        /* === НОВЫЕ СТИЛИ ДЛЯ ЭТАПА 2 === */
+        /* === СТИЛИ ДЛЯ РАБОЧИХ ЭКРАНОВ === */
         .balance-big {
             text-align: center; padding: 40px 20px;
             background: var(--bg-card); backdrop-filter: blur(10px);
@@ -178,13 +178,14 @@
         .tracker-status.contact { background: rgba(17,153,142,0.2); color: #38ef7d; }
         .tracker-status.responded { background: rgba(79,172,254,0.2); color: #4facfe; }
         .tracker-status.other { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
-        .textarea-vacancy {
-            width: 100%; min-height: 200px; padding: 16px;
+        .input-field {
+            width: 100%; padding: 16px;
             background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1);
             border-radius: var(--radius-card); color: var(--text-primary);
-            font-size: 14px; font-family: inherit; resize: vertical; outline: none;
+            font-size: 15px; font-family: inherit; outline: none; margin-bottom: 16px;
         }
-        .textarea-vacancy:focus { border-color: #667eea; }
+        .input-field:focus { border-color: #667eea; }
+        textarea.input-field { min-height: 200px; resize: vertical; }
         .result-card {
             padding: 20px; background: var(--bg-card); backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card);
@@ -197,7 +198,7 @@
         .result-pitch {
             padding: 16px; background: rgba(102,126,234,0.1);
             border-left: 3px solid #667eea; border-radius: 8px;
-            font-size: 14px; line-height: 1.6; white-space: pre-wrap;
+            font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word;
         }
         .result-contact {
             padding: 12px; background: rgba(255,255,255,0.03);
@@ -219,6 +220,43 @@
             text-align: center; padding: 40px 20px; color: var(--text-secondary);
         }
         .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .vacancy-card {
+            padding: 16px; background: var(--bg-card); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card);
+            margin-bottom: 12px;
+        }
+        .vacancy-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .vacancy-score {
+            padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700;
+            background: rgba(17,153,142,0.2); color: #38ef7d;
+        }
+        .vacancy-score.low { background: rgba(255,154,63,0.2); color: #ff9a3f; }
+        .vacancy-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .vacancy-company { font-size: 14px; color: var(--text-secondary); margin-bottom: 8px; }
+        .vacancy-salary { font-size: 14px; color: #4facfe; margin-bottom: 8px; }
+        .vacancy-reason { font-size: 12px; color: var(--text-secondary); font-style: italic; }
+        .link-list { display: grid; gap: 8px; margin-top: 12px; }
+        .link-item {
+            display: block; padding: 12px 16px; background: rgba(79,172,254,0.1);
+            border-radius: 12px; color: #4facfe; text-decoration: none; font-size: 14px;
+        }
+        .link-item:active { background: rgba(79,172,254,0.2); }
+        .analysis-block {
+            padding: 16px; background: rgba(255,255,255,0.03);
+            border-radius: 12px; margin-bottom: 12px; white-space: pre-wrap; word-break: break-word;
+            font-size: 14px; line-height: 1.6;
+        }
+        .percent-circle {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: conic-gradient(#38ef7d 0%, #38ef7d var(--pct), rgba(255,255,255,0.1) var(--pct));
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px; position: relative;
+        }
+        .percent-inner {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: var(--bg-primary); display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: 700;
+        }
         ::-webkit-scrollbar { width: 0; }
     </style>
 </head>
@@ -245,8 +283,8 @@
                     <div class="stat-label">Вакансий</div>
                 </div>
                 <div class="stat-card" onclick="showScreen('seeker')">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">Работа</div>
+                    <div class="stat-number">💼</div>
+                    <div class="stat-label">Соискатель</div>
                 </div>
             </div>
 
@@ -254,7 +292,7 @@
                 <div class="mode-card seeker" onclick="showScreen('seeker')">
                     <div class="mode-icon">💼</div>
                     <div class="mode-title">Я ищу работу</div>
-                    <div class="mode-description">Разбор вакансий, поиск контактов рекрутеров, генерация питчей</div>
+                    <div class="mode-description">Разбор вакансий, поиск контактов, генерация питчей</div>
                     <div class="mode-features">
                         <span class="feature-tag">🔗 Разбор вакансий</span>
                         <span class="feature-tag">🕵️ Поиск ЛПР</span>
@@ -283,8 +321,8 @@
             </div>
 
             <div class="action-buttons">
-                <div class="action-button primary" onclick="openBot()">🚀 Открыть бота</div>
-                <div class="action-button secondary" onclick="shareBot()">📤 Поделиться ботом</div>
+                <button class="action-button primary" onclick="openBot()">🚀 Открыть бота</button>
+                <button class="action-button secondary" onclick="shareBot()">📤 Поделиться ботом</button>
             </div>
 
             <div class="footer">Сделано с ❤️ для поиска работы мечты</div>
@@ -345,7 +383,7 @@
                     </div>
                     <span class="feature-badge free">2 ⭐</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('search')">
                     <div class="feature-icon blue">🔍</div>
                     <div class="feature-info">
                         <div class="feature-name">Поиск вакансий</div>
@@ -353,7 +391,7 @@
                     </div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('lpr')">
                     <div class="feature-icon purple">🕵️</div>
                     <div class="feature-info">
                         <div class="feature-name">Найти ЛПР</div>
@@ -361,7 +399,7 @@
                     </div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('pitch')">
                     <div class="feature-icon blue">📝</div>
                     <div class="feature-info">
                         <div class="feature-name">Короткие питчи</div>
@@ -369,11 +407,11 @@
                     </div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('skillgap')">
                     <div class="feature-icon purple">📊</div>
                     <div class="feature-info">
                         <div class="feature-name">Анализ навыков</div>
-                        <div class="feature-desc">Skill Gap анализ и исправление резюме</div>
+                        <div class="feature-desc">Skill Gap анализ и рекомендации</div>
                     </div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
@@ -409,13 +447,59 @@
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🔗 Разбор вакансии</div>
             <div class="screen-subtitle">Скопируй текст вакансии из приложения hh.ru и вставь сюда</div>
-            <textarea class="textarea-vacancy" id="vacancyInput" placeholder="Вставь полный текст вакансии сюда...&#10;&#10;Должность, компания, обязанности, требования, условия..."></textarea>
-            <div class="action-buttons">
-                <button class="action-button primary" id="analyzeBtn" onclick="runAnalyze()">
-                    🔍 Разобрать вакансию (2 ⭐)
-                </button>
-            </div>
+            <textarea class="input-field" id="vacancyInput" placeholder="Вставь полный текст вакансии сюда...&#10;&#10;Должность, компания, обязанности, требования, условия..."></textarea>
+            <button class="action-button primary" id="analyzeBtn" onclick="runAnalyze()">
+                🔍 Разобрать вакансию (2 ⭐)
+            </button>
             <div id="analyzeResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- ЭКРАН ПОИСКА ВАКАНСИЙ -->
+        <div class="screen" id="screen-search">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">🔍 Поиск вакансий</div>
+            <div class="screen-subtitle">Подбор по вашему резюме и региону</div>
+            <button class="action-button primary" id="searchBtn" onclick="runSearch()">
+                🔍 Найти вакансии (1 ⭐)
+            </button>
+            <div id="searchResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- ЭКРАН ПОИСКА ЛПР -->
+        <div class="screen" id="screen-lpr">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">🕵️ Найти ЛПР</div>
+            <div class="screen-subtitle">Поиск контактов нанимающих менеджеров</div>
+            <input type="text" class="input-field" id="lprCompany" placeholder="Компания (например: Сбер)">
+            <input type="text" class="input-field" id="lprPosition" placeholder="Должность (необязательно)">
+            <button class="action-button primary" id="lprBtn" onclick="runFindLPR()">
+                🕵️ Найти контакты (1 ⭐)
+            </button>
+            <div id="lprResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- ЭКРАН ГЕНЕРАЦИИ ПИТЧА -->
+        <div class="screen" id="screen-pitch">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">📝 Генерация питча</div>
+            <div class="screen-subtitle">Цепляющее сообщение для рекрутера</div>
+            <input type="text" class="input-field" id="pitchCompany" placeholder="Компания (например: Яндекс)">
+            <input type="text" class="input-field" id="pitchTitle" placeholder="Должность (например: Product Manager)">
+            <button class="action-button primary" id="pitchBtn" onclick="runPitch()">
+                📝 Сгенерировать питч (1 ⭐)
+            </button>
+            <div id="pitchResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- ЭКРАН АНАЛИЗА НАВЫКОВ -->
+        <div class="screen" id="screen-skillgap">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">📊 Анализ навыков</div>
+            <div class="screen-subtitle">Skill Gap анализ вашего резюме</div>
+            <button class="action-button primary" id="skillGapBtn" onclick="runSkillGap()">
+                📊 Провести анализ (1 ⭐)
+            </button>
+            <div id="skillGapResult" style="margin-top: 24px;"></div>
         </div>
 
         <!-- ЭКРАН РЕКРУТЕРА -->
@@ -424,7 +508,7 @@
             <div class="screen-title">🏢 Я нанимаю</div>
             <div class="screen-subtitle">Инструменты для оценки кандидатов и создания вакансий</div>
             <div class="feature-grid">
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('hr-match')">
                     <div class="feature-icon purple">📊</div>
                     <div class="feature-info">
                         <div class="feature-name">Соответствие резюме вакансии</div>
@@ -432,7 +516,7 @@
                     </div>
                     <span class="feature-badge free">2 ⭐</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('hr-scoring')">
                     <div class="feature-icon blue">🎯</div>
                     <div class="feature-info">
                         <div class="feature-name">Скоринг кандидата</div>
@@ -490,11 +574,36 @@
                 </div>
             </div>
         </div>
+
+        <!-- ЭКРАН HR: СООТВЕТСТВИЕ -->
+        <div class="screen" id="screen-hr-match">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">📊 Соответствие резюме вакансии</div>
+            <div class="screen-subtitle">Вставьте текст резюме кандидата и текст вакансии</div>
+            <textarea class="input-field" id="hrMatchResume" placeholder="Текст резюме кандидата..."></textarea>
+            <textarea class="input-field" id="hrMatchVacancy" placeholder="Текст вакансии..."></textarea>
+            <button class="action-button primary" id="hrMatchBtn" onclick="runHRMatch()">
+                📊 Проанализировать (2 ⭐)
+            </button>
+            <div id="hrMatchResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- ЭКРАН HR: СКОРИНГ -->
+        <div class="screen" id="screen-hr-scoring">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">🎯 Скоринг кандидата</div>
+            <div class="screen-subtitle">Вставьте текст резюме кандидата</div>
+            <textarea class="input-field" id="hrScoringResume" placeholder="Текст резюме кандидата..."></textarea>
+            <button class="action-button primary" id="hrScoringBtn" onclick="runHRScoring()">
+                🎯 Оценить кандидата (1 ⭐)
+            </button>
+            <div id="hrScoringResult" style="margin-top: 24px;"></div>
+        </div>
     </div>
 
     <script>
         // === НАСТРОЙКИ ===
-        const BOT_API_URL = "https://lemus-career-bot.onrender.com"; // ← ЗАМЕНИ на URL твоего Render сервиса
+        const BOT_API_URL = "https://lemus-career-bot.onrender.com"; // ← ЗАМЕНИ на URL твоего Render сервиса!
         const tg = window.Telegram && window.Telegram.WebApp;
         let currentUserId = null;
         let userData = null;
@@ -514,7 +623,7 @@
             } catch(e) {}
         }
 
-        // === АВТОРИЗАЦИЯ ЧЕРЕЗ TELEGRAM INIT DATA ===
+        // === АВТОРИЗАЦИЯ ===
         async function authenticateWithTelegram() {
             if (!tg || !tg.initData) {
                 console.warn('No Telegram initData available');
@@ -538,7 +647,7 @@
             }
         }
 
-        // === ЗАГРУЗКА ДАННЫХ ПОЛЬЗОВАТЕЛЯ ===
+        // === ЗАГРУЗКА ДАННЫХ ===
         async function loadUserData() {
             if (!currentUserId) return;
             try {
@@ -555,14 +664,11 @@
 
         function updateUIWithData() {
             if (!userData) return;
-            // Баланс
             document.getElementById('homeBalance').textContent = userData.balance;
             document.getElementById('balanceNum').textContent = userData.balance;
-            // Премиум статус
             if (userData.is_premium) {
                 document.getElementById('premiumStatus').style.display = 'inline-block';
             }
-            // Трекер
             const trackerCount = userData.tracker ? userData.tracker.length : 0;
             document.getElementById('homeTracker').textContent = trackerCount;
             renderTracker(userData.tracker || []);
@@ -577,12 +683,11 @@
             let html = '';
             trackerItems.forEach(item => {
                 let statusClass = 'other';
-                let statusText = item.status;
                 if (item.status.includes('Контакт')) { statusClass = 'contact'; }
-                else if (item.status.includes('Откликнулся')) { statusClass = 'responded'; }
+                else if (item.status.includes('Откликнулся') || item.status.includes('Разобрана')) { statusClass = 'responded'; }
                 html += '<div class="tracker-item">' +
                     '<div class="tracker-title">' + escapeHtml(item.title) + '</div>' +
-                    '<span class="tracker-status ' + statusClass + '">' + escapeHtml(statusText) + '</span>' +
+                    '<span class="tracker-status ' + statusClass + '">' + escapeHtml(item.status) + '</span>' +
                     '</div>';
             });
             container.innerHTML = html;
@@ -593,7 +698,7 @@
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
 
-        // === ЗАПУСК РАЗБОРА ВАКАНСИИ ===
+        // === РАЗБОР ВАКАНСИИ ===
         async function runAnalyze() {
             const textarea = document.getElementById('vacancyInput');
             const btn = document.getElementById('analyzeBtn');
@@ -617,16 +722,11 @@
                     body: JSON.stringify({ user_id: currentUserId, vacancy_text: vacancyText })
                 });
                 const data = await response.json();
-                if (!response.ok) {
-                    throw new Error(data.error || 'Ошибка сервера');
-                }
+                if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
                 renderAnalyzeResult(data);
-                // Обновляем баланс после операции
                 await loadUserData();
             } catch(e) {
-                resultDiv.innerHTML = '<div class="result-card" style="border-color: #f5576c;">' +
-                    '<div class="result-company" style="color: #f5576c;">❌ Ошибка</div>' +
-                    '<div class="result-title">' + escapeHtml(e.message) + '</div></div>';
+                resultDiv.innerHTML = '<div class="result-card" style="border-color: #f5576c;"><div class="result-company" style="color: #f5576c;">❌ Ошибка</div><div class="result-title">' + escapeHtml(e.message) + '</div></div>';
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '🔍 Разобрать вакансию (2 ⭐)';
@@ -642,10 +742,8 @@
                 html += '<div class="result-title">👤 Контакт: ' + escapeHtml(data.contact_name) + '</div>';
             }
             html += '</div>';
-            // Контакты
             if (data.contacts && data.contacts.length > 0) {
-                html += '<div class="result-card">' +
-                    '<div class="result-section-title">✅ Найденные контакты</div>';
+                html += '<div class="result-card"><div class="result-section-title">✅ Найденные контакты</div>';
                 data.contacts.forEach(c => {
                     html += '<div class="result-contact">';
                     if (c.name) html += '<strong>' + escapeHtml(c.name) + '</strong><br>';
@@ -656,33 +754,321 @@
                 });
                 html += '</div>';
             }
-            // Шаблоны почт
             if (data.email_templates && data.email_templates.length > 0) {
-                html += '<div class="result-card">' +
-                    '<div class="result-section-title">📧 Шаблоны корпоративных почт</div>';
+                html += '<div class="result-card"><div class="result-section-title">📧 Шаблоны корпоративных почт</div>';
                 data.email_templates.forEach(t => {
                     html += '<div class="result-contact">' + escapeHtml(t) + '</div>';
                 });
                 html += '</div>';
             }
-            // Питч
             if (data.pitch) {
-                html += '<div class="result-card">' +
-                    '<div class="result-section-title">📝 Питч для отправки</div>' +
+                html += '<div class="result-card"><div class="result-section-title">📝 Питч для отправки</div>' +
                     '<div class="result-pitch" id="pitchText">' + escapeHtml(data.pitch) + '</div>' +
-                    '<button class="copy-btn" onclick="copyPitch()">📋 Скопировать питч</button>' +
-                    '</div>';
+                    '<button class="copy-btn" onclick="copyPitch(this)">📋 Скопировать питч</button></div>';
             }
             resultDiv.innerHTML = html;
         }
 
-        function copyPitch() {
-            const pitchEl = document.getElementById('pitchText');
+        // === ПОИСК ВАКАНСИЙ ===
+        async function runSearch() {
+            const btn = document.getElementById('searchBtn');
+            const resultDiv = document.getElementById('searchResult');
+            if (!currentUserId) {
+                alert('⚠️ Не удалось авторизоваться. Закрой и открой приложение заново.');
+                return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Ищу вакансии...';
+            resultDiv.innerHTML = '';
+            try {
+                const response = await fetch(BOT_API_URL + '/miniapp/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
+                renderSearchResults(data.vacancies || []);
+                await loadUserData();
+            } catch(e) {
+                resultDiv.innerHTML = '<div class="result-card" style="border-color: #f5576c;"><div class="result-company" style="color: #f5576c;">❌ Ошибка</div><div class="result-title">' + escapeHtml(e.message) + '</div></div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔍 Найти вакансии (1 ⭐)';
+            }
+        }
+
+        function renderSearchResults(vacancies) {
+            const resultDiv = document.getElementById('searchResult');
+            if (!vacancies || vacancies.length === 0) {
+                resultDiv.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div>Не удалось найти вакансии. Загрузите резюме через бота.</div></div>';
+                return;
+            }
+            let html = '<div class="result-section-title">Найдено вакансий: ' + vacancies.length + '</div>';
+            vacancies.forEach(v => {
+                const scoreClass = v.match_score >= 70 ? '' : 'low';
+                html += '<div class="vacancy-card">' +
+                    '<div class="vacancy-header">' +
+                    '<div class="vacancy-title">' + escapeHtml(v.title) + '</div>' +
+                    '<span class="vacancy-score ' + scoreClass + '">' + v.match_score + '%</span>' +
+                    '</div>' +
+                    '<div class="vacancy-company">🏢 ' + escapeHtml(v.company) + '</div>';
+                if (v.salary) {
+                    html += '<div class="vacancy-salary">' + escapeHtml(v.salary) + '</div>';
+                }
+                html += '<div class="vacancy-reason">' + escapeHtml(v.match_reason) + '</div>';
+                if (v.url) {
+                    html += '<a href="' + escapeHtml(v.url) + '" target="_blank" class="link-item" style="margin-top:12px;">🔗 Открыть вакансию на hh.ru</a>';
+                }
+                html += '</div>';
+            });
+            resultDiv.innerHTML = html;
+        }
+
+        // === ПОИСК ЛПР ===
+        async function runFindLPR() {
+            const company = document.getElementById('lprCompany').value.trim();
+            const position = document.getElementById('lprPosition').value.trim();
+            const btn = document.getElementById('lprBtn');
+            const resultDiv = document.getElementById('lprResult');
+            if (!company) {
+                alert('⚠️ Укажите название компании');
+                return;
+            }
+            if (!currentUserId) {
+                alert('⚠️ Не удалось авторизоваться.');
+                return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Ищу контакты...';
+            resultDiv.innerHTML = '';
+            try {
+                const response = await fetch(BOT_API_URL + '/miniapp/find-lpr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, company: company, position: position })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
+                renderLPRResult(data);
+                await loadUserData();
+            } catch(e) {
+                resultDiv.innerHTML = '<div class="result-card" style="border-color: #f5576c;"><div class="result-company" style="color: #f5576c;">❌ Ошибка</div><div class="result-title">' + escapeHtml(e.message) + '</div></div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🕵️ Найти контакты (1 ⭐)';
+            }
+        }
+
+        function renderLPRResult(data) {
+            const resultDiv = document.getElementById('lprResult');
+            let html = '<div class="result-card">' +
+                '<div class="result-company">🏢 ' + escapeHtml(data.company) + '</div>' +
+                (data.position ? '<div class="result-title">💼 ' + escapeHtml(data.position) + '</div>' : '') +
+                '</div>';
+            if (data.contacts && data.contacts.length > 0) {
+                html += '<div class="result-card"><div class="result-section-title">✅ Найденные контакты</div>';
+                data.contacts.forEach(c => {
+                    html += '<div class="result-contact">';
+                    if (c.name) html += '<strong>' + escapeHtml(c.name) + '</strong><br>';
+                    if (c.email) html += '📧 ' + escapeHtml(c.email) + '<br>';
+                    if (c.phone) html += '📱 ' + escapeHtml(c.phone) + '<br>';
+                    if (c.url) html += '<a href="' + escapeHtml(c.url) + '" target="_blank" style="color:#4facfe;">🔗 Профиль</a>';
+                    html += '</div>';
+                });
+                html += '</div>';
+            } else {
+                html += '<div class="result-card"><div class="result-section-title">ℹ️ Прямых контактов не найдено</div><div class="analysis-block">Попробуйте использовать ссылки ниже для ручного поиска:</div></div>';
+            }
+            if (data.email_templates && data.email_templates.length > 0) {
+                html += '<div class="result-card"><div class="result-section-title">📧 Шаблоны корпоративных почт</div>';
+                data.email_templates.forEach(t => {
+                    html += '<div class="result-contact">' + escapeHtml(t) + '</div>';
+                });
+                html += '</div>';
+            }
+            if (data.links && data.links.length > 0) {
+                html += '<div class="result-card"><div class="result-section-title">🔗 Быстрые ссылки для поиска</div><div class="link-list">';
+                data.links.forEach(link => {
+                    html += '<a href="' + escapeHtml(link.url) + '" target="_blank" class="link-item">' + escapeHtml(link.text) + '</a>';
+                });
+                html += '</div></div>';
+            }
+            resultDiv.innerHTML = html;
+        }
+
+        // === ГЕНЕРАЦИЯ ПИТЧА ===
+        async function runPitch() {
+            const company = document.getElementById('pitchCompany').value.trim();
+            const title = document.getElementById('pitchTitle').value.trim();
+            const btn = document.getElementById('pitchBtn');
+            const resultDiv = document.getElementById('pitchResult');
+            if (!company) {
+                alert('⚠️ Укажите название компании');
+                return;
+            }
+            if (!currentUserId) {
+                alert('⚠️ Не удалось авторизоваться.');
+                return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Генерирую...';
+            resultDiv.innerHTML = '';
+            try {
+                const response = await fetch(BOT_API_URL + '/miniapp/pitch', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, company: company, title: title })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
+                resultDiv.innerHTML = '<div class="result-card">' +
+                    '<div class="result-company">🏢 ' + escapeHtml(data.company) + '</div>' +
+                    (data.title ? '<div class="result-title">💼 ' + escapeHtml(data.title) + '</div>' : '') +
+                    '<div class="result-section-title" style="margin-top:16px;">📝 Ваш питч</div>' +
+                    '<div class="result-pitch" id="generatedPitch">' + escapeHtml(data.pitch) + '</div>' +
+                    '<button class="copy-btn" onclick="copyPitch(this)">📋 Скопировать питч</button>' +
+                    '</div>';
+                await loadUserData();
+            } catch(e) {
+                resultDiv.innerHTML = '<div class="result-card" style="border-color: #f5576c;"><div class="result-company" style="color: #f5576c;">❌ Ошибка</div><div class="result-title">' + escapeHtml(e.message) + '</div></div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '📝 Сгенерировать питч (1 ⭐)';
+            }
+        }
+
+        // === АНАЛИЗ НАВЫКОВ ===
+        async function runSkillGap() {
+            const btn = document.getElementById('skillGapBtn');
+            const resultDiv = document.getElementById('skillGapResult');
+            if (!currentUserId) {
+                alert('⚠️ Не удалось авторизоваться.');
+                return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Анализирую...';
+            resultDiv.innerHTML = '';
+            try {
+                const response = await fetch(BOT_API_URL + '/miniapp/skill-gap', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
+                resultDiv.innerHTML = '<div class="result-card">' +
+                    '<div class="result-section-title">📊 Результат анализа навыков</div>' +
+                    '<div class="analysis-block">' + escapeHtml(data.analysis) + '</div>' +
+                    '</div>';
+                await loadUserData();
+            } catch(e) {
+                resultDiv.innerHTML = '<div class="result-card" style="border-color: #f5576c;"><div class="result-company" style="color: #f5576c;">❌ Ошибка</div><div class="result-title">' + escapeHtml(e.message) + '</div></div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '📊 Провести анализ (1 ⭐)';
+            }
+        }
+
+        // === HR: СООТВЕТСТВИЕ ===
+        async function runHRMatch() {
+            const resume = document.getElementById('hrMatchResume').value.trim();
+            const vacancy = document.getElementById('hrMatchVacancy').value.trim();
+            const btn = document.getElementById('hrMatchBtn');
+            const resultDiv = document.getElementById('hrMatchResult');
+            if (!resume || resume.length < 100) {
+                alert('⚠️ Текст резюме слишком короткий');
+                return;
+            }
+            if (!vacancy || vacancy.length < 100) {
+                alert('⚠️ Текст вакансии слишком короткий');
+                return;
+            }
+            if (!currentUserId) {
+                alert('⚠️ Не удалось авторизоваться.');
+                return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Анализирую...';
+            resultDiv.innerHTML = '';
+            try {
+                const response = await fetch(BOT_API_URL + '/miniapp/hr-match', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, resume_text: resume, vacancy_text: vacancy })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
+                const pct = data.overall_percent || 0;
+                resultDiv.innerHTML = '<div class="result-card" style="text-align:center;">' +
+                    '<div class="percent-circle" style="--pct:' + pct + '%;">' +
+                    '<div class="percent-inner">' + pct + '%</div>' +
+                    '</div>' +
+                    '<div class="result-section-title">Общий процент соответствия</div>' +
+                    '</div>' +
+                    '<div class="result-card">' +
+                    '<div class="result-section-title">📊 Детальный анализ</div>' +
+                    '<div class="analysis-block">' + escapeHtml(data.analysis) + '</div>' +
+                    '</div>';
+                await loadUserData();
+            } catch(e) {
+                resultDiv.innerHTML = '<div class="result-card" style="border-color: #f5576c;"><div class="result-company" style="color: #f5576c;">❌ Ошибка</div><div class="result-title">' + escapeHtml(e.message) + '</div></div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '📊 Проанализировать (2 ⭐)';
+            }
+        }
+
+        // === HR: СКОРИНГ ===
+        async function runHRScoring() {
+            const resume = document.getElementById('hrScoringResume').value.trim();
+            const btn = document.getElementById('hrScoringBtn');
+            const resultDiv = document.getElementById('hrScoringResult');
+            if (!resume || resume.length < 100) {
+                alert('⚠️ Текст резюме слишком короткий');
+                return;
+            }
+            if (!currentUserId) {
+                alert('⚠️ Не удалось авторизоваться.');
+                return;
+            }
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loader"></span> Оцениваю...';
+            resultDiv.innerHTML = '';
+            try {
+                const response = await fetch(BOT_API_URL + '/miniapp/hr-scoring', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUserId, resume_text: resume })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Ошибка сервера');
+                const rating = data.rating || 0;
+                resultDiv.innerHTML = '<div class="result-card" style="text-align:center;">' +
+                    '<div class="balance-num" style="font-size:48px;">' + rating + '/10</div>' +
+                    '<div class="balance-label">Общая оценка кандидата</div>' +
+                    '</div>' +
+                    '<div class="result-card">' +
+                    '<div class="result-section-title">🎯 Детальный скоринг</div>' +
+                    '<div class="analysis-block">' + escapeHtml(data.scoring) + '</div>' +
+                    '</div>';
+                await loadUserData();
+            } catch(e) {
+                resultDiv.innerHTML = '<div class="result-card" style="border-color: #f5576c;"><div class="result-company" style="color: #f5576c;">❌ Ошибка</div><div class="result-title">' + escapeHtml(e.message) + '</div></div>';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🎯 Оценить кандидата (1 ⭐)';
+            }
+        }
+
+        // === КОПИРОВАНИЕ ПИТЧА ===
+        function copyPitch(btn) {
+            const pitchEl = btn.parentElement.querySelector('.result-pitch, #generatedPitch, #pitchText');
             if (!pitchEl) return;
             navigator.clipboard.writeText(pitchEl.textContent).then(() => {
-                const btn = event.target;
+                const originalText = btn.textContent;
                 btn.textContent = '✅ Скопировано!';
-                setTimeout(() => { btn.textContent = '📋 Скопировать питч'; }, 2000);
+                setTimeout(() => { btn.textContent = originalText; }, 2000);
             }).catch(() => {
                 alert('Не удалось скопировать. Выдели текст вручную.');
             });
@@ -697,9 +1083,18 @@
             if (tg && tg.HapticFeedback) {
                 try { tg.HapticFeedback.selectionChanged(); } catch(e) {}
             }
-            // Загружаем данные при переходе на экран баланса или трекера
             if ((screenId === 'balance' || screenId === 'tracker') && currentUserId) {
                 loadUserData();
+            }
+            // Обновляем системную кнопку назад
+            if (tg && tg.BackButton) {
+                try {
+                    if (screenId === 'home') {
+                        tg.BackButton.hide();
+                    } else {
+                        tg.BackButton.show();
+                    }
+                } catch(e) {}
             }
         }
 
@@ -745,17 +1140,6 @@
         }
 
         // === СИСТЕМНАЯ КНОПКА НАЗАД ===
-        function updateBackButton(screenId) {
-            if (!tg || !tg.BackButton) return;
-            try {
-                if (screenId === 'home') {
-                    tg.BackButton.hide();
-                } else {
-                    tg.BackButton.show();
-                }
-            } catch(e) {}
-        }
-
         if (tg && tg.onEvent) {
             try {
                 tg.onEvent('backButtonClicked', function() {
