@@ -38,14 +38,12 @@
         }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         .animate-in { animation: fadeInUp 0.6s ease forwards; opacity: 0; }
         .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; } .delay-4 { animation-delay: 0.4s; }
         .delay-5 { animation-delay: 0.5s; } .delay-6 { animation-delay: 0.6s; }
         .container { max-width: 480px; margin: 0 auto; padding: 20px; padding-bottom: 100px; }
-        /* ИСПРАВЛЕНО: убрана конфликтующая анимация, хедер теперь видим */
         .header { text-align: center; padding: 30px 0 20px; }
         .logo {
             width: 80px; height: 80px; margin: 0 auto 16px;
@@ -79,7 +77,6 @@
         }
         .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
         .mode-cards { display: grid; gap: 16px; margin: 24px 0; }
-        /* ИСПРАВЛЕНО: отступ справа, чтобы стрелка не наезжала на текст */
         .mode-card {
             position: relative; border-radius: var(--radius-card);
             padding: 24px; padding-right: 56px;
@@ -95,7 +92,7 @@
         .feature-tag { padding: 6px 12px; background: rgba(255,255,255,0.15); border-radius: 20px; font-size: 12px; font-weight: 500; }
         .mode-arrow { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 24px; opacity: 0.6; }
         .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+        .screen.active { display: block; }
         .back-button {
             display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px;
             background: var(--bg-card); backdrop-filter: blur(10px);
@@ -147,47 +144,30 @@
         .action-button.secondary { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .action-button:active { transform: scale(0.98); }
         .footer { text-align: center; padding: 30px 0; color: var(--text-secondary); font-size: 13px; }
-        .loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg-primary); display: flex; flex-direction: column;
-            align-items: center; justify-content: center; z-index: 1000; transition: opacity 0.5s ease;
-        }
-        .loading-screen.hidden { opacity: 0; pointer-events: none; }
-        .loading-logo {
-            width: 80px; height: 80px; background: var(--gradient-main); border-radius: 24px;
-            display: flex; align-items: center; justify-content: center; font-size: 40px;
-            animation: pulse 1.5s ease-in-out infinite; margin-bottom: 20px;
-        }
-        .loading-text { color: var(--text-secondary); font-size: 15px; }
         ::-webkit-scrollbar { width: 0; }
     </style>
 </head>
 <body>
     <div class="bg-animation"></div>
 
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-logo">🚀</div>
-        <div class="loading-text">Загружаем карьерного агента...</div>
-    </div>
-
     <div class="container">
         <!-- ГЛАВНЫЙ ЭКРАН -->
         <div class="screen active" id="screen-home">
-            <div class="header animate-in">
+            <div class="header">
                 <div class="logo">🚀</div>
                 <h1>Lemus Career Agent</h1>
                 <p class="subtitle">ИИ-карьерный агент для соискателей и рекрутеров</p>
                 <div class="user-greeting" id="userGreeting">👋 Добро пожаловать!</div>
             </div>
 
-            <div class="stats-row animate-in delay-1">
+            <div class="stats-row">
                 <div class="stat-card"><div class="stat-number">15+</div><div class="stat-label">Функций</div></div>
                 <div class="stat-card"><div class="stat-number">2</div><div class="stat-label">Режима</div></div>
                 <div class="stat-card"><div class="stat-number">24/7</div><div class="stat-label">Работа</div></div>
             </div>
 
             <div class="mode-cards">
-                <div class="mode-card seeker animate-in delay-2" onclick="showScreen('seeker')">
+                <div class="mode-card seeker" onclick="showScreen('seeker')">
                     <div class="mode-icon">💼</div>
                     <div class="mode-title">Я ищу работу</div>
                     <div class="mode-description">Разбор вакансий, поиск контактов рекрутеров, генерация питчей и сопроводительных писем</div>
@@ -200,7 +180,7 @@
                     <div class="mode-arrow">→</div>
                 </div>
 
-                <div class="mode-card recruiter animate-in delay-3" onclick="showScreen('recruiter')">
+                <div class="mode-card recruiter" onclick="showScreen('recruiter')">
                     <div class="mode-icon">🏢</div>
                     <div class="mode-title">Я нанимаю</div>
                     <div class="mode-description">Оценка кандидатов, тестовые задания, генерация описаний вакансий и шаблонов</div>
@@ -214,18 +194,18 @@
                 </div>
             </div>
 
-            <div class="premium-banner animate-in delay-4">
+            <div class="premium-banner">
                 <div class="premium-title">🎓 Премиум возможности</div>
                 <div class="premium-text">3 курса по трудоустройству, 10 шаблонов писем, аналитика откликов и персональный план поиска работы</div>
                 <div class="premium-button" onclick="openBot()">Узнать больше</div>
             </div>
 
-            <div class="action-buttons animate-in delay-5">
+            <div class="action-buttons">
                 <div class="action-button primary" onclick="openBot()">🚀 Открыть бота</div>
                 <div class="action-button secondary" onclick="shareBot()">📤 Поделиться ботом</div>
             </div>
 
-            <div class="footer animate-in delay-6">Сделано с ❤️ для поиска работы мечты</div>
+            <div class="footer">Сделано с ❤️ для поиска работы мечты</div>
         </div>
 
         <!-- ЭКРАН СОИСКАТЕЛЯ -->
@@ -266,52 +246,72 @@
     </div>
 
     <script>
-        const tg = window.Telegram?.WebApp;
+        var tg = window.Telegram && window.Telegram.WebApp;
         if (tg) {
-            tg.ready();
-            tg.expand();
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                document.getElementById('userGreeting').textContent = `👋 Привет, ${user.first_name || 'друг'}!`;
-            }
-            tg.setHeaderColor('#0f0f1a');
-            tg.setBackgroundColor('#0f0f1a');
+            try {
+                tg.ready();
+                tg.expand();
+                var user = tg.initDataUnsafe && tg.initDataUnsafe.user;
+                if (user && user.first_name) {
+                    document.getElementById('userGreeting').textContent = '👋 Привет, ' + user.first_name + '!';
+                }
+                try { tg.setHeaderColor('#0f0f1a'); } catch(e) {}
+                try { tg.setBackgroundColor('#0f0f1a'); } catch(e) {}
+            } catch(e) { console.log('TG init error:', e); }
         }
 
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loadingScreen').classList.add('hidden');
-            }, 800);
-        });
-
         function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            const target = document.getElementById(`screen-${screenId}`);
+            var screens = document.querySelectorAll('.screen');
+            for (var i = 0; i < screens.length; i++) {
+                screens[i].classList.remove('active');
+            }
+            var target = document.getElementById('screen-' + screenId);
             if (target) target.classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            if (tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+            if (tg && tg.HapticFeedback) {
+                try { tg.HapticFeedback.selectionChanged(); } catch(e) {}
+            }
         }
 
         function openBot() {
-            if (tg) {
-                tg.openTelegramLink('https://t.me/LemusCareer_Bot');
+            if (tg && tg.openTelegramLink) {
+                try {
+                    tg.openTelegramLink('https://t.me/LemusCareer_Bot');
+                } catch(e) {
+                    window.open('https://t.me/LemusCareer_Bot', '_blank');
+                }
             } else {
                 window.open('https://t.me/LemusCareer_Bot', '_blank');
             }
-            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+            if (tg && tg.HapticFeedback) {
+                try { tg.HapticFeedback.impactOccurred('medium'); } catch(e) {}
+            }
         }
 
         function shareBot() {
-            const shareText = '🚀 Нашёл крутой ИИ-карьерный агент! Помогает искать работу и нанимать. Попробуй: ';
-            const botLink = 'https://t.me/LemusCareer_Bot';
-            if (tg) {
-                tg.switchInlineQuery(shareText + botLink, ['users', 'groups']);
-            } else if (navigator.share) {
-                navigator.share({ title: 'Lemus Career Agent', text: shareText, url: botLink });
-            } else {
-                navigator.clipboard.writeText(botLink).then(() => alert('Ссылка скопирована!'));
+            var shareText = '🚀 Нашёл крутой ИИ-карьерный агент! Помогает искать работу и нанимать. Попробуй: ';
+            var botLink = 'https://t.me/LemusCareer_Bot';
+            if (tg && tg.switchInlineQuery) {
+                try {
+                    tg.switchInlineQuery(shareText + botLink, ['users', 'groups']);
+                    return;
+                } catch(e) {}
             }
-            if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+            if (navigator.share) {
+                try {
+                    navigator.share({ title: 'Lemus Career Agent', text: shareText, url: botLink });
+                    return;
+                } catch(e) {}
+            }
+            try {
+                navigator.clipboard.writeText(botLink);
+                alert('Ссылка скопирована!');
+            } catch(e) {
+                alert('Ссылка: ' + botLink);
+            }
+            if (tg && tg.HapticFeedback) {
+                try { tg.HapticFeedback.impactOccurred('light'); } catch(e) {}
+            }
         }
     </script>
 </body>
