@@ -45,7 +45,8 @@
         .delay-3 { animation-delay: 0.3s; } .delay-4 { animation-delay: 0.4s; }
         .delay-5 { animation-delay: 0.5s; } .delay-6 { animation-delay: 0.6s; }
         .container { max-width: 480px; margin: 0 auto; padding: 20px; padding-bottom: 100px; }
-        .header { text-align: center; padding: 30px 0 20px; animation: fadeInUp 0.6s ease; }
+        /* ИСПРАВЛЕНО: убрана конфликтующая анимация, хедер теперь видим */
+        .header { text-align: center; padding: 30px 0 20px; }
         .logo {
             width: 80px; height: 80px; margin: 0 auto 16px;
             background: var(--gradient-main); border-radius: 24px;
@@ -78,8 +79,10 @@
         }
         .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
         .mode-cards { display: grid; gap: 16px; margin: 24px 0; }
+        /* ИСПРАВЛЕНО: отступ справа, чтобы стрелка не наезжала на текст */
         .mode-card {
-            position: relative; border-radius: var(--radius-card); padding: 24px;
+            position: relative; border-radius: var(--radius-card);
+            padding: 24px; padding-right: 56px;
             cursor: pointer; overflow: hidden; color: #fff;
         }
         .mode-card.seeker { background: var(--gradient-seeker); }
@@ -90,7 +93,7 @@
         .mode-description { font-size: 14px; opacity: 0.9; line-height: 1.5; margin-bottom: 16px; }
         .mode-features { display: flex; flex-wrap: wrap; gap: 8px; }
         .feature-tag { padding: 6px 12px; background: rgba(255,255,255,0.15); border-radius: 20px; font-size: 12px; font-weight: 500; }
-        .mode-arrow { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); font-size: 24px; opacity: 0.6; }
+        .mode-arrow { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 24px; opacity: 0.6; }
         .screen { display: none; }
         .screen.active { display: block; animation: fadeIn 0.3s ease; }
         .back-button {
