@@ -18,10 +18,9 @@
             --bg-card: rgba(255, 255, 255, 0.05);
             --text-primary: #ffffff;
             --text-secondary: #a0a0b0;
+            --accent-blue: #4facfe;
             --gradient-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --radius-card: 20px;
-            --radius-button: 16px;
+            --radius-card: 16px;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -30,301 +29,476 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-        .container { max-width: 480px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; padding: 30px 0 20px; }
-        .logo { width: 80px; height: 80px; margin: 0 auto 16px; background: var(--gradient-main); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 10px 40px rgba(102,126,234,0.4); }
-        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
-        .user-greeting { display: inline-block; margin-top: 12px; padding: 8px 20px; background: var(--bg-card); border-radius: 30px; font-size: 14px; color: var(--text-secondary); }
+        .container { max-width: 480px; margin: 0 auto; padding: 20px; padding-bottom: 40px; }
         
-        /* Статус загрузки */
-        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 16px; }
-        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+        /* Header */
+        .header { text-align: center; margin-bottom: 30px; }
+        .logo { width: 70px; height: 70px; margin: 0 auto 12px; background: var(--gradient-main); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 34px; box-shadow: 0 4px 20px rgba(102,126,234,0.3); }
+        h1 { font-size: 24px; font-weight: 700; }
+        .user-info { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
+
+        /* Screens */
+        .screen { display: none; animation: fadeInUp 0.3s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Role Selection Buttons (Main Screen) */
+        .role-buttons { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
+        .role-btn {
+            display: flex; align-items: center; gap: 16px;
+            padding: 24px; border-radius: var(--radius-card);
+            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.2s; text-align: left;
+        }
+        .role-btn:active { transform: scale(0.98); background: rgba(255,255,255,0.1); }
+        .role-icon { font-size: 36px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 14px; flex-shrink: 0; }
+        .role-text h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .role-text p { font-size: 13px; color: var(--text-secondary); line-height: 1.3; }
+
+        /* Function Grid (Sub-screens) */
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 15px; }
+        .menu-item {
+            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card);
+            padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; cursor: pointer; transition: transform 0.2s, background 0.2s; min-height: 100px;
+        }
+        .menu-item:active { transform: scale(0.96); background: rgba(255,255,255,0.1); }
+        .menu-icon { font-size: 28px; margin-bottom: 8px; }
+        .menu-text { font-size: 13px; font-weight: 500; line-height: 1.2; color: #ddd; }
+
+        /* Back Button */
+        .btn-back { 
+            background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; 
+            padding: 10px 18px; border-radius: 10px; cursor: pointer; margin-bottom: 15px; display: inline-block; font-size: 14px;
+        }
+        .btn-back:active { background: rgba(255,255,255,0.1); }
+
+        /* Loader Overlay */
+        .overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85);
+            z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px;
+        }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .status-text { font-size: 14px; color: #ddd; text-align: center; max-width: 80%; }
+
+        /* Feature Detail Area */
+        .feature-detail { display: none; margin-top: 15px; }
+        .card-result { background: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--accent-blue); word-break: break-word; white-space: pre-wrap; }
         
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeInUp 0.35s ease; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .feature-grid { display: grid; gap: 12px; margin-top: 20px; }
-        .feature-card {
-            display: flex; align-items: center; gap: 16px; padding: 18px;
-            background: var(--bg-card); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); cursor: pointer; transition: all 0.2s;
+        input[type=text], textarea {
+            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; resize: vertical;
         }
-        .feature-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
-        .feature-card.highlight {
-            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
-            border: 1px solid rgba(102,126,234,0.4);
+        button.primary { 
+            width: 100%; padding: 14px; background: var(--gradient-main); color: white; 
+            border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: opacity 0.2s;
         }
-        .feature-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; background: rgba(255,255,255,0.1); }
-        .feature-info { flex: 1; }
-        .feature-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-        .feature-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+        button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
         
-        .action-button {
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            padding: 16px 24px; border-radius: var(--radius-button);
-            font-size: 16px; font-weight: 600; cursor: pointer; color: white; border: none; width: 100%;
-            background: var(--gradient-main); margin-top: 20px; transition: opacity 0.2s;
-        }
-        .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
-        .back-button {
-            display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px;
-            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-button);
-            color: var(--text-primary); font-size: 15px; cursor: pointer; margin-bottom: 20px;
-        }
-        
-        /* Результаты */
-        .result-card { padding: 20px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 16px; }
-        .vacancy-card { padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; }
-        .vacancy-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-        .vacancy-company { font-size: 14px; color: var(--text-secondary); }
-        .link-item { display: block; padding: 12px 16px; background: rgba(79,172,254,0.1); border-radius: 12px; color: #4facfe; text-decoration: none; font-size: 14px; margin-top: 8px; }
-        
-        .error-msg { color: #ff6b6b; font-size: 14px; margin-top: 10px; text-align: center; }
-        .success-msg { color: #51cf66; font-size: 14px; margin-top: 10px; text-align: center; }
-        
-        textarea.input-field {
-            width: 100%; height: 150px; background: var(--bg-card); 
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; 
-            padding: 16px; color: white; resize: none; font-size: 14px;
-        }
-        textarea.input-field:focus { outline: none; border-color: #667eea; }
+        .error-msg { color: #ff6b6b; font-size: 13px; margin-top: 10px; text-align: center; }
     </style>
 </head>
 <body>
-    <div class="loading-overlay" id="loader">
-        <div class="spinner"></div>
-        <div style="font-size: 14px;">Загрузка...</div>
+
+<div class="overlay" id="loaderOverlay">
+    <div class="spinner"></div>
+    <div class="status-text" id="loaderStatus">Подключение...</div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <div class="logo">🚀</div>
+        <h1>Lemus Career</h1>
+        <div class="user-info" id="userNameDisplay">Загрузка профиля...</div>
     </div>
 
-    <div class="container">
-        <!-- ГЛАВНЫЙ ЭКРАН -->
-        <div class="screen active" id="screen-home">
-            <div class="header">
-                <div class="logo">🚀</div>
-                <h1>Lemus Career</h1>
-                <p style="color: var(--text-secondary);">ИИ-помощник для поиска работы</p>
-                <div class="user-greeting" id="userGreeting">👋 Привет!</div>
-            </div>
-
-            <div class="feature-grid">
-                <!-- 🔥 ГЛАВНАЯ ФУНКЦИЯ СВЕРХУ -->
-                <div class="feature-card highlight" onclick="runSearch()">
-                    <div class="feature-icon">🔍</div>
-                    <div class="feature-info">
-                        <div class="feature-name">Поиск вакансий</div>
-                        <div class="feature-desc">Подбор по резюме и региону</div>
-                    </div>
-                </div>
-                
-                <div class="feature-card" onclick="showScreen('analyze')">
-                    <div class="feature-icon">🔗</div>
-                    <div class="feature-info">
-                        <div class="feature-name">Разобрать вакансию</div>
-                        <div class="feature-desc">Контакты ЛПР и питч</div>
-                    </div>
-                </div>
-
-                <div class="feature-card" onclick="openBot()">
-                    <div class="feature-icon">💬</div>
-                    <div class="feature-info">
-                        <div class="feature-name">Открыть бота</div>
-                        <div class="feature-desc">Все функции в чате</div>
-                    </div>
+    <!-- ЭКРАН 1: Выбор роли -->
+    <div class="screen active" id="screen-role-select">
+        <div class="role-buttons">
+            <div class="role-btn" onclick="showRoleMenu('seeker')">
+                <div class="role-icon">💼</div>
+                <div class="role-text">
+                    <h3>Ищу работу</h3>
+                    <p>Поиск вакансий, разбор офферов, подготовка к собеседованию</p>
                 </div>
             </div>
-            
-            <div id="homeResult"></div>
-        </div>
-
-        <!-- ЭКРАН АНАЛИЗА ВАКАНСИИ -->
-        <div class="screen" id="screen-analyze">
-            <div class="back-button" onclick="showScreen('home')">← Назад</div>
-            <div class="screen-title" style="font-size: 24px; font-weight: bold; margin-bottom: 16px;">🔗 Разбор вакансии</div>
-            <textarea class="input-field" id="vacancyInput" placeholder="Вставь текст вакансии..."></textarea>
-            <button class="action-button" onclick="runAnalyze()" id="btnAnalyze">🔍 Разобрать (2 ⭐)</button>
-            <div id="analyzeResult"></div>
+            <div class="role-btn" onclick="showRoleMenu('recruiter')">
+                <div class="role-icon">🏢</div>
+                <div class="role-text">
+                    <h3>Нанимаю сотрудников</h3>
+                    <p>Скоринг кандидатов, генерация вопросов, описание вакансий</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script>
-        const BOT_API_URL = "https://lemus-career-bot.onrender.com"; 
-        const tg = window.Telegram && window.Telegram.WebApp;
+    <!-- ЭКРАН 2: Меню соискателя -->
+    <div class="screen" id="screen-seeker">
+        <button class="btn-back" onclick="goHome()">← Назад</button>
+        <h2 style="margin-bottom:15px;">💼 Инструменты соискателя</h2>
+        <div class="grid-menu">
+            <div class="menu-item" onclick="openFeature('search')"><span class="menu-icon">🔍</span><span class="menu-text">Поиск вакансий</span></div>
+            <div class="menu-item" onclick="openFeature('analyze')"><span class="menu-icon">🔗</span><span class="menu-text">Разобрать вакансию</span></div>
+            <div class="menu-item" onclick="openFeature('lpr')"><span class="menu-icon">🕵️</span><span class="menu-text">Найти ЛПР</span></div>
+            <div class="menu-item" onclick="openFeature('pitch')"><span class="menu-icon">📝</span><span class="menu-text">Короткий питч</span></div>
+            <div class="menu-item" onclick="alert('Для работы с резюме используйте бота в чате')"><span class="menu-icon">📄</span><span class="menu-text">Моё резюме</span></div>
+            <div class="menu-item" onclick="alert('Тренажер доступен через бота')"><span class="menu-icon">🎤</span><span class="menu-text">Собеседование</span></div>
+            <div class="menu-item" onclick="alert('Трекер доступен через бота')"><span class="menu-icon">📊</span><span class="menu-text">Трекер</span></div>
+            <div class="menu-item" onclick="alert('Премиум функции доступны через бота')"><span class="menu-icon">🎓</span><span class="menu-text">Премиум</span></div>
+        </div>
+        <div class="feature-detail" id="detail-seeker"></div>
+    </div>
+
+    <!-- ЭКРАН 3: Меню рекрутера -->
+    <div class="screen" id="screen-recruiter">
+        <button class="btn-back" onclick="goHome()">← Назад</button>
+        <h2 style="margin-bottom:15px;">🏢 Инструменты рекрутера</h2>
+        <div class="grid-menu">
+            <div class="menu-item" onclick="openFeature('hr_match')"><span class="menu-icon">📊</span><span class="menu-text">Соответствие</span></div>
+            <div class="menu-item" onclick="openFeature('hr_scoring')"><span class="menu-icon">🎯</span><span class="menu-text">Скоринг кандидата</span></div>
+            <div class="menu-item" onclick="alert('Генерация вопросов доступна через бота')"><span class="menu-icon">❓</span><span class="menu-text">Вопросы интервью</span></div>
+            <div class="menu-item" onclick="alert('Тестовые задания доступны через бота')"><span class="menu-icon">📝</span><span class="menu-text">Тестовое задание</span></div>
+            <div class="menu-item" onclick="alert('Описание вакансии доступно через бота')"><span class="menu-icon">📋</span><span class="menu-text">Описание вакансии</span></div>
+            <div class="menu-item" onclick="alert('Шаблон отказа доступен через бота')"><span class="menu-icon">✉️</span><span class="menu-text">Вежливый отказ</span></div>
+            <div class="menu-item" onclick="alert('Шаблон оффера доступен через бота')"><span class="menu-icon">📄</span><span class="menu-text">Шаблон оффера</span></div>
+            <div class="menu-item" onclick="alert('Оценка зарплаты доступна через бота')"><span class="menu-icon">💰</span><span class="menu-text">Оценка зарплаты</span></div>
+        </div>
+        <div class="feature-detail" id="detail-recruiter"></div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://lemus-career-bot.onrender.com";
+    let userId = null;
+    let currentRole = 'seeker'; // seeker | recruiter
+    let isAuthenticating = false;
+
+    // 1. Инициализация Telegram WebApp
+    if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
         
-        // Хранилище текущего пользователя
-        let currentUserId = null;
-
-        // === ИНИЦИАЛИЗАЦИЯ ===
-        if (tg) {
-            try {
-                tg.ready();
-                tg.expand();
-                const user = tg.initDataUnsafe?.user;
-                if (user) document.getElementById('userGreeting').textContent = `👋 Привет, ${user.first_name}!`;
-            } catch(e) { console.error("TG init error", e); }
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('userNameDisplay').textContent = `${user.first_name} ${user.last_name || ''}`;
+        } else {
+            document.getElementById('userNameDisplay').textContent = "Открой через Telegram!";
         }
+    }
 
-        function showLoader(show) {
-            document.getElementById('loader').style.display = show ? 'flex' : 'none';
-        }
-
-        function showError(containerId, msg) {
-            const el = document.getElementById(containerId);
-            if(el) el.innerHTML = `<div class="error-msg">❌ ${msg}</div>`;
-        }
+    // 2. Умный Fetch с обработкой ошибок сети и таймаутов
+    async function safeFetch(url, options = {}) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // Таймаут 15 секунд
         
-        function showSuccess(containerId, msg) {
-             const el = document.getElementById(containerId);
-             if(el) el.innerHTML = `<div class="success-msg">✅ ${msg}</div>`;
-        }
-
-        // === АВТОРИЗАЦИЯ (ЖЁСТКАЯ ПРОВЕРКА С ОТВЕТОМ СЕРВЕРА) ===
-        async function authenticate() {
-            // Если мы уже авторизованы в этой сессии — пропускаем запрос
-            if (currentUserId) return true;
-
-            if (!tg || !tg.initData) {
-                console.warn("No Telegram initData available");
-                return false;
-            }
-            
-            showLoader(true);
-            try {
-                const res = await fetch(`${BOT_API_URL}/miniapp/verify`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ initData: tg.initData })
-                });
-                
-                // Читаем тело ответа независимо от статуса
-                const data = await res.json();
-                
-                if (res.ok && data.ok && data.user_id) {
-                    currentUserId = data.user_id;
-                    console.log("Auth success:", currentUserId);
-                    return true;
-                } else {
-                    console.error("Auth failed:", data);
-                    alert("Ошибка входа: " + (data.error || "Неизвестная ошибка"));
-                    return false;
-                }
-            } catch (e) {
-                console.error("Network error during auth:", e);
-                alert("Сеть недоступна. Проверьте интернет.");
-                return false;
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        // === ПОИСК ВАКАНСИЙ ===
-        async function runSearch() {
-            document.getElementById('homeResult').innerHTML = '';
-            
-            // 1. Авторизация
-            const isAuthed = await authenticate();
-            if (!isAuthed) return; // Прерываем, если вход не удался
-
-            showLoader(true);
-            try {
-                // 2. Запрос данных
-                const res = await fetch(`${BOT_API_URL}/miniapp/search`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: currentUserId })
-                });
-                
-                const data = await res.json();
-                
-                if (!res.ok) throw new Error(data.error || "Ошибка сервера");
-                
-                renderVacancies(data.vacancies || []);
-            } catch (e) {
-                showError('homeResult', e.message);
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        function renderVacancies(vacs) {
-            const container = document.getElementById('homeResult');
-            if (!vacs.length) {
-                container.innerHTML = '<div style="padding:20px;text-align:center;color:#aaa;">Нет вакансий. Загрузи резюме через бота.</div>';
-                return;
-            }
-            
-            let html = '<div style="margin-top:20px;font-weight:bold;margin-bottom:10px;">Найдено вакансий:</div>';
-            vacs.slice(0, 5).forEach(v => {
-                html += `
-                <div class="vacancy-card">
-                    <div class="vacancy-title">${v.title}</div>
-                    <div class="vacancy-company">${v.company} • ${v.salary || 'З/P не указана'}</div>
-                    <a href="${v.url}" target="_blank" class="link-item">🔗 Открыть на HH.ru</a>
-                </div>`;
+        try {
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
             });
-            container.innerHTML = html;
-        }
-
-        // === РАЗБОР ВАКАНСИИ ===
-        async function runAnalyze() {
-            const text = document.getElementById('vacancyInput').value.trim();
-            if (text.length < 50) {
-                alert("Текст слишком короткий!");
-                return;
+            
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             
-            // 1. Авторизация
-            const isAuthed = await authenticate();
-            if (!isAuthed) return;
-
-            const btn = document.getElementById('btnAnalyze');
-            btn.disabled = true;
-            btn.textContent = "Обработка...";
-            showLoader(true);
-            document.getElementById('analyzeResult').innerHTML = '';
-
-            try {
-                // 2. Запрос анализа
-                const res = await fetch(`${BOT_API_URL}/miniapp/analyze`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_id: currentUserId, vacancy_text: text })
-                });
-                
-                const data = await res.json();
-                
-                if (!res.ok) throw new Error(data.error || "Ошибка анализа");
-                
-                document.getElementById('analyzeResult').innerHTML = `
-                    <div class="result-card">
-                        <div style="font-weight:bold;margin-bottom:8px;">${data.company} — ${data.title}</div>
-                        <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-top:10px;">
-                            <strong>Питч:</strong><br>${data.pitch}
-                        </div>
-                        ${data.contacts && data.contacts.length > 0 ? `
-                        <div style="margin-top:10px;"><strong>Контакты:</strong><ul>
-                        ${data.contacts.map(c => `<li>${c.name}: ${c.email || c.phone || ''}</li>`).join('')}
-                        </ul></div>` : ''}
-                    </div>`;
-                    
-            } catch (e) {
-                showError('analyzeResult', e.message);
-            } finally {
-                showLoader(false);
-                btn.disabled = false;
-                btn.textContent = "🔍 Разобрать (2 ⭐)";
+            return await response.json();
+        } catch (err) {
+            clearTimeout(timeoutId);
+            if (err.name === 'AbortError') {
+                throw new Error("Превышено время ожидания ответа от сервера.");
             }
+            if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
+                throw new Error("Не удалось подключиться к серверу. Проверьте интернет.");
+            }
+            throw err;
+        }
+    }
+
+    // 3. Авторизация (вызывается один раз при первом действии)
+    async function ensureAuth() {
+        if (userId) return true;
+        if (isAuthenticating) {
+            while(isAuthenticating) await new Promise(r => setTimeout(r, 100));
+            return !!userId;
         }
 
-        function openBot() {
-            if (tg) tg.openTelegramLink('https://t.me/LemusCareer_Bot');
-        }
+        isAuthenticating = true;
+        showLoader("Авторизация...", true);
+        
+        try {
+            if (!window.Telegram || !window.Telegram.WebApp.initData) {
+                throw new Error("Нет данных Telegram");
+            }
 
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(`screen-${id}`).classList.add('active');
+            const data = await safeFetch(`${API_URL}/miniapp/verify`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ initData: window.Telegram.WebApp.initData })
+            });
+            
+            if (data.ok && data.user_id) {
+                userId = data.user_id;
+                return true;
+            } else {
+                throw new Error(data.error || "Ошибка авторизации");
+            }
+        } catch (e) {
+            console.error("Auth Error:", e);
+            alert("Ошибка входа:\n" + e.message);
+            return false;
+        } finally {
+            isAuthenticating = false;
+            showLoader("", false);
         }
-    </script>
+    }
+
+    // --- НАВИГАЦИЯ ПО ЭКРАНАМ ---
+    function goHome() {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-role-select').classList.add('active');
+        closeAllDetails();
+    }
+
+    function showRoleMenu(role) {
+        currentRole = role;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(`screen-${role}`).classList.add('active');
+        closeAllDetails();
+    }
+
+    function closeAllDetails() {
+        document.querySelectorAll('.feature-detail').forEach(d => d.style.display = 'none');
+        document.querySelectorAll('.grid-menu').forEach(g => g.style.display = 'grid');
+    }
+
+    function openFeature(featureId) {
+        // Скрываем сетку меню текущего роля
+        const menuEl = document.querySelector(`#screen-${currentRole} .grid-menu`);
+        const detailEl = document.getElementById(`detail-${currentRole}`);
+        
+        if(menuEl) menuEl.style.display = 'none';
+        if(detailEl) {
+            detailEl.style.display = 'block';
+            detailEl.innerHTML = ''; // Очищаем старое
+            
+            // Рендерим форму в зависимости от featureId
+            if (featureId === 'search') renderSearchForm(detailEl);
+            else if (featureId === 'analyze') renderAnalyzeForm(detailEl);
+            else if (featureId === 'lpr') renderLprForm(detailEl);
+            else if (featureId === 'pitch') renderPitchForm(detailEl);
+            else if (featureId === 'skillgap') runSkillGap(detailEl);
+            else if (featureId === 'hr_match') renderHrMatchForm(detailEl);
+            else if (featureId === 'hr_scoring') renderHrScoringForm(detailEl);
+        }
+    }
+
+    function backToGrid() {
+        const menuEl = document.querySelector(`#screen-${currentRole} .grid-menu`);
+        const detailEl = document.getElementById(`detail-${currentRole}`);
+        if(menuEl) menuEl.style.display = 'grid';
+        if(detailEl) { detailEl.style.display = 'none'; detailEl.innerHTML = ''; }
+    }
+
+    function showLoader(text, show) {
+        const overlay = document.getElementById('loaderOverlay');
+        const status = document.getElementById('loaderStatus');
+        if (show) {
+            status.textContent = text;
+            overlay.style.display = 'flex';
+        } else {
+            overlay.style.display = 'none';
+        }
+    }
+
+    // --- ФОРМЫ И ЛОГИКА ДЕЙСТВИЙ ---
+
+    function renderSearchForm(container) {
+        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
+        <h3 style="margin-bottom:15px;">🔍 Поиск вакансий</h3>
+        <p style="font-size:13px;color:#aaa;margin-bottom:15px;">Поиск по вашему активному резюме.</p>
+        <button class="primary" onclick="doSearch(this)">Найти вакансии (1 ⭐)</button>
+        <div id="searchResults" style="margin-top:15px;"></div>`;
+    }
+
+    async function doSearch(btn) {
+        btn.disabled = true; btn.innerText = "Поиск...";
+        if (!await ensureAuth()) { btn.disabled=false; btn.innerText="Найти вакансии (1 ⭐)"; return; }
+        
+        showLoader("Анализирую резюме и ищу...", true);
+        try {
+            const res = await safeFetch(`${API_URL}/miniapp/search`, {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ user_id: userId })
+            });
+            
+            const list = res.vacancies || [];
+            let html = "";
+            if(list.length === 0) html = "<p>Ничего не найдено. Загрузите резюме через бота.</p>";
+            else {
+                list.forEach(v => {
+                    html += `<div class="card-result">
+                        <strong>${v.title}</strong><br>
+                        <small>${v.company} • ${v.salary || 'З/П не указана'}</small><br>
+                        <a href="${v.url}" target="_blank" style="color:#4facfe; font-size:12px;">Открыть на HH.ru ↗</a>
+                    </div>`;
+                });
+            }
+            document.getElementById('searchResults').innerHTML = html;
+        } catch(e) { 
+            document.getElementById('searchResults').innerHTML = `<div class="error-msg">${e.message}</div>`;
+        }
+        finally { showLoader("", false); btn.disabled=false; btn.innerText="Найти вакансии (1 ⭐)"; }
+    }
+
+    function renderAnalyzeForm(container) {
+        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
+        <h3 style="margin-bottom:15px;">🔗 Разбор вакансии</h3>
+        <textarea id="vacText" placeholder="Вставьте текст вакансии сюда..." rows="6"></textarea>
+        <button class="primary" onclick="doAnalyze(this)">Разобрать (2 ⭐)</button>
+        <div id="analyzeRes" style="margin-top:15px;"></div>`;
+    }
+
+    async function doAnalyze(btn) {
+        const txt = document.getElementById('vacText').value.trim();
+        if(txt.length < 50) return alert("Слишком короткий текст");
+        
+        btn.disabled = true;
+        if (!await ensureAuth()) { btn.disabled=false; return; }
+        
+        showLoader("AI анализирует контакты...", true);
+        try {
+            const res = await safeFetch(`${API_URL}/miniapp/analyze`, {
+                method: 'POST', headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({ user_id: userId, vacancy_text: txt })
+            });
+            
+            document.getElementById('analyzeRes').innerHTML = `
+                <div class="card-result">
+                    <strong>${res.company} — ${res.title}</strong><br><br>
+                    <em>Питч:</em><br>"${res.pitch}"<br><br>
+                    ${res.contacts && res.contacts.length > 0 ? '<strong>Контакты:</strong>' + res.contacts.map(c=>`${c.name}: ${c.email||''}`).join('<br>') : 'Контакты не найдены'}
+                </div>`;
+        } catch(e) { 
+            document.getElementById('analyzeRes').innerHTML = `<div class="error-msg">${e.message}</div>`;
+        }
+        finally { showLoader("", false); btn.disabled=false; }
+    }
+
+    function renderLprForm(container) {
+        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
+        <h3 style="margin-bottom:15px;">🕵️ Найти ЛПР</h3>
+        <input type="text" id="lprComp" placeholder="Компания (например: Сбер)">
+        <input type="text" id="lprPos" placeholder="Должность (например: HR Director)">
+        <button class="primary" onclick="doFindLpr(this)">Искать контакты (1 ⭐)</button>
+        <div id="lprRes" style="margin-top:15px;"></div>`;
+    }
+
+    async function doFindLpr(btn) {
+        const comp = document.getElementById('lprComp').value;
+        const pos = document.getElementById('lprPos').value;
+        if(!comp) return alert("Укажите компанию");
+        
+        btn.disabled=true;
+        if (!await ensureAuth()) { btn.disabled=false; return; }
+        
+        showLoader("Поиск в открытых источниках...", true);
+        try {
+            const res = await safeFetch(`${API_URL}/miniapp/find-lpr`, {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ user_id: userId, company: comp, position: pos })
+            });
+            
+            let html = `<div class="card-result"><strong>Результаты по ${comp}</strong><br>`;
+            if(res.contacts && res.contacts.length > 0) {
+                res.contacts.forEach(c => html += `<br>👤 ${c.name}<br>📧 ${c.email || '-'}<br>📱 ${c.phone || '-'}`);
+            } else {
+                html += "Прямых контактов не найдено.<br>Рекомендуемые ссылки:<br>";
+                if(res.links) res.links.forEach(l => html += `<a href="${l.url}" target="_blank" style="display:block;color:#4facfe;margin-top:5px;">${l.text}</a>`);
+            }
+            html += "</div>";
+            document.getElementById('lprRes').innerHTML = html;
+        } catch(e) { document.getElementById('lprRes').innerHTML = `<div class="error-msg">${e.message}</div>`; }
+        finally { showLoader("",false); btn.disabled=false; }
+    }
+
+    function renderPitchForm(container) {
+        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
+        <h3 style="margin-bottom:15px;">📝 Короткий Питч</h3>
+        <input type="text" id="pitchComp" placeholder="Компания">
+        <input type="text" id="pitchTitle" placeholder="Должность">
+        <button class="primary" onclick="doPitch(this)">Сгенерировать (1 ⭐)</button>
+        <div id="pitchRes" style="margin-top:15px;"></div>`;
+    }
+
+    async function doPitch(btn) {
+        btn.disabled=true;
+        if (!await ensureAuth()) { btn.disabled=false; return; }
+        showLoader("Генерация текста...", true);
+        try {
+            const res = await safeFetch(`${API_URL}/miniapp/pitch`, {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ user_id: userId, company: document.getElementById('pitchComp').value, title: document.getElementById('pitchTitle').value })
+            });
+            document.getElementById('pitchRes').innerHTML = `<div class="card-result">${res.pitch}</div>`;
+        } catch(e){ document.getElementById('pitchRes').innerHTML = `<div class="error-msg">${e.message}</div>`; }
+        finally { showLoader("",false); btn.disabled=false; }
+    }
+
+    async function runSkillGap(container) {
+        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
+        <h3>Skill Gap Анализ</h3><p>Проверка...</p>`;
+        if (!await ensureAuth()) { container.innerHTML="<p>Ошибка входа</p>"; return; }
+        showLoader("Анализ навыков...", true);
+        try {
+            const res = await safeFetch(`${API_URL}/miniapp/skill-gap`, {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ user_id: userId })
+            });
+            container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button><div class="card-result">${res.analysis}</div>`;
+        } catch(e){ container.innerHTML=`<button class="btn-back" onclick="backToGrid()">← Назад</button><div class="error-msg">${e.message}</div>`; }
+        finally { showLoader("",false); }
+    }
+
+    // --- HR FORMS ---
+    function renderHrMatchForm(container) {
+        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
+        <h3>HR: Соответствие</h3>
+        <textarea id="hrResume" placeholder="Текст резюме кандидата" rows="5"></textarea>
+        <textarea id="hrVacancy" placeholder="Текст вакансии" rows="5"></textarea>
+        <button class="primary" onclick="doHrMatch(this)">Проверить (2 ⭐)</button>
+        <div id="hrMatchRes"></div>`;
+    }
+    async function doHrMatch(btn) {
+        btn.disabled=true;
+        if(!await ensureAuth()){btn.disabled=false;return;}
+        showLoader("Сравнение...",true);
+        try{
+            const res = await safeFetch(`${API_URL}/miniapp/hr-match`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrResume').value,vacancy_text:document.getElementById('hrVacancy').value})});
+            document.getElementById('hrMatchRes').innerHTML=`<div class="card-result">${res.analysis}</div>`;
+        }catch(e){document.getElementById('hrMatchRes').innerHTML=`<div class="error-msg">${e.message}</div>`;}finally{showLoader("",false);btn.disabled=false;}
+    }
+
+    function renderHrScoringForm(container) {
+        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
+        <h3>HR: Скоринг</h3>
+        <textarea id="hrScoreResume" placeholder="Текст резюме" rows="8"></textarea>
+        <button class="primary" onclick="doHrScore(this)">Оценить (1 ⭐)</button>
+        <div id="hrScoreRes"></div>`;
+    }
+    async function doHrScore(btn) {
+        btn.disabled=true;
+        if(!await ensureAuth()){btn.disabled=false;return;}
+        showLoader("Оценка...",true);
+        try{
+            const res = await safeFetch(`${API_URL}/miniapp/hr-scoring`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrScoreResume').value})});
+            document.getElementById('hrScoreRes').innerHTML=`<div class="card-result">${res.scoring}</div>`;
+        }catch(e){document.getElementById('hrScoreRes').innerHTML=`<div class="error-msg">${e.message}</div>`;}finally{showLoader("",false);btn.disabled=false;}
+    }
+
+</script>
 </body>
 </html>
