@@ -24,28 +24,36 @@
             --radius-button: 16px;
         }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
-        .bg-animation { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
-        .bg-animation::before { content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(circle at 20% 50%, rgba(102,126,234,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(118,75,162,0.15) 0%, transparent 50%), radial-gradient(circle at 40% 80%, rgba(240,147,251,0.1) 0%, transparent 50%); animation: rotate 30s linear infinite; }
-        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .orb { position: fixed; border-radius: 50%; filter: blur(90px); opacity: .30; z-index: -1; animation: float 18s ease-in-out infinite; pointer-events: none; }
+        .orb1 { width: 340px; height: 340px; background: #667eea; top: -90px; left: -110px; }
+        .orb2 { width: 300px; height: 300px; background: #f5576c; bottom: -70px; right: -90px; animation-delay: -6s; }
+        .orb3 { width: 220px; height: 220px; background: #00f2fe; top: 42%; right: -130px; animation-delay: -12s; }
+        @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-40px) scale(1.08); } 66% { transform: translate(-25px,30px) scale(.95); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes cardIn { from { opacity: 0; transform: translateY(18px) scale(.97); } to { opacity: 1; transform: none; } }
         @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes shine { to { background-position: 200% center; } }
+        @keyframes sweep { 0% { left: -60%; } 60%,100% { left: 130%; } }
+        @keyframes glowPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(56,239,125,0); } 50% { box-shadow: 0 0 16px 3px rgba(56,239,125,.35); } }
+        @keyframes rip { to { transform: scale(3); opacity: 0; } }
         .container { max-width: 480px; margin: 0 auto; padding: 20px; padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
         .header { text-align: center; padding: 24px 0 12px; }
-        .logo { width: 80px; height: 80px; margin: 0 auto 16px; background: var(--gradient-main); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 10px 40px rgba(102,126,234,0.4); animation: pulse 3s ease-in-out infinite; }
-        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #fff 0%, #a0a0ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo { width: 80px; height: 80px; margin: 0 auto 16px; background: var(--gradient-main); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 10px 40px rgba(102,126,234,0.4); animation: pulse 3s ease-in-out infinite; position: relative; }
+        .logo::before { content: ''; position: absolute; inset: -6px; border-radius: 28px; background: conic-gradient(from 0deg, #667eea, #00f2fe, #f093fb, #667eea); animation: spin 6s linear infinite; z-index: -1; filter: blur(7px); opacity: .85; }
+        .header h1 { font-size: 28px; font-weight: 800; margin-bottom: 8px; background: linear-gradient(90deg, #fff 0%, #a0a0ff 25%, #4facfe 50%, #a0a0ff 75%, #fff 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shine 5s linear infinite; }
         .header .subtitle { color: var(--text-secondary); font-size: 15px; line-height: 1.5; }
         .user-greeting { display: inline-block; margin-top: 12px; padding: 8px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); font-size: 14px; color: var(--text-secondary); }
         .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
-        .stat-card { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); padding: 16px 12px; text-align: center; cursor: pointer; }
-        .stat-card:active { transform: scale(0.95); }
+        .stat-card { background: var(--bg-card); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); padding: 16px 12px; text-align: center; cursor: pointer; position: relative; overflow: hidden; transition: transform .18s, border-color .18s; }
+        .stat-card:active { transform: scale(0.95); border-color: rgba(102,126,234,.5); }
         .stat-number { font-size: 24px; font-weight: 700; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
         .mode-cards { display: grid; gap: 16px; margin: 20px 0; }
-        .mode-card { position: relative; border-radius: var(--radius-card); padding: 24px; padding-right: 56px; cursor: pointer; overflow: hidden; color: #fff; }
+        .mode-card { position: relative; border-radius: var(--radius-card); padding: 24px; padding-right: 56px; cursor: pointer; overflow: hidden; color: #fff; transition: transform .18s, box-shadow .18s; }
         .mode-card.seeker { background: var(--gradient-seeker); }
         .mode-card.recruiter { background: var(--gradient-recruiter); }
-        .mode-card:active { transform: scale(0.98); }
+        .mode-card:active { transform: scale(0.98); box-shadow: 0 12px 40px rgba(0,0,0,.45); }
         .mode-icon { font-size: 48px; margin-bottom: 12px; }
         .mode-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
         .mode-description { font-size: 14px; opacity: 0.9; line-height: 1.5; margin-bottom: 16px; }
@@ -54,13 +62,26 @@
         .mode-arrow { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 24px; opacity: 0.6; }
         .screen { display: none; }
         .screen.active { display: block; animation: fadeInUp 0.35s ease; }
-        .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-button); color: var(--text-primary); font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 20px; }
-        .back-button:active { transform: scale(0.95); }
+        .screen.active .feature-card, .screen.active .mode-card, .screen.active .stat-card, .screen.active .tariff-card, .screen.active .switch-row { animation: cardIn .45s cubic-bezier(.2,.9,.3,1.15) both; }
+        .screen.active .feature-card:nth-child(1), .screen.active .stat-card:nth-child(1) { animation-delay: .04s; }
+        .screen.active .feature-card:nth-child(2), .screen.active .stat-card:nth-child(2) { animation-delay: .08s; }
+        .screen.active .feature-card:nth-child(3), .screen.active .stat-card:nth-child(3) { animation-delay: .12s; }
+        .screen.active .feature-card:nth-child(4) { animation-delay: .16s; }
+        .screen.active .feature-card:nth-child(5) { animation-delay: .20s; }
+        .screen.active .feature-card:nth-child(6) { animation-delay: .24s; }
+        .screen.active .feature-card:nth-child(7) { animation-delay: .28s; }
+        .screen.active .feature-card:nth-child(8) { animation-delay: .32s; }
+        .screen.active .feature-card:nth-child(9) { animation-delay: .36s; }
+        .screen.active .feature-card:nth-child(10) { animation-delay: .40s; }
+        .screen.active .feature-card:nth-child(11) { animation-delay: .44s; }
+        .screen.active .feature-card:nth-child(12) { animation-delay: .48s; }
+        .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-button); color: var(--text-primary); font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 20px; transition: transform .15s, background .15s; }
+        .back-button:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
         .screen-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
         .screen-subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 24px; line-height: 1.5; }
         .feature-grid { display: grid; gap: 12px; }
-        .feature-card { display: flex; align-items: center; gap: 16px; padding: 18px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); cursor: pointer; }
-        .feature-card:active { transform: scale(0.98); background: rgba(255,255,255,0.08); }
+        .feature-card { display: flex; align-items: center; gap: 16px; padding: 18px; background: var(--bg-card); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); cursor: pointer; position: relative; overflow: hidden; transition: transform .18s, border-color .18s, box-shadow .18s, background .18s; }
+        .feature-card:active { transform: scale(0.97); background: rgba(255,255,255,0.09); border-color: rgba(102,126,234,.45); box-shadow: 0 8px 30px rgba(102,126,234,.18); }
         .feature-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
         .feature-icon.purple { background: rgba(102,126,234,0.2); }
         .feature-icon.blue { background: rgba(79,172,254,0.2); }
@@ -75,89 +96,104 @@
         .feature-badge.premium { background: rgba(240,147,251,0.2); color: #f093fb; }
         .feature-badge.new { background: rgba(79,172,254,0.2); color: #4facfe; }
         .premium-banner { position: relative; background: var(--gradient-premium); border-radius: var(--radius-card); padding: 24px; margin: 24px 0; overflow: hidden; }
+        .premium-banner::before { content: ''; position: absolute; top: 0; left: -60%; width: 40%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent); animation: sweep 3.5s ease-in-out infinite; }
         .premium-banner::after { content: '✨'; position: absolute; right: 20px; top: 20px; font-size: 40px; opacity: 0.3; }
-        .premium-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
-        .premium-text { font-size: 14px; opacity: 0.9; line-height: 1.5; margin-bottom: 16px; }
-        .premium-button { display: inline-block; padding: 12px 24px; background: rgba(255,255,255,0.2); border-radius: var(--radius-button); font-size: 15px; font-weight: 600; cursor: pointer; }
+        .premium-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; position: relative; }
+        .premium-text { font-size: 14px; opacity: 0.9; line-height: 1.5; margin-bottom: 16px; position: relative; }
+        .premium-button { display: inline-block; padding: 12px 24px; background: rgba(255,255,255,0.2); border-radius: var(--radius-button); font-size: 15px; font-weight: 600; cursor: pointer; position: relative; transition: background .15s, transform .15s; }
+        .premium-button:active { transform: scale(0.95); background: rgba(255,255,255,0.3); }
         .action-buttons { display: grid; gap: 12px; margin-top: 24px; }
-        .action-button { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 24px; border-radius: var(--radius-button); font-size: 16px; font-weight: 600; cursor: pointer; color: white; border: none; width: 100%; }
+        .action-button { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 24px; border-radius: var(--radius-button); font-size: 16px; font-weight: 600; cursor: pointer; color: white; border: none; width: 100%; position: relative; overflow: hidden; transition: transform .15s, box-shadow .15s, opacity .15s; }
         .action-button.primary { background: var(--gradient-main); box-shadow: 0 8px 24px rgba(102,126,234,0.3); }
+        .action-button.primary:active { transform: scale(0.97); box-shadow: 0 4px 14px rgba(102,126,234,0.45); }
         .action-button.secondary { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .action-button.secondary:active { transform: scale(0.97); }
         .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
         .footer { text-align: center; color: var(--text-secondary); font-size: 13px; padding: 24px 0; }
         .footer a { color: #4facfe; text-decoration: none; }
-        .balance-big { text-align: center; padding: 40px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 24px; }
+        .balance-big { text-align: center; padding: 40px 20px; background: var(--bg-card); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 24px; }
         .balance-num { font-size: 64px; font-weight: 800; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .balance-label { font-size: 16px; color: var(--text-secondary); margin-top: 8px; }
         .premium-status { display: inline-block; margin-top: 12px; padding: 8px 20px; background: rgba(240,147,251,0.2); border-radius: 30px; font-size: 14px; color: #f093fb; font-weight: 600; }
-        .tracker-item { padding: 16px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; }
+        .tracker-item { padding: 16px; background: var(--bg-card); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; }
         .tracker-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
         .tracker-status { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
         .tracker-status.contact { background: rgba(17,153,142,0.2); color: #38ef7d; }
         .tracker-status.responded { background: rgba(79,172,254,0.2); color: #4facfe; }
         .tracker-status.other { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
-        .input-field { width: 100%; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-card); color: var(--text-primary); font-size: 15px; font-family: inherit; outline: none; margin-bottom: 16px; }
-        .input-field:focus { border-color: #667eea; }
+        .input-field { width: 100%; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-card); color: var(--text-primary); font-size: 15px; font-family: inherit; outline: none; margin-bottom: 16px; transition: border-color .2s, box-shadow .2s; }
+        .input-field:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,.15); }
         textarea.input-field { min-height: 140px; resize: vertical; }
-        .result-card { padding: 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 16px; }
+        .result-card { padding: 20px; background: var(--bg-card); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 16px; animation: cardIn .4s ease both; }
         .result-company { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
         .result-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
         .result-section-title { font-size: 13px; font-weight: 600; color: #4facfe; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         .result-pitch { padding: 16px; background: rgba(102,126,234,0.1); border-left: 3px solid #667eea; border-radius: 8px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
         .result-contact { padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
         .analysis-block { padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 12px; white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.6; }
-        .vacancy-card { padding: 16px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; }
+        .vacancy-card { padding: 16px; background: var(--bg-card); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; animation: cardIn .4s ease both; transition: transform .15s, border-color .15s; }
+        .vacancy-card:active { transform: scale(0.98); border-color: rgba(79,172,254,.4); }
         .vacancy-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
         .vacancy-score { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; background: rgba(17,153,142,0.2); color: #38ef7d; flex-shrink: 0; }
         .vacancy-score.mid { background: rgba(79,172,254,0.2); color: #4facfe; }
         .vacancy-score.low { background: rgba(255,154,63,0.2); color: #ff9a3f; }
+        .vacancy-score.hot { background: rgba(56,239,125,.25); color: #38ef7d; animation: glowPulse 2s ease-in-out infinite; }
         .vacancy-title { font-size: 16px; font-weight: 600; }
         .vacancy-company { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
         .vacancy-salary { font-size: 14px; color: #4facfe; margin-bottom: 6px; }
         .vacancy-reason { font-size: 12px; color: var(--text-secondary); font-style: italic; }
-        .link-item { display: block; padding: 12px 16px; background: rgba(79,172,254,0.1); border-radius: 12px; color: #4facfe; text-decoration: none; font-size: 14px; margin-top: 8px; }
-        .copy-btn { display: inline-block; padding: 8px 16px; margin-top: 8px; background: rgba(255,255,255,0.1); border-radius: 12px; font-size: 13px; cursor: pointer; border: none; color: var(--text-primary); }
+        .link-item { display: block; padding: 12px 16px; background: rgba(79,172,254,0.1); border-radius: 12px; color: #4facfe; text-decoration: none; font-size: 14px; margin-top: 8px; transition: background .15s; }
+        .link-item:active { background: rgba(79,172,254,0.25); }
+        .copy-btn { display: inline-block; padding: 8px 16px; margin-top: 8px; background: rgba(255,255,255,0.1); border-radius: 12px; font-size: 13px; cursor: pointer; border: none; color: var(--text-primary); transition: background .15s, transform .15s; }
+        .copy-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
         .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .error-box { padding: 16px; background: rgba(245,87,108,0.12); border: 1px solid rgba(245,87,108,0.4); border-radius: 12px; color: #ff8a94; font-size: 14px; margin-top: 12px; }
-        .info-box { padding: 12px 16px; background: rgba(79,172,254,0.08); border: 1px solid rgba(79,172,254,0.25); border-radius: 12px; color: #9ed2ff; font-size: 13px; margin-top: 12px; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px; }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+        .error-box { padding: 16px; background: rgba(245,87,108,0.12); border: 1px solid rgba(245,87,108,0.4); border-radius: 12px; color: #ff8a94; font-size: 14px; margin-top: 12px; animation: cardIn .35s ease both; }
+        .info-box { padding: 12px 16px; background: rgba(79,172,254,0.08); border: 1px solid rgba(79,172,254,0.25); border-radius: 12px; color: #9ed2ff; font-size: 13px; margin-top: 12px; animation: cardIn .35s ease both; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px; backdrop-filter: blur(4px); }
+        .spinner { width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.12); border-top-color: #fff; border-bottom-color: #667eea; border-radius: 50%; animation: spin .9s linear infinite; }
         .status-text { font-size: 14px; color: #ddd; text-align: center; max-width: 80%; }
-        .onboard-slide { text-align: center; padding: 30px 10px; }
-        .onboard-icon { font-size: 72px; margin-bottom: 24px; }
+        .onboard-slide { text-align: center; padding: 30px 10px; animation: fadeInUp .4s ease; }
+        .onboard-icon { font-size: 72px; margin-bottom: 24px; animation: pulse 2.5s ease-in-out infinite; }
         .onboard-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
         .onboard-text { font-size: 15px; color: var(--text-secondary); line-height: 1.6; max-width: 320px; margin: 0 auto; }
         .onboard-dots { display: flex; justify-content: center; gap: 8px; margin: 24px 0; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: all .3s; }
         .dot.active { background: #667eea; width: 24px; border-radius: 4px; }
-        .tariff-card { padding: 20px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-card); margin-bottom: 14px; }
+        .tariff-card { padding: 20px; background: var(--bg-card); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-card); margin-bottom: 14px; position: relative; overflow: hidden; transition: transform .15s, border-color .15s; }
+        .tariff-card:active { transform: scale(0.98); border-color: rgba(255,215,106,.5); }
         .tariff-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
         .tariff-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
-        .tariff-price { font-size: 22px; font-weight: 800; color: #ffd76a; margin-bottom: 14px; }
-        .switch-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; cursor: pointer; }
+        .tariff-price { font-size: 22px; font-weight: 800; color: #ffd76a; margin-bottom: 14px; text-shadow: 0 0 18px rgba(255,215,106,.35); }
+        .switch-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; cursor: pointer; transition: transform .15s; }
+        .switch-row:active { transform: scale(0.98); }
         .switch-label { font-size: 15px; font-weight: 600; }
         .switch-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-        .switch-state { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.1); color: var(--text-secondary); }
-        .switch-state.on { background: rgba(17,153,142,0.25); color: #38ef7d; }
-        .file-drop { border: 2px dashed rgba(255,255,255,0.2); border-radius: var(--radius-card); padding: 30px 20px; text-align: center; color: var(--text-secondary); font-size: 14px; cursor: pointer; margin-bottom: 16px; }
-        .file-drop:active { border-color: #667eea; }
-        .resume-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 10px; cursor: pointer; }
+        .switch-state { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.1); color: var(--text-secondary); transition: all .25s; }
+        .switch-state.on { background: rgba(17,153,142,0.25); color: #38ef7d; box-shadow: 0 0 12px rgba(56,239,125,.25); }
+        .file-drop { border: 2px dashed rgba(255,255,255,0.2); border-radius: var(--radius-card); padding: 30px 20px; text-align: center; color: var(--text-secondary); font-size: 14px; cursor: pointer; margin-bottom: 16px; transition: border-color .2s, background .2s; }
+        .file-drop:active { border-color: #667eea; background: rgba(102,126,234,.08); }
+        .resume-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 10px; cursor: pointer; transition: transform .15s, border-color .15s; }
+        .resume-item:active { transform: scale(0.98); }
         .resume-item.active { border-color: rgba(17,153,142,0.5); background: rgba(17,153,142,0.08); }
         .resume-name { font-size: 15px; font-weight: 600; }
         .resume-active { font-size: 12px; color: #38ef7d; font-weight: 600; }
+        .ripple { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.22); transform: scale(0); animation: rip .6s ease-out forwards; pointer-events: none; }
+        .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); background: rgba(20,20,35,.96); border: 1px solid rgba(102,126,234,.55); color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; opacity: 0; transition: .3s; z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,.55); pointer-events: none; max-width: 85%; text-align: center; }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         ::-webkit-scrollbar { width: 0; }
     </style>
 </head>
 <body>
-    <div class="bg-animation"></div>
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
     <div class="overlay" id="loaderOverlay">
         <div class="spinner"></div>
         <div class="status-text" id="loaderStatus">Подключение...</div>
     </div>
 
     <div class="container">
-        <!-- ОНБОРДИНГ -->
         <div class="screen" id="screen-onboard">
             <div class="onboard-slide">
                 <div class="onboard-icon" id="obIcon">🚀</div>
@@ -173,7 +209,6 @@
             </div>
         </div>
 
-        <!-- ГЛАВНЫЙ -->
         <div class="screen active" id="screen-home">
             <div class="header">
                 <div class="logo">🚀</div>
@@ -230,7 +265,6 @@
             <div class="footer">Сделано с ❤️ • Поддержка: <a href="mailto:a.lemus@ya.ru">a.lemus@ya.ru</a></div>
         </div>
 
-        <!-- БАЛАНС -->
         <div class="screen" id="screen-balance">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">💎 Мой баланс</div>
@@ -264,7 +298,6 @@
             </div>
         </div>
 
-        <!-- ТАРИФЫ -->
         <div class="screen" id="screen-tariffs">
             <div class="back-button" onclick="showScreen('balance')">← Назад</div>
             <div class="screen-title">💳 Тарифы</div>
@@ -284,7 +317,6 @@
             <div class="info-box">Альтернатива: оплата по СБП через бота (кнопка «💎 Оплата и Баланс»).</div>
         </div>
 
-        <!-- ИСТОРИЯ ПЛАТЕЖЕЙ -->
         <div class="screen" id="screen-payments">
             <div class="back-button" onclick="showScreen('balance')">← Назад</div>
             <div class="screen-title">🧾 История операций</div>
@@ -292,7 +324,6 @@
             <div id="paymentsList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Операций пока нет</div></div></div>
         </div>
 
-        <!-- ТРЕКЕР -->
         <div class="screen" id="screen-tracker">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">📌 Трекер откликов</div>
@@ -300,7 +331,6 @@
             <div id="trackerList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Загружаем...</div></div></div>
         </div>
 
-        <!-- СОИСКАТЕЛЬ -->
         <div class="screen" id="screen-seeker">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">💼 Я ищу работу</div>
@@ -358,10 +388,10 @@
                 </div>
                 <div class="feature-card" onclick="launchBot()">
                     <div class="feature-icon green">🚀</div>
-                    <div class="feature-info"><div class="feature-name">Запустить бота</div><div class="feature-desc">Открыть чат и прогреть сервер</div></div>
+                    <div class="feature-info"><div class="feature-name">Запустить бота</div><div class="feature-desc">Бот сам напишет тебе в чат — работает на iPhone</div></div>
                     <span class="feature-badge free">Чат</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="launchBot()">
                     <div class="feature-icon green">🎤</div>
                     <div class="feature-info"><div class="feature-name">Тренажёр собеседований</div><div class="feature-desc">Практика ответов с ИИ (в чате бота)</div></div>
                     <span class="feature-badge free">1 ⭐</span>
@@ -369,7 +399,6 @@
             </div>
         </div>
 
-        <!-- ЗАГРУЗКА РЕЗЮМЕ -->
         <div class="screen" id="screen-upload">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📥 Загрузить резюме</div>
@@ -379,7 +408,6 @@
             <div id="uploadResult"></div>
         </div>
 
-        <!-- МОИ РЕЗЮМЕ -->
         <div class="screen" id="screen-resumes">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📁 Мои резюме</div>
@@ -388,7 +416,6 @@
             <button class="action-button secondary" onclick="showScreen('upload')" style="margin-top:16px;">📥 Загрузить новое резюме</button>
         </div>
 
-        <!-- ПОИСК ВАКАНСИЙ -->
         <div class="screen" id="screen-search">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🔍 Поиск вакансий</div>
@@ -401,7 +428,6 @@
             <div id="searchResult" style="margin-top: 16px;"></div>
         </div>
 
-        <!-- РАЗБОР ВАКАНСИИ -->
         <div class="screen" id="screen-analyze">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🔗 Разбор вакансии</div>
@@ -411,7 +437,6 @@
             <div id="analyzeResult" style="margin-top: 24px;"></div>
         </div>
 
-        <!-- ЛПР -->
         <div class="screen" id="screen-lpr">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🕵️ Найти ЛПР</div>
@@ -422,7 +447,6 @@
             <div id="lprResult" style="margin-top: 24px;"></div>
         </div>
 
-        <!-- ПИТЧ -->
         <div class="screen" id="screen-pitch">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📝 Генерация питча</div>
@@ -433,7 +457,6 @@
             <div id="pitchResult" style="margin-top: 24px;"></div>
         </div>
 
-        <!-- SKILL GAP -->
         <div class="screen" id="screen-skillgap">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📊 Анализ навыков</div>
@@ -442,7 +465,6 @@
             <div id="skillGapResult" style="margin-top: 24px;"></div>
         </div>
 
-        <!-- 🆘 АНТИКРИЗИСНЫЙ ПАКЕТ -->
         <div class="screen" id="screen-crisis">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🆘 Антикризисный пакет</div>
@@ -461,7 +483,6 @@
             </div>
         </div>
 
-        <!-- РЕФЕРАЛКА -->
         <div class="screen" id="screen-referral">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🎁 Бонусы и друзья</div>
@@ -477,7 +498,6 @@
             </div>
         </div>
 
-        <!-- ПРЕМИУМ -->
         <div class="screen" id="screen-premium">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">🎓 Премиум-контент</div>
@@ -492,7 +512,6 @@
             <div id="premiumContent"></div>
         </div>
 
-        <!-- РЕКРУТЕР -->
         <div class="screen" id="screen-recruiter">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">🏢 Я нанимаю</div>
@@ -551,7 +570,6 @@
             </div>
         </div>
 
-        <!-- HR ЭКРАНЫ -->
         <div class="screen" id="screen-hr-match">
             <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
             <div class="screen-title">📊 Соответствие</div>
@@ -655,16 +673,94 @@
             } catch(e) {}
         }
 
-        // ---------- ПРОГРЕВ СЕРВЕРА И ЗАПУСК БОТА ----------
+        function toast(msg) {
+            let t = document.getElementById('toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'toast';
+                t.className = 'toast';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2400);
+        }
+        function countUp(el, target) {
+            if (!el) return;
+            const dur = 700;
+            const t0 = performance.now();
+            function step(now) {
+                const p = Math.min(1, (now - t0) / dur);
+                el.textContent = Math.round(target * p);
+                if (p < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+        document.addEventListener('click', function(e) {
+            const card = e.target.closest('.feature-card, .mode-card, .action-button, .stat-card, .tariff-card, .switch-row, .resume-item');
+            if (!card) return;
+            const r = card.getBoundingClientRect();
+            const s = document.createElement('span');
+            s.className = 'ripple';
+            const d = Math.max(r.width, r.height);
+            s.style.width = s.style.height = d + 'px';
+            s.style.left = (e.clientX - r.left - d / 2) + 'px';
+            s.style.top = (e.clientY - r.top - d / 2) + 'px';
+            card.appendChild(s);
+            setTimeout(() => s.remove(), 650);
+        }, true);
+
         async function wakeServer() {
             try {
                 await fetch(BOT_API_URL + '/?ping=' + Date.now(), { method: 'GET', cache: 'no-store' });
-            } catch (e) { /* сервер ещё прогревается — повторится автоматически */ }
+            } catch (e) {}
         }
 
-        function launchBot() {
+        // ГЛАВНАЯ ФУНКЦИЯ: бот сам пишет в чат — работает на iPhone
+        async function launchBot() {
+            toast('🚀 Бот пишет тебе в чат...');
+            
+            // 1) Прогреваем сервер
             wakeServer();
-            openBot();
+            
+            // 2) Если авторизованы — просим бота написать нам в чат через API
+            if (currentUserId) {
+                try {
+                    const res = await fetch(BOT_API_URL + '/miniapp/wake-bot', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                        body: JSON.stringify({ user_id: currentUserId })
+                    });
+                    if (res.ok) {
+                        toast('✅ Смотри сообщение от бота в чате!');
+                    } else {
+                        toast('⚠️ Не удалось разбудить бота');
+                    }
+                } catch (e) {
+                    toast('⚠️ Сервер не отвечает');
+                }
+            } else {
+                // Не авторизованы — пробуем авторизоваться и разбудить
+                if (await ensureAuth()) {
+                    try {
+                        await fetch(BOT_API_URL + '/miniapp/wake-bot', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+                            body: JSON.stringify({ user_id: currentUserId })
+                        });
+                        toast('✅ Смотри сообщение от бота в чате!');
+                    } catch (e) {}
+                }
+            }
+            
+            // 3) Параллельно пробуем открыть чат (на Android/Desktop сработает, на iOS — бонус)
+            setTimeout(() => {
+                try {
+                    if (tg && tg.openTelegramLink) {
+                        tg.openTelegramLink('https://t.me/LemusCareer_Bot');
+                    }
+                } catch (e) {}
+            }, 800);
         }
 
         const OB_SLIDES = [
@@ -713,14 +809,14 @@
         }
         async function ensureAuth() {
             if (currentUserId) return true;
-            if (!tg || !tg.initData) { alert('⚠️ Откройте приложение из Telegram.'); return false; }
+            if (!tg || !tg.initData) { toast('⚠️ Откройте приложение из Telegram.'); return false; }
             showLoader('Авторизация...', true);
             try {
                 const data = await api('/miniapp/verify', { initData: tg.initData });
                 if (data && data.user_id) { currentUserId = data.user_id; return true; }
                 throw new Error('Сервер не вернул user_id');
             } catch (e) {
-                alert('⚠️ Ошибка входа: ' + e.message);
+                toast('⚠️ Ошибка входа: ' + e.message);
                 return false;
             } finally { showLoader('', false); }
         }
@@ -728,10 +824,10 @@
             if (!currentUserId) return;
             try {
                 userData = await api('/miniapp/data?user_id=' + currentUserId);
-                document.getElementById('homeBalance').textContent = userData.balance;
-                document.getElementById('balanceNum').textContent = userData.balance;
+                countUp(document.getElementById('homeBalance'), userData.balance);
+                countUp(document.getElementById('balanceNum'), userData.balance);
                 document.getElementById('premiumStatus').style.display = userData.is_premium ? 'inline-block' : 'none';
-                document.getElementById('homeTracker').textContent = (userData.tracker || []).length;
+                countUp(document.getElementById('homeTracker'), (userData.tracker || []).length);
                 const ds = document.getElementById('digestState');
                 ds.textContent = userData.digest_active ? 'ВКЛ' : 'ВЫКЛ';
                 ds.className = 'switch-state' + (userData.digest_active ? ' on' : '');
@@ -772,16 +868,12 @@
         if (tg && tg.onEvent) {
             try { tg.onEvent('backButtonClicked', function() { showScreen('home'); }); } catch(e) {}
         }
-        function openBot() {
-            if (tg && tg.openTelegramLink) { try { tg.openTelegramLink('https://t.me/LemusCareer_Bot'); return; } catch(e) {} }
-            window.open('https://t.me/LemusCareer_Bot', '_blank');
-        }
         function shareBot() {
             const shareText = '🚀 Нашёл крутой ИИ-карьерный агент! Помогает искать работу и нанимать. Попробуй: ';
             const botLink = 'https://t.me/LemusCareer_Bot';
             if (tg && tg.switchInlineQuery) { try { tg.switchInlineQuery(shareText + botLink, ['users', 'groups']); return; } catch(e) {} }
             if (navigator.share) { try { navigator.share({ title: 'Lemus Career Agent', text: shareText, url: botLink }); return; } catch(e) {} }
-            try { navigator.clipboard.writeText(botLink); alert('Ссылка скопирована!'); } catch(e) { alert('Ссылка: ' + botLink); }
+            try { navigator.clipboard.writeText(botLink); toast('Ссылка скопирована!'); } catch(e) { alert('Ссылка: ' + botLink); }
         }
         function errorBox(msg, withUpload) {
             let btnHtml = '';
@@ -800,7 +892,7 @@
                 if (tg && tg.openInvoice) {
                     tg.openInvoice(d.invoice_link, async function(status) {
                         if (status === 'paid') {
-                            alert('✅ Оплата прошла! Баланс и премиум обновлены.');
+                            toast('✅ Оплата прошла! Баланс обновлён.');
                             await loadUserData();
                         } else {
                             alert('Оплата не завершена.');
@@ -838,7 +930,7 @@
             try {
                 await api('/miniapp/digest', { user_id: currentUserId, active: next });
                 await loadUserData();
-                alert(next ? '✅ Дайджест включён: топ-5 вакансий каждые 12 часов.' : 'Дайджест выключен.');
+                toast(next ? '✅ Дайджест включён' : 'Дайджест выключен');
             } catch (e) { alert('⚠️ ' + e.message); }
         }
 
@@ -854,6 +946,7 @@
                 try {
                     const d = await api('/miniapp/upload-resume', { user_id: currentUserId, filename: f.name, content_base64: b64 });
                     document.getElementById('uploadResult').innerHTML = '<div class="info-box">✅ Резюме «' + escapeHtml(f.name) + '» сохранено и активно. Всего резюме: ' + escapeHtml(d.resumes_count) + '</div>';
+                    toast('✅ Резюме загружено');
                     await loadUserData();
                 } catch (e) {
                     document.getElementById('uploadResult').innerHTML = errorBox(e.message, false);
@@ -891,7 +984,7 @@
                 await api('/miniapp/activate-resume', { user_id: currentUserId, resume_id: id });
                 await loadResumes();
                 await loadUserData();
-                alert('✅ Резюме активировано');
+                toast('✅ Резюме активировано');
             } catch (e) { alert('⚠️ ' + e.message); }
             finally { showLoader('', false); }
         }
@@ -926,10 +1019,10 @@
                 return;
             }
             let html = '<div class="result-section-title">Найдено: ' + list.length + ' (отсортировано по соответствию)</div>';
-            list.forEach(v => {
+            list.forEach((v, i) => {
                 const sc = v.match_score || 0;
-                const cls = sc >= 75 ? '' : (sc >= 60 ? ' mid' : ' low');
-                html += '<div class="vacancy-card">' +
+                const cls = sc >= 75 ? ' hot' : (sc >= 60 ? ' mid' : ' low');
+                html += '<div class="vacancy-card" style="animation-delay:' + (i * 0.05) + 's">' +
                     '<div class="vacancy-header"><div class="vacancy-title">' + escapeHtml(v.title) + '</div><span class="vacancy-score' + cls + '">' + escapeHtml(sc) + '%</span></div>' +
                     '<div class="vacancy-company">🏢 ' + escapeHtml(v.company) + '</div>' +
                     (v.salary ? '<div class="vacancy-salary">' + escapeHtml(v.salary) + '</div>' : '') +
@@ -983,7 +1076,7 @@
         function copyPitch() {
             const el = document.getElementById('pitchText');
             if (!el) return;
-            navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
+            navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
         async function runFindLPR() {
@@ -1059,7 +1152,7 @@
         function copyGeneratedPitch() {
             const el = document.getElementById('generatedPitch');
             if (!el) return;
-            navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
+            navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
         async function runSkillGap() {
@@ -1081,7 +1174,6 @@
             }
         }
 
-        // ---------- 🆘 АНТИКРИЗИС ----------
         const CRISIS_TOOLS = {
             day:      { icon: '📅', name: 'План на сегодня', hint: '3 микро-шага на сегодня по твоему резюме. Ввод не нужен.', params: false, ph: '' },
             gap:      { icon: '🕳', name: 'Объяснение пробела', hint: 'Сколько длился пробел и причина своими словами', params: true, ph: '8 месяцев, сокращение + уход за болеющим родственником' },
@@ -1167,7 +1259,7 @@
         function copyCrisis() {
             const el = document.getElementById('crisisText');
             if (!el) return;
-            navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
+            navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
         async function loadReferral() {
@@ -1180,7 +1272,7 @@
         }
         function copyRefLink() {
             const el = document.getElementById('refLink');
-            navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Ссылка скопирована!')).catch(() => alert('Скопируй вручную'));
+            navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Ссылка скопирована!')).catch(() => alert('Скопируй вручную'));
         }
 
         async function loadPremium() {
@@ -1230,7 +1322,6 @@
             finally { showLoader('', false); }
         }
 
-        // ---------- HR ----------
         async function runHRMatch() {
             const resume = document.getElementById('hrMatchResume').value.trim();
             const vacancy = document.getElementById('hrMatchVacancy').value.trim();
@@ -1324,12 +1415,8 @@
         function runHRCandidatePitch() { runHRParams('/miniapp/hr-candidate-pitch', 'hrCandidatePitchParams', 'hrCandidatePitchBtn', 'hrCandidatePitchResult', '💬 Питч кандидату', 20, 'pitch'); }
         function runHRFollowup() { runHRParams('/miniapp/hr-followup', 'hrFollowupParams', 'hrFollowupBtn', 'hrFollowupResult', '📅 Фоллоу-ап', 20, 'followup'); }
 
-        // ---------- АВТО-ЗАПУСК ПРИ ОТКРЫТИИ ПРИЛОЖЕНИЯ ----------
         (async function startApp() {
-            // 1) Авто-прогрев сервера: срабатывает сам при открытии приложения
             wakeServer();
-
-            // 2) Онбординг при первом входе
             let onboarded = false;
             try { onboarded = localStorage.getItem('lc_onboarded_v1') === '1'; } catch(e) {}
             if (!onboarded) {
@@ -1337,8 +1424,6 @@
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('screen-onboard').classList.add('active');
             }
-
-            // 3) Авто-авторизация и загрузка данных, с повтором если сервер холодный
             for (let attempt = 1; attempt <= 2; attempt++) {
                 try {
                     if (tg && tg.initData) {
