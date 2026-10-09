@@ -124,7 +124,6 @@
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px; }
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
         .status-text { font-size: 14px; color: #ddd; text-align: center; max-width: 80%; }
-        /* Онбординг */
         .onboard-slide { text-align: center; padding: 30px 10px; }
         .onboard-icon { font-size: 72px; margin-bottom: 24px; }
         .onboard-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
@@ -132,7 +131,6 @@
         .onboard-dots { display: flex; justify-content: center; gap: 8px; margin: 24px 0; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); }
         .dot.active { background: #667eea; width: 24px; border-radius: 4px; }
-        /* Тарифы */
         .tariff-card { padding: 20px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-card); margin-bottom: 14px; }
         .tariff-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
         .tariff-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
@@ -144,6 +142,10 @@
         .switch-state.on { background: rgba(17,153,142,0.25); color: #38ef7d; }
         .file-drop { border: 2px dashed rgba(255,255,255,0.2); border-radius: var(--radius-card); padding: 30px 20px; text-align: center; color: var(--text-secondary); font-size: 14px; cursor: pointer; margin-bottom: 16px; }
         .file-drop:active { border-color: #667eea; }
+        .resume-item { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 10px; cursor: pointer; }
+        .resume-item.active { border-color: rgba(17,153,142,0.5); background: rgba(17,153,142,0.08); }
+        .resume-name { font-size: 15px; font-weight: 600; }
+        .resume-active { font-size: 12px; color: #38ef7d; font-weight: 600; }
         ::-webkit-scrollbar { width: 0; }
     </style>
 </head>
@@ -287,7 +289,7 @@
             <div class="back-button" onclick="showScreen('balance')">← Назад</div>
             <div class="screen-title">🧾 История операций</div>
             <div class="screen-subtitle">Платежи и начисления</div>
-            <div id="paymentsList"><div class="empty-state"><div class="empty-state-icon"></div><div>Операций пока нет</div></div></div>
+            <div id="paymentsList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Операций пока нет</div></div></div>
         </div>
 
         <!-- ТРЕКЕР -->
@@ -312,6 +314,11 @@
                 <div class="feature-card" onclick="showScreen('upload')">
                     <div class="feature-icon green">📥</div>
                     <div class="feature-info"><div class="feature-name">Загрузить резюме</div><div class="feature-desc">PDF, DOCX, TXT или фото — для точного подбора</div></div>
+                    <span class="feature-badge new">Новое</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('resumes')">
+                    <div class="feature-icon blue">📁</div>
+                    <div class="feature-info"><div class="feature-name">Мои резюме</div><div class="feature-desc">Список и переключение между резюме</div></div>
                     <span class="feature-badge new">Новое</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('analyze')">
@@ -362,6 +369,15 @@
             <div id="uploadResult"></div>
         </div>
 
+        <!-- МОИ РЕЗЮМЕ -->
+        <div class="screen" id="screen-resumes">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">📁 Мои резюме</div>
+            <div class="screen-subtitle">Нажми на резюме, чтобы сделать его активным для поиска</div>
+            <div id="resumesList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Загружаем...</div></div></div>
+            <button class="action-button secondary" onclick="showScreen('upload')" style="margin-top:16px;">📥 Загрузить новое резюме</button>
+        </div>
+
         <!-- ПОИСК ВАКАНСИЙ -->
         <div class="screen" id="screen-search">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
@@ -380,7 +396,7 @@
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🔗 Разбор вакансии</div>
             <div class="screen-subtitle">Скопируй текст вакансии из hh.ru и вставь сюда</div>
-            <textarea class="input-field" id="vacancyInput" placeholder="Вставь полный текст вакансии сюда...&#10;&#10;Должность, компания, обязанности, требования, условия..."></textarea>
+            <textarea class="input-field" id="vacancyInput" placeholder="Вставь полный текст вакансии сюда..."></textarea>
             <button class="action-button primary" id="analyzeBtn" onclick="runAnalyze()">🔍 Разобрать вакансию (2 ⭐)</button>
             <div id="analyzeResult" style="margin-top: 24px;"></div>
         </div>
@@ -463,25 +479,45 @@
                     <div class="feature-info"><div class="feature-name">Скоринг кандидата</div><div class="feature-desc">Сильные стороны, флаги, оценка 1-10</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('hr-questions')">
                     <div class="feature-icon purple">❓</div>
-                    <div class="feature-info"><div class="feature-name">Вопросы для интервью</div><div class="feature-desc">Персональные вопросы (в чате бота)</div></div>
+                    <div class="feature-info"><div class="feature-name">Вопросы для интервью</div><div class="feature-desc">Персональные вопросы по резюме</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('hr-test')">
                     <div class="feature-icon orange">📝</div>
-                    <div class="feature-info"><div class="feature-name">Тестовое задание</div><div class="feature-desc">Задание на основе резюме (в чате бота)</div></div>
+                    <div class="feature-info"><div class="feature-name">Тестовое задание</div><div class="feature-desc">Задание на основе резюме</div></div>
                     <span class="feature-badge new">Новое</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('hr-description')">
                     <div class="feature-icon green">📋</div>
-                    <div class="feature-info"><div class="feature-name">Описание вакансии</div><div class="feature-desc">Текст по структуре hh.ru (в чате бота)</div></div>
+                    <div class="feature-info"><div class="feature-name">Описание вакансии</div><div class="feature-desc">Текст по структуре hh.ru</div></div>
                     <span class="feature-badge new">Новое</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
-                    <div class="feature-icon blue">💰</div>
-                    <div class="feature-info"><div class="feature-name">Оценка зарплаты</div><div class="feature-desc">Рыночная вилка и тренды (в чате бота)</div></div>
+                <div class="feature-card" onclick="showScreen('hr-rejection')">
+                    <div class="feature-icon blue">✉️</div>
+                    <div class="feature-info"><div class="feature-name">Вежливый отказ</div><div class="feature-desc">Письмо кандидату с отказом</div></div>
+                    <span class="feature-badge new">Новое</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('hr-offer')">
+                    <div class="feature-icon green">📄</div>
+                    <div class="feature-info"><div class="feature-name">Шаблон оффера</div><div class="feature-desc">Профессиональный оффер</div></div>
+                    <span class="feature-badge new">Новое</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('hr-salary')">
+                    <div class="feature-icon orange">💰</div>
+                    <div class="feature-info"><div class="feature-name">Оценка зарплаты</div><div class="feature-desc">Рыночная вилка и тренды</div></div>
                     <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('hr-candidate-pitch')">
+                    <div class="feature-icon purple">💬</div>
+                    <div class="feature-info"><div class="feature-name">Питч кандидату</div><div class="feature-desc">Сообщение для привлечения</div></div>
+                    <span class="feature-badge new">Новое</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('hr-followup')">
+                    <div class="feature-icon blue">📅</div>
+                    <div class="feature-info"><div class="feature-name">Фоллоу-ап</div><div class="feature-desc">Письмо после собеседования</div></div>
+                    <span class="feature-badge new">Новое</span>
                 </div>
             </div>
         </div>
@@ -506,6 +542,86 @@
             <button class="action-button primary" id="hrScoringBtn" onclick="runHRScoring()">🎯 Оценить кандидата (1 ⭐)</button>
             <div id="hrScoringResult" style="margin-top: 24px;"></div>
         </div>
+
+        <!-- HR QUESTIONS -->
+        <div class="screen" id="screen-hr-questions">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">❓ Вопросы для интервью</div>
+            <div class="screen-subtitle">Персональные вопросы по резюме кандидата</div>
+            <textarea class="input-field" id="hrQuestionsResume" placeholder="Текст резюме кандидата..."></textarea>
+            <button class="action-button primary" id="hrQuestionsBtn" onclick="runHRQuestions()">❓ Сгенерировать вопросы (1 ⭐)</button>
+            <div id="hrQuestionsResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- HR TEST -->
+        <div class="screen" id="screen-hr-test">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">📝 Тестовое задание</div>
+            <div class="screen-subtitle">Задание на основе резюме кандидата</div>
+            <textarea class="input-field" id="hrTestResume" placeholder="Текст резюме кандидата..."></textarea>
+            <button class="action-button primary" id="hrTestBtn" onclick="runHRTest()">📝 Сгенерировать задание (2 ⭐)</button>
+            <div id="hrTestResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- HR DESCRIPTION -->
+        <div class="screen" id="screen-hr-description">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">📋 Описание вакансии</div>
+            <div class="screen-subtitle">Текст по структуре hh.ru</div>
+            <textarea class="input-field" id="hrDescriptionParams" placeholder="Опишите вакансию: должность, компания, требования, условия..."></textarea>
+            <button class="action-button primary" id="hrDescriptionBtn" onclick="runHRDescription()">📋 Сгенерировать описание (2 ⭐)</button>
+            <div id="hrDescriptionResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- HR REJECTION -->
+        <div class="screen" id="screen-hr-rejection">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">✉️ Вежливый отказ</div>
+            <div class="screen-subtitle">Письмо кандидату с отказом</div>
+            <textarea class="input-field" id="hrRejectionParams" placeholder="Опишите ситуацию: должность, причина отказа, тон..."></textarea>
+            <button class="action-button primary" id="hrRejectionBtn" onclick="runHRRejection()">✉️ Сгенерировать письмо (1 ⭐)</button>
+            <div id="hrRejectionResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- HR OFFER -->
+        <div class="screen" id="screen-hr-offer">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">📄 Шаблон оффера</div>
+            <div class="screen-subtitle">Профессиональный оффер кандидату</div>
+            <textarea class="input-field" id="hrOfferParams" placeholder="Должность, зарплата, дата выхода, условия..."></textarea>
+            <button class="action-button primary" id="hrOfferBtn" onclick="runHROffer()">📄 Сгенерировать оффер (1 ⭐)</button>
+            <div id="hrOfferResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- HR SALARY -->
+        <div class="screen" id="screen-hr-salary">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">💰 Оценка зарплаты</div>
+            <div class="screen-subtitle">Рыночная вилка и тренды</div>
+            <textarea class="input-field" id="hrSalaryParams" placeholder="Должность, регион, опыт, отрасль..."></textarea>
+            <button class="action-button primary" id="hrSalaryBtn" onclick="runHRSalary()">💰 Оценить зарплату (1 ⭐)</button>
+            <div id="hrSalaryResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- HR CANDIDATE PITCH -->
+        <div class="screen" id="screen-hr-candidate-pitch">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">💬 Питч кандидату</div>
+            <div class="screen-subtitle">Сообщение для привлечения кандидата</div>
+            <textarea class="input-field" id="hrCandidatePitchParams" placeholder="Опишите вакансию и что делает её привлекательной..."></textarea>
+            <button class="action-button primary" id="hrCandidatePitchBtn" onclick="runHRCandidatePitch()">💬 Сгенерировать питч (1 ⭐)</button>
+            <div id="hrCandidatePitchResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- HR FOLLOWUP -->
+        <div class="screen" id="screen-hr-followup">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">📅 Фоллоу-ап</div>
+            <div class="screen-subtitle">Письмо кандидату после собеседования</div>
+            <textarea class="input-field" id="hrFollowupParams" placeholder="Имя кандидата, что впечатлило, следующие шаги..."></textarea>
+            <button class="action-button primary" id="hrFollowupBtn" onclick="runHRFollowup()">📅 Сгенерировать письмо (1 ⭐)</button>
+            <div id="hrFollowupResult" style="margin-top: 24px;"></div>
+        </div>
     </div>
 
     <script>
@@ -527,7 +643,6 @@
             } catch(e) {}
         }
 
-        // ---------- ОНБОРДИНГ ----------
         const OB_SLIDES = [
             { icon: '🚀', title: 'Lemus Career Agent', text: 'ИИ-агент анализирует вакансии, находит контакты руководителей и пишет питчи за тебя.' },
             { icon: '📄', title: 'Загрузи резюме', text: 'Приложение подберёт вакансии твоего уровня и отрасли с процентом соответствия.' },
@@ -553,7 +668,6 @@
             showScreen('home');
         }
 
-        // ---------- БАЗА ----------
         function showLoader(text, show) {
             document.getElementById('loaderStatus').textContent = text || '';
             document.getElementById('loaderOverlay').style.display = show ? 'flex' : 'none';
@@ -627,6 +741,7 @@
                 if (id === 'payments') loadPayments();
                 if (id === 'referral') loadReferral();
                 if (id === 'premium') loadPremium();
+                if (id === 'resumes') loadResumes();
             }
         }
         if (tg && tg.onEvent) {
@@ -643,12 +758,15 @@
             if (navigator.share) { try { navigator.share({ title: 'Lemus Career Agent', text: shareText, url: botLink }); return; } catch(e) {} }
             try { navigator.clipboard.writeText(botLink); alert('Ссылка скопирована!'); } catch(e) { alert('Ссылка: ' + botLink); }
         }
-        function errorBox(msg, withBot) {
-            return '<div class="error-box">⚠️ ' + escapeHtml(msg) + '</div>' +
-                (withBot ? '<button class="action-button secondary" style="margin-top:12px;" onclick="openBot()">💬 Открыть бота</button>' : '');
+        function errorBox(msg, withUpload) {
+            // 🆕 ФИКС: кнопка ошибки ведёт на screen-upload внутри приложения
+            let btnHtml = '';
+            if (withUpload) {
+                btnHtml = '<button class="action-button secondary" style="margin-top:12px;" onclick="showScreen(\'upload\')">📥 Загрузить резюме</button>';
+            }
+            return '<div class="error-box">⚠️ ' + escapeHtml(msg) + '</div>' + btnHtml;
         }
 
-        // ---------- ОПЛАТА STARS ----------
         async function payTariff(tariff) {
             if (!await ensureAuth()) return;
             showLoader('Создаю счёт Stars...', true);
@@ -690,7 +808,6 @@
             } catch (e) { console.warn(e.message); }
         }
 
-        // ---------- ДАЙДЖЕСТ ----------
         async function toggleDigest() {
             if (!await ensureAuth()) return;
             const next = userData && userData.digest_active ? 0 : 1;
@@ -701,7 +818,6 @@
             } catch (e) { alert('⚠️ ' + e.message); }
         }
 
-        // ---------- ЗАГРУЗКА РЕЗЮМЕ ----------
         function onFilePicked(input) {
             const f = input.files && input.files[0];
             if (!f) return;
@@ -725,9 +841,46 @@
             reader.readAsDataURL(f);
         }
 
-        // ---------- ПОИСК ВАКАНСИЙ ----------
+        // 🆕 МОИ РЕЗЮМЕ
+        async function loadResumes() {
+            if (!currentUserId) return;
+            try {
+                const d = await api('/miniapp/resumes?user_id=' + currentUserId);
+                const box = document.getElementById('resumesList');
+                if (!d.resumes || !d.resumes.length) {
+                    box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div>Нет резюме. Загрузите первое!</div></div>';
+                    return;
+                }
+                let html = '';
+                d.resumes.forEach(r => {
+                    html += '<div class="resume-item' + (r.active ? ' active' : '') + '" onclick="activateResume(' + r.id + ')">' +
+                        '<div class="resume-name">' + escapeHtml(r.name) + '</div>' +
+                        (r.active ? '<div class="resume-active">✓ Активно</div>' : '<div style="font-size:12px;color:#999;">Нажми для активации</div>') +
+                        '</div>';
+                });
+                box.innerHTML = html;
+            } catch (e) { console.warn(e.message); }
+        }
+        async function activateResume(id) {
+            if (!await ensureAuth()) return;
+            showLoader('Активирую резюме...', true);
+            try {
+                await api('/miniapp/activate-resume', { user_id: currentUserId, resume_id: id });
+                await loadResumes();
+                await loadUserData();
+                alert('✅ Резюме активировано');
+            } catch (e) { alert('⚠️ ' + e.message); }
+            finally { showLoader('', false); }
+        }
+
         async function runSearch() {
             if (!await ensureAuth()) return;
+            // Проверка: есть ли активное резюме
+            if (!userData || !userData.has_active_resume) {
+                const box = document.getElementById('searchResult');
+                box.innerHTML = errorBox('Сначала загрузите резюме для точного подбора вакансий', true);
+                return;
+            }
             const box = document.getElementById('searchResult');
             const meta = document.getElementById('searchMeta');
             box.innerHTML = ''; meta.innerHTML = '';
@@ -740,6 +893,7 @@
                 }
                 renderVacancies(d.vacancies || [], box);
             } catch (e) {
+                // 🆕 ФИКС: ошибка ведёт на screen-upload внутри приложения
                 box.innerHTML = errorBox(e.message, true);
             } finally {
                 showLoader('', false);
@@ -766,7 +920,6 @@
             box.innerHTML = html;
         }
 
-        // ---------- РАЗБОР ВАКАНСИИ ----------
         async function runAnalyze() {
             const txt = document.getElementById('vacancyInput').value.trim();
             const btn = document.getElementById('analyzeBtn');
@@ -800,7 +953,7 @@
                 }
                 box.innerHTML = html;
             } catch (e) {
-                box.innerHTML = errorBox(e.message, true);
+                box.innerHTML = errorBox(e.message, false);
             } finally {
                 showLoader('', false);
                 btn.disabled = false;
@@ -813,7 +966,6 @@
             navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
-        // ---------- ЛПР ----------
         async function runFindLPR() {
             const company = document.getElementById('lprCompany').value.trim();
             const position = document.getElementById('lprPosition').value.trim();
@@ -851,7 +1003,7 @@
                 }
                 box.innerHTML = html;
             } catch (e) {
-                box.innerHTML = errorBox(e.message, true);
+                box.innerHTML = errorBox(e.message, false);
             } finally {
                 showLoader('', false);
                 btn.disabled = false;
@@ -859,7 +1011,6 @@
             }
         }
 
-        // ---------- ПИТЧ ----------
         async function runPitch() {
             const company = document.getElementById('pitchCompany').value.trim();
             const title = document.getElementById('pitchTitle').value.trim();
@@ -878,7 +1029,7 @@
                     '<div class="result-pitch" id="generatedPitch">' + escapeHtml(d.pitch) + '</div>' +
                     '<button class="copy-btn" onclick="copyGeneratedPitch()">📋 Скопировать</button></div>';
             } catch (e) {
-                box.innerHTML = errorBox(e.message, true);
+                box.innerHTML = errorBox(e.message, false);
             } finally {
                 showLoader('', false);
                 btn.disabled = false;
@@ -891,7 +1042,6 @@
             navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
-        // ---------- SKILL GAP ----------
         async function runSkillGap() {
             const btn = document.getElementById('skillGapBtn');
             const box = document.getElementById('skillGapResult');
@@ -911,7 +1061,6 @@
             }
         }
 
-        // ---------- РЕФЕРАЛКА ----------
         async function loadReferral() {
             if (!currentUserId) return;
             try {
@@ -925,7 +1074,6 @@
             navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Ссылка скопирована!')).catch(() => alert('Скопируй вручную'));
         }
 
-        // ---------- ПРЕМИУМ ----------
         async function loadPremium() {
             const gate = document.getElementById('premiumGate');
             const content = document.getElementById('premiumContent');
@@ -973,7 +1121,6 @@
             finally { showLoader('', false); }
         }
 
-        // ---------- HR ----------
         async function runHRMatch() {
             const resume = document.getElementById('hrMatchResume').value.trim();
             const vacancy = document.getElementById('hrMatchVacancy').value.trim();
@@ -990,7 +1137,7 @@
                 box.innerHTML = '<div class="result-card" style="text-align:center;"><div class="balance-num" style="font-size:48px;">' + escapeHtml(d.overall_percent) + '%</div><div class="balance-label">общее соответствие</div></div>' +
                     '<div class="result-card"><div class="result-section-title">📊 Детальный анализ</div><div class="analysis-block">' + escapeHtml(d.analysis) + '</div></div>';
             } catch (e) {
-                box.innerHTML = errorBox(e.message, true);
+                box.innerHTML = errorBox(e.message, false);
             } finally {
                 showLoader('', false);
                 btn.disabled = false;
@@ -1011,7 +1158,7 @@
                 box.innerHTML = '<div class="result-card" style="text-align:center;"><div class="balance-num" style="font-size:48px;">' + escapeHtml(d.rating) + '/10</div><div class="balance-label">оценка кандидата</div></div>' +
                     '<div class="result-card"><div class="result-section-title">🎯 Скоринг</div><div class="analysis-block">' + escapeHtml(d.scoring) + '</div></div>';
             } catch (e) {
-                box.innerHTML = errorBox(e.message, true);
+                box.innerHTML = errorBox(e.message, false);
             } finally {
                 showLoader('', false);
                 btn.disabled = false;
@@ -1019,7 +1166,182 @@
             }
         }
 
-        // ---------- СТАРТ ----------
+        // 🆕 HR QUESTIONS
+        async function runHRQuestions() {
+            const resume = document.getElementById('hrQuestionsResume').value.trim();
+            const btn = document.getElementById('hrQuestionsBtn');
+            const box = document.getElementById('hrQuestionsResult');
+            if (resume.length < 100) { alert('⚠️ Текст резюме слишком короткий'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Генерирую вопросы...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-questions', { user_id: currentUserId, resume_text: resume });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">❓ Вопросы для интервью</div><div class="analysis-block">' + escapeHtml(d.questions) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // 🆕 HR TEST
+        async function runHRTest() {
+            const resume = document.getElementById('hrTestResume').value.trim();
+            const btn = document.getElementById('hrTestBtn');
+            const box = document.getElementById('hrTestResult');
+            if (resume.length < 100) { alert('⚠️ Текст резюме слишком короткий'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Генерирую тестовое задание...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-test', { user_id: currentUserId, resume_text: resume });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">📝 Тестовое задание</div><div class="analysis-block">' + escapeHtml(d.test_task) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // 🆕 HR DESCRIPTION
+        async function runHRDescription() {
+            const params = document.getElementById('hrDescriptionParams').value.trim();
+            const btn = document.getElementById('hrDescriptionBtn');
+            const box = document.getElementById('hrDescriptionResult');
+            if (params.length < 50) { alert('⚠️ Опишите вакансию подробнее (минимум 50 символов)'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Генерирую описание вакансии...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-description', { user_id: currentUserId, params: params });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">📋 Описание вакансии</div><div class="analysis-block">' + escapeHtml(d.description) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // 🆕 HR REJECTION
+        async function runHRRejection() {
+            const params = document.getElementById('hrRejectionParams').value.trim();
+            const btn = document.getElementById('hrRejectionBtn');
+            const box = document.getElementById('hrRejectionResult');
+            if (params.length < 20) { alert('⚠️ Опишите ситуацию подробнее'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Генерирую письмо с отказом...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-rejection', { user_id: currentUserId, params: params });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">✉️ Вежливый отказ</div><div class="analysis-block">' + escapeHtml(d.letter) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // 🆕 HR OFFER
+        async function runHROffer() {
+            const params = document.getElementById('hrOfferParams').value.trim();
+            const btn = document.getElementById('hrOfferBtn');
+            const box = document.getElementById('hrOfferResult');
+            if (params.length < 20) { alert('⚠️ Опишите параметры подробнее'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Генерирую шаблон оффера...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-offer', { user_id: currentUserId, params: params });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">📄 Шаблон оффера</div><div class="analysis-block">' + escapeHtml(d.offer) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // 🆕 HR SALARY
+        async function runHRSalary() {
+            const params = document.getElementById('hrSalaryParams').value.trim();
+            const btn = document.getElementById('hrSalaryBtn');
+            const box = document.getElementById('hrSalaryResult');
+            if (params.length < 20) { alert('⚠️ Опишите параметры подробнее'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Оцениваю зарплату...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-salary', { user_id: currentUserId, params: params });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">💰 Оценка зарплаты</div><div class="analysis-block">' + escapeHtml(d.analysis) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // 🆕 HR CANDIDATE PITCH
+        async function runHRCandidatePitch() {
+            const params = document.getElementById('hrCandidatePitchParams').value.trim();
+            const btn = document.getElementById('hrCandidatePitchBtn');
+            const box = document.getElementById('hrCandidatePitchResult');
+            if (params.length < 20) { alert('⚠️ Опишите вакансию подробнее'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Генерирую питч кандидату...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-candidate-pitch', { user_id: currentUserId, params: params });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">💬 Питч кандидату</div><div class="analysis-block">' + escapeHtml(d.pitch) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // 🆕 HR FOLLOWUP
+        async function runHRFollowup() {
+            const params = document.getElementById('hrFollowupParams').value.trim();
+            const btn = document.getElementById('hrFollowupBtn');
+            const box = document.getElementById('hrFollowupResult');
+            if (params.length < 20) { alert('⚠️ Опишите ситуацию подробнее'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Генерирую фоллоу-ап...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-followup', { user_id: currentUserId, params: params });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">📅 Фоллоу-ап после собеседования</div><div class="analysis-block">' + escapeHtml(d.followup) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
         (async function startApp() {
             let onboarded = false;
             try { onboarded = localStorage.getItem('lc_onboarded_v1') === '1'; } catch(e) {}
