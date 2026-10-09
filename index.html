@@ -187,22 +187,8 @@
         }
     }
 
-    // 2. Простой Fetch (Без сложных обработок ошибок сети)
-    async function simpleFetch(url, options = {}) {
-        try {
-            const response = await fetch(url, options);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return await response.json();
-        } catch (err) {
-            console.error("Fetch failed:", err);
-            throw err;
-        }
-    }
-
-    // 3. Авторизация (Вызывается один раз при старте приложения)
-    async function initAuth() {
+    // 2. САМАЯ ПРОСТАЯ АВТОРИЗАЦИЯ (БЕЗ СЛОЖНЫХ ПРОВЕРОК)
+    async function ensureAuth() {
         if (userId) return true;
         
         showLoader("Авторизация...", true);
@@ -211,20 +197,33 @@
                 throw new Error("Нет данных Telegram");
             }
 
-            const data = await simpleFetch(`${API_URL}/miniapp/verify`, {
+            // Делаем запрос и ждем любой JSON ответ
+            const res = await fetch(`${API_URL}/miniapp/verify`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ initData: window.Telegram.WebApp.initData })
             });
             
-            if (data.ok && data.user_id) {
+            // Читаем тело ответа как текст (это обходит проблемы с парсингом JSON в WebView)
+            const textResponse = await res.text();
+            console.log("Raw response:", textResponse);
+            
+            // Пробуем распарсить вручную
+            let data;
+            try {
+                data = JSON.parse(textResponse);
+            } catch(e) {
+                throw new Error("Некорректный ответ от сервера");
+            }
+
+            if (data.user_id) {
                 userId = data.user_id;
                 return true;
             } else {
                 throw new Error(data.error || "Ошибка авторизации");
             }
         } catch (e) {
-            alert("Не удалось подключиться.\n\nПричина: " + e.message);
+            alert("Ошибка входа:\n" + e.message);
             return false;
         } finally {
             showLoader("", false);
@@ -308,16 +307,17 @@
 
     async function doSearch(btn) {
         btn.disabled = true; btn.innerText = "Поиск...";
-        if (!await initAuth()) { btn.disabled=false; btn.innerText="Найти вакансии (1 ⭐)"; return; }
+        if (!await ensureAuth()) { btn.disabled=false; btn.innerText="Найти вакансии (1 ⭐)"; return; }
         
         showLoader("Анализирую резюме и ищу...", true);
         try {
-            const res = await simpleFetch(`${API_URL}/miniapp/search`, {
+            const res = await fetch(`${API_URL}/miniapp/search`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId })
             });
+            const data = await res.json();
             
-            const list = res.vacancies || [];
+            const list = data.vacancies || [];
             let html = "";
             if(list.length === 0) html = "<p>Ничего не найдено. Загрузите резюме через бота.</p>";
             else {
@@ -349,20 +349,21 @@
         if(txt.length < 50) return alert("Слишком короткий текст");
         
         btn.disabled = true;
-        if (!await initAuth()) { btn.disabled=false; return; }
+        if (!await ensureAuth()) { btn.disabled=false; return; }
         
         showLoader("AI анализирует контакты...", true);
         try {
-            const res = await simpleFetch(`${API_URL}/miniapp/analyze`, {
+            const res = await fetch(`${API_URL}/miniapp/analyze`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId, vacancy_text: txt })
             });
+            const data = await res.json();
             
             document.getElementById('analyzeRes').innerHTML = `
                 <div class="card-result">
-                    <strong>${res.company} — ${res.title}</strong><br><br>
-                    <em>Питч:</em><br>"${res.pitch}"<br><br>
-                    ${res.contacts && res.contacts.length > 0 ? '<strong>Контакты:</strong>' + res.contacts.map(c=>`${c.name}: ${c.email||''}`).join('<br>') : 'Контакты не найдены'}
+                    <strong>${data.company} — ${data.title}</strong><br><br>
+                    <em>Питч:</em><br>"${data.pitch}"<br><br>
+                    ${data.contacts && data.contacts.length > 0 ? '<strong>Контакты:</strong>' + data.contacts.map(c=>`${c.name}: ${c.email||''}`).join('<br>') : 'Контакты не найдены'}
                 </div>`;
         } catch(e) { 
             document.getElementById('analyzeRes').innerHTML = `<div class="error-msg">${e.message}</div>`;
@@ -385,21 +386,22 @@
         if(!comp) return alert("Укажите компанию");
         
         btn.disabled=true;
-        if (!await initAuth()) { btn.disabled=false; return; }
+        if (!await ensureAuth()) { btn.disabled=false; return; }
         
         showLoader("Поиск в открытых источниках...", true);
         try {
-            const res = await simpleFetch(`${API_URL}/miniapp/find-lpr`, {
+            const res = await fetch(`${API_URL}/miniapp/find-lpr`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId, company: comp, position: pos })
             });
+            const data = await res.json();
             
             let html = `<div class="card-result"><strong>Результаты по ${comp}</strong><br>`;
-            if(res.contacts && res.contacts.length > 0) {
-                res.contacts.forEach(c => html += `<br>👤 ${c.name}<br>📧 ${c.email || '-'}<br>📱 ${c.phone || '-'}`);
+            if(data.contacts && data.contacts.length > 0) {
+                data.contacts.forEach(c => html += `<br>👤 ${c.name}<br>📧 ${c.email || '-'}<br>📱 ${c.phone || '-'}`);
             } else {
                 html += "Прямых контактов не найдено.<br>Рекомендуемые ссылки:<br>";
-                if(res.links) res.links.forEach(l => html += `<a href="${l.url}" target="_blank" style="display:block;color:#4facfe;margin-top:5px;">${l.text}</a>`);
+                if(data.links) data.links.forEach(l => html += `<a href="${l.url}" target="_blank" style="display:block;color:#4facfe;margin-top:5px;">${l.text}</a>`);
             }
             html += "</div>";
             document.getElementById('lprRes').innerHTML = html;
@@ -418,14 +420,15 @@
 
     async function doPitch(btn) {
         btn.disabled=true;
-        if (!await initAuth()) { btn.disabled=false; return; }
+        if (!await ensureAuth()) { btn.disabled=false; return; }
         showLoader("Генерация текста...", true);
         try {
-            const res = await simpleFetch(`${API_URL}/miniapp/pitch`, {
+            const res = await fetch(`${API_URL}/miniapp/pitch`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId, company: document.getElementById('pitchComp').value, title: document.getElementById('pitchTitle').value })
             });
-            document.getElementById('pitchRes').innerHTML = `<div class="card-result">${res.pitch}</div>`;
+            const data = await res.json();
+            document.getElementById('pitchRes').innerHTML = `<div class="card-result">${data.pitch}</div>`;
         } catch(e){ document.getElementById('pitchRes').innerHTML = `<div class="error-msg">${e.message}</div>`; }
         finally { showLoader("",false); btn.disabled=false; }
     }
@@ -433,14 +436,15 @@
     async function runSkillGap(container) {
         container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
         <h3>Skill Gap Анализ</h3><p>Проверка...</p>`;
-        if (!await initAuth()) { container.innerHTML="<p>Ошибка входа</p>"; return; }
+        if (!await ensureAuth()) { container.innerHTML="<p>Ошибка входа</p>"; return; }
         showLoader("Анализ навыков...", true);
         try {
-            const res = await simpleFetch(`${API_URL}/miniapp/skill-gap`, {
+            const res = await fetch(`${API_URL}/miniapp/skill-gap`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId })
             });
-            container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button><div class="card-result">${res.analysis}</div>`;
+            const data = await res.json();
+            container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button><div class="card-result">${data.analysis}</div>`;
         } catch(e){ container.innerHTML=`<button class="btn-back" onclick="backToGrid()">← Назад</button><div class="error-msg">${e.message}</div>`; }
         finally { showLoader("",false); }
     }
@@ -456,11 +460,12 @@
     }
     async function doHrMatch(btn) {
         btn.disabled=true;
-        if(!await initAuth()){btn.disabled=false;return;}
+        if(!await ensureAuth()){btn.disabled=false;return;}
         showLoader("Сравнение...",true);
         try{
-            const res = await simpleFetch(`${API_URL}/miniapp/hr-match`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrResume').value,vacancy_text:document.getElementById('hrVacancy').value})});
-            document.getElementById('hrMatchRes').innerHTML=`<div class="card-result">${res.analysis}</div>`;
+            const res = await fetch(`${API_URL}/miniapp/hr-match`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrResume').value,vacancy_text:document.getElementById('hrVacancy').value})});
+            const data = await res.json();
+            document.getElementById('hrMatchRes').innerHTML=`<div class="card-result">${data.analysis}</div>`;
         }catch(e){document.getElementById('hrMatchRes').innerHTML=`<div class="error-msg">${e.message}</div>`;}finally{showLoader("",false);btn.disabled=false;}
     }
 
@@ -473,11 +478,12 @@
     }
     async function doHrScore(btn) {
         btn.disabled=true;
-        if(!await initAuth()){btn.disabled=false;return;}
+        if(!await ensureAuth()){btn.disabled=false;return;}
         showLoader("Оценка...",true);
         try{
-            const res = await simpleFetch(`${API_URL}/miniapp/hr-scoring`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrScoreResume').value})});
-            document.getElementById('hrScoreRes').innerHTML=`<div class="card-result">${res.scoring}</div>`;
+            const res = await fetch(`${API_URL}/miniapp/hr-scoring`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrScoreResume').value})});
+            const data = await res.json();
+            document.getElementById('hrScoreRes').innerHTML=`<div class="card-result">${data.scoring}</div>`;
         }catch(e){document.getElementById('hrScoreRes').innerHTML=`<div class="error-msg">${e.message}</div>`;}finally{showLoader("",false);btn.disabled=false;}
     }
 
