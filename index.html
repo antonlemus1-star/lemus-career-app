@@ -39,6 +39,7 @@
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
         .container {
             max-width: 480px; margin: 0 auto; padding: 20px;
             padding-bottom: calc(100px + env(safe-area-inset-bottom));
@@ -109,6 +110,10 @@
             border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); cursor: pointer;
         }
         .feature-card:active { transform: scale(0.98); background: rgba(255,255,255,0.08); }
+        .feature-card.highlight {
+            background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
+            border: 1px solid rgba(102,126,234,0.4);
+        }
         .feature-icon {
             width: 50px; height: 50px; border-radius: 14px;
             display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0;
@@ -215,7 +220,6 @@
             border: 3px solid rgba(255,255,255,0.3); border-radius: 50%;
             border-top-color: #fff; animation: spin 0.8s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
         .empty-state {
             text-align: center; padding: 40px 20px; color: var(--text-secondary);
         }
@@ -292,11 +296,11 @@
                 <div class="mode-card seeker" onclick="showScreen('seeker')">
                     <div class="mode-icon">💼</div>
                     <div class="mode-title">Я ищу работу</div>
-                    <div class="mode-description">Разбор вакансий, поиск контактов, генерация питчей</div>
+                    <div class="mode-description">Поиск вакансий, разбор, контакты ЛПР, питчи</div>
                     <div class="mode-features">
-                        <span class="feature-tag">🔗 Разбор вакансий</span>
+                        <span class="feature-tag">🔍 Поиск вакансий</span>
+                        <span class="feature-tag">🔗 Разбор вакансии</span>
                         <span class="feature-tag">🕵️ Поиск ЛПР</span>
-                        <span class="feature-tag">📝 Питчи</span>
                     </div>
                     <div class="mode-arrow">→</div>
                 </div>
@@ -375,21 +379,23 @@
             <div class="screen-title">💼 Я ищу работу</div>
             <div class="screen-subtitle">Инструменты для эффективного поиска работы</div>
             <div class="feature-grid">
+                <!-- 🔥 ГЛАВНАЯ ФУНКЦИЯ СВЕРХУ -->
+                <div class="feature-card highlight" onclick="showScreen('search')">
+                    <div class="feature-icon purple">🔍</div>
+                    <div class="feature-info">
+                        <div class="feature-name">Поиск вакансий</div>
+                        <div class="feature-desc">Подбор по резюме и региону с процентом соответствия</div>
+                    </div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                
                 <div class="feature-card" onclick="showScreen('analyze')">
-                    <div class="feature-icon purple">🔗</div>
+                    <div class="feature-icon blue">🔗</div>
                     <div class="feature-info">
                         <div class="feature-name">Разобрать вакансию</div>
                         <div class="feature-desc">Вставь текст вакансии — получишь контакты и питч</div>
                     </div>
                     <span class="feature-badge free">2 ⭐</span>
-                </div>
-                <div class="feature-card" onclick="showScreen('search')">
-                    <div class="feature-icon blue">🔍</div>
-                    <div class="feature-info">
-                        <div class="feature-name">Поиск вакансий</div>
-                        <div class="feature-desc">Подбор по региону с процентом соответствия</div>
-                    </div>
-                    <span class="feature-badge free">1 ⭐</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('lpr')">
                     <div class="feature-icon purple">🕵️</div>
@@ -603,7 +609,7 @@
 
     <script>
         // === НАСТРОЙКИ ===
-        const BOT_API_URL = "https://lemus-career-bot.onrender.com"; // ← ЗАМЕНИ на URL твоего Render сервиса!
+        const BOT_API_URL = "https://lemus-career-bot.onrender.com"; // ← ЗАМЕНИ если нужно
         const tg = window.Telegram && window.Telegram.WebApp;
         let currentUserId = null;
         let userData = null;
@@ -623,7 +629,7 @@
             } catch(e) {}
         }
 
-        // === АВТОРИЗАЦИЯ ===
+        // === АВТОРИЗАЦИЯ (ИСПРАВЛЕННАЯ) ===
         async function authenticateWithTelegram() {
             if (!tg || !tg.initData) {
                 console.warn('No Telegram initData available');
@@ -635,14 +641,27 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ initData: tg.initData })
                 });
-                const data = await response.json();
-                if (data.ok && data.user_id) {
+                
+                // Читаем сырой ответ для отладки
+                const textResponse = await response.text();
+                let data;
+                try {
+                    data = JSON.parse(textResponse);
+                } catch (e) {
+                    console.error('Invalid JSON from server:', textResponse);
+                    return false;
+                }
+
+                // Проверяем успешность
+                if (response.ok && data.ok && data.user_id) {
                     currentUserId = data.user_id;
                     return true;
+                } else {
+                    console.error('Auth failed:', data);
+                    return false;
                 }
-                return false;
             } catch(e) {
-                console.error('Auth error:', e);
+                console.error('Network/Auth error:', e);
                 return false;
             }
         }
