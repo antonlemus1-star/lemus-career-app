@@ -224,7 +224,7 @@
                 <div class="premium-button" onclick="showScreen('premium')">Открыть</div>
             </div>
             <div class="action-buttons">
-                <button class="action-button primary" onclick="openBot()">🚀 Открыть бота</button>
+                <button class="action-button primary" onclick="launchBot()">🚀 Запустить бота</button>
                 <button class="action-button secondary" onclick="shareBot()">📤 Поделиться ботом</button>
             </div>
             <div class="footer">Сделано с ❤️ • Поддержка: <a href="mailto:a.lemus@ya.ru">a.lemus@ya.ru</a></div>
@@ -355,6 +355,11 @@
                     <div class="feature-icon pink">🎓</div>
                     <div class="feature-info"><div class="feature-name">Курсы и шаблоны</div><div class="feature-desc">Премиум-контент для поиска работы</div></div>
                     <span class="feature-badge premium">Премиум</span>
+                </div>
+                <div class="feature-card" onclick="launchBot()">
+                    <div class="feature-icon green">🚀</div>
+                    <div class="feature-info"><div class="feature-name">Запустить бота</div><div class="feature-desc">Открыть чат и прогреть сервер</div></div>
+                    <span class="feature-badge free">Чат</span>
                 </div>
                 <div class="feature-card" onclick="openBot()">
                     <div class="feature-icon green">🎤</div>
@@ -650,6 +655,18 @@
             } catch(e) {}
         }
 
+        // ---------- ПРОГРЕВ СЕРВЕРА И ЗАПУСК БОТА ----------
+        async function wakeServer() {
+            try {
+                await fetch(BOT_API_URL + '/?ping=' + Date.now(), { method: 'GET', cache: 'no-store' });
+            } catch (e) { /* сервер ещё прогревается — повторится автоматически */ }
+        }
+
+        function launchBot() {
+            wakeServer();
+            openBot();
+        }
+
         const OB_SLIDES = [
             { icon: '🚀', title: 'Lemus Career Agent', text: 'ИИ-агент анализирует вакансии, находит контакты руководителей и пишет питчи за тебя.' },
             { icon: '📄', title: 'Загрузи резюме', text: 'Приложение подберёт вакансии твоего уровня и отрасли с процентом соответствия.' },
@@ -686,7 +703,7 @@
         async function api(path, payload) {
             const opts = (payload === undefined)
                 ? { method: 'GET' }
-                : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) };
+                : { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify(payload) };
             const res = await fetch(BOT_API_URL + path, opts);
             const raw = await res.text();
             let data = {};
@@ -1078,12 +1095,9 @@
         async function initCrisis() {
             const gate = document.getElementById('crisisGate');
             const tools = document.getElementById('crisisTools');
-            
-            // Ждём загрузку userData если ещё не загружен
             if (!userData && currentUserId) {
                 await loadUserData();
             }
-            
             if (!userData || !userData.is_premium) {
                 gate.style.display = 'block';
                 tools.style.display = 'none';
@@ -1310,7 +1324,12 @@
         function runHRCandidatePitch() { runHRParams('/miniapp/hr-candidate-pitch', 'hrCandidatePitchParams', 'hrCandidatePitchBtn', 'hrCandidatePitchResult', '💬 Питч кандидату', 20, 'pitch'); }
         function runHRFollowup() { runHRParams('/miniapp/hr-followup', 'hrFollowupParams', 'hrFollowupBtn', 'hrFollowupResult', '📅 Фоллоу-ап', 20, 'followup'); }
 
+        // ---------- АВТО-ЗАПУСК ПРИ ОТКРЫТИИ ПРИЛОЖЕНИЯ ----------
         (async function startApp() {
+            // 1) Авто-прогрев сервера: срабатывает сам при открытии приложения
+            wakeServer();
+
+            // 2) Онбординг при первом входе
             let onboarded = false;
             try { onboarded = localStorage.getItem('lc_onboarded_v1') === '1'; } catch(e) {}
             if (!onboarded) {
@@ -1318,12 +1337,26 @@
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById('screen-onboard').classList.add('active');
             }
-            try {
-                if (tg && tg.initData) {
-                    const d = await api('/miniapp/verify', { initData: tg.initData });
-                    if (d && d.user_id) { currentUserId = d.user_id; await loadUserData(); }
+
+            // 3) Авто-авторизация и загрузка данных, с повтором если сервер холодный
+            for (let attempt = 1; attempt <= 2; attempt++) {
+                try {
+                    if (tg && tg.initData) {
+                        const d = await api('/miniapp/verify', { initData: tg.initData });
+                        if (d && d.user_id) {
+                            currentUserId = d.user_id;
+                            await loadUserData();
+                        }
+                    }
+                    break;
+                } catch (e) {
+                    if (attempt === 2) {
+                        console.warn('silent auth failed:', e.message);
+                    } else {
+                        await new Promise(r => setTimeout(r, 2500));
+                    }
                 }
-            } catch (e) { console.warn('silent auth failed:', e.message); }
+            }
         })();
     </script>
 </body>
