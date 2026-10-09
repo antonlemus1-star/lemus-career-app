@@ -23,22 +23,9 @@
             --radius-card: 20px;
             --radius-button: 16px;
         }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
-        .bg-animation::before {
-            content: '';
-            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
-            background: radial-gradient(circle at 20% 50%, rgba(102,126,234,0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(118,75,162,0.15) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 80%, rgba(240,147,251,0.1) 0%, transparent 50%);
-            animation: rotate 30s linear infinite;
-        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+        .bg-animation { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+        .bg-animation::before { content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(circle at 20% 50%, rgba(102,126,234,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(118,75,162,0.15) 0%, transparent 50%), radial-gradient(circle at 40% 80%, rgba(240,147,251,0.1) 0%, transparent 50%); animation: rotate 30s linear infinite; }
         @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
@@ -74,7 +61,6 @@
         .feature-grid { display: grid; gap: 12px; }
         .feature-card { display: flex; align-items: center; gap: 16px; padding: 18px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); cursor: pointer; }
         .feature-card:active { transform: scale(0.98); background: rgba(255,255,255,0.08); }
-        .feature-card.highlight { background: linear-gradient(135deg, rgba(102,126,234,0.25), rgba(118,75,162,0.25)); border: 1px solid rgba(102,126,234,0.5); }
         .feature-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
         .feature-icon.purple { background: rgba(102,126,234,0.2); }
         .feature-icon.blue { background: rgba(79,172,254,0.2); }
@@ -84,7 +70,7 @@
         .feature-info { flex: 1; }
         .feature-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
         .feature-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
-        .feature-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .feature-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
         .feature-badge.free { background: rgba(17,153,142,0.2); color: #38ef7d; }
         .feature-badge.premium { background: rgba(240,147,251,0.2); color: #f093fb; }
         .feature-badge.new { background: rgba(79,172,254,0.2); color: #4facfe; }
@@ -93,13 +79,13 @@
         .premium-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
         .premium-text { font-size: 14px; opacity: 0.9; line-height: 1.5; margin-bottom: 16px; }
         .premium-button { display: inline-block; padding: 12px 24px; background: rgba(255,255,255,0.2); border-radius: var(--radius-button); font-size: 15px; font-weight: 600; cursor: pointer; }
-        .premium-button:active { transform: scale(0.95); }
         .action-buttons { display: grid; gap: 12px; margin-top: 24px; }
         .action-button { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 24px; border-radius: var(--radius-button); font-size: 16px; font-weight: 600; cursor: pointer; color: white; border: none; width: 100%; }
         .action-button.primary { background: var(--gradient-main); box-shadow: 0 8px 24px rgba(102,126,234,0.3); }
         .action-button.secondary { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
         .footer { text-align: center; color: var(--text-secondary); font-size: 13px; padding: 24px 0; }
+        .footer a { color: #4facfe; text-decoration: none; }
         .balance-big { text-align: center; padding: 40px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 24px; }
         .balance-num { font-size: 64px; font-weight: 800; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .balance-label { font-size: 16px; color: var(--text-secondary); margin-top: 8px; }
@@ -123,6 +109,7 @@
         .vacancy-card { padding: 16px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; }
         .vacancy-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
         .vacancy-score { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; background: rgba(17,153,142,0.2); color: #38ef7d; flex-shrink: 0; }
+        .vacancy-score.mid { background: rgba(79,172,254,0.2); color: #4facfe; }
         .vacancy-score.low { background: rgba(255,154,63,0.2); color: #ff9a3f; }
         .vacancy-title { font-size: 16px; font-weight: 600; }
         .vacancy-company { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
@@ -133,9 +120,30 @@
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
         .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
         .error-box { padding: 16px; background: rgba(245,87,108,0.12); border: 1px solid rgba(245,87,108,0.4); border-radius: 12px; color: #ff8a94; font-size: 14px; margin-top: 12px; }
+        .info-box { padding: 12px 16px; background: rgba(79,172,254,0.08); border: 1px solid rgba(79,172,254,0.25); border-radius: 12px; color: #9ed2ff; font-size: 13px; margin-top: 12px; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px; }
         .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
         .status-text { font-size: 14px; color: #ddd; text-align: center; max-width: 80%; }
+        /* Онбординг */
+        .onboard-slide { text-align: center; padding: 30px 10px; }
+        .onboard-icon { font-size: 72px; margin-bottom: 24px; }
+        .onboard-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+        .onboard-text { font-size: 15px; color: var(--text-secondary); line-height: 1.6; max-width: 320px; margin: 0 auto; }
+        .onboard-dots { display: flex; justify-content: center; gap: 8px; margin: 24px 0; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); }
+        .dot.active { background: #667eea; width: 24px; border-radius: 4px; }
+        /* Тарифы */
+        .tariff-card { padding: 20px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-card); margin-bottom: 14px; }
+        .tariff-name { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .tariff-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+        .tariff-price { font-size: 22px; font-weight: 800; color: #ffd76a; margin-bottom: 14px; }
+        .switch-row { display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; cursor: pointer; }
+        .switch-label { font-size: 15px; font-weight: 600; }
+        .switch-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .switch-state { padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.1); color: var(--text-secondary); }
+        .switch-state.on { background: rgba(17,153,142,0.25); color: #38ef7d; }
+        .file-drop { border: 2px dashed rgba(255,255,255,0.2); border-radius: var(--radius-card); padding: 30px 20px; text-align: center; color: var(--text-secondary); font-size: 14px; cursor: pointer; margin-bottom: 16px; }
+        .file-drop:active { border-color: #667eea; }
         ::-webkit-scrollbar { width: 0; }
     </style>
 </head>
@@ -147,7 +155,23 @@
     </div>
 
     <div class="container">
-        <!-- ГЛАВНЫЙ ЭКРАН -->
+        <!-- ОНБОРДИНГ -->
+        <div class="screen" id="screen-onboard">
+            <div class="onboard-slide">
+                <div class="onboard-icon" id="obIcon">🚀</div>
+                <div class="onboard-title" id="obTitle">Lemus Career Agent</div>
+                <div class="onboard-text" id="obText">ИИ-агент анализирует вакансии, находит контакты руководителей и пишет питчи за тебя.</div>
+            </div>
+            <div class="onboard-dots" id="obDots">
+                <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-button primary" id="obNext" onclick="onboardNext()">Далее →</button>
+                <button class="action-button secondary" onclick="onboardSkip()">Пропустить</button>
+            </div>
+        </div>
+
+        <!-- ГЛАВНЫЙ -->
         <div class="screen active" id="screen-home">
             <div class="header">
                 <div class="logo">🚀</div>
@@ -194,36 +218,76 @@
             </div>
             <div class="premium-banner">
                 <div class="premium-title">🎓 Премиум возможности</div>
-                <div class="premium-text">3 курса по трудоустройству, 10 шаблонов писем, аналитика откликов и план поиска работы</div>
-                <div class="premium-button" onclick="openBot()">Узнать больше</div>
+                <div class="premium-text">3 курса, 10 шаблонов писем, аналитика откликов и план поиска работы</div>
+                <div class="premium-button" onclick="showScreen('premium')">Открыть</div>
             </div>
             <div class="action-buttons">
                 <button class="action-button primary" onclick="openBot()">🚀 Открыть бота</button>
                 <button class="action-button secondary" onclick="shareBot()">📤 Поделиться ботом</button>
             </div>
-            <div class="footer">Сделано с ❤️ для поиска работы мечты</div>
+            <div class="footer">Сделано с ❤️ • Поддержка: <a href="mailto:a.lemus@ya.ru">a.lemus@ya.ru</a></div>
         </div>
 
         <!-- БАЛАНС -->
         <div class="screen" id="screen-balance">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">💎 Мой баланс</div>
-            <div class="screen-subtitle">Количество доступных запросов к ИИ</div>
+            <div class="screen-subtitle">Запросы к ИИ и управление подписками</div>
             <div class="balance-big">
                 <div class="balance-num" id="balanceNum">—</div>
                 <div class="balance-label">запросов осталось</div>
                 <div class="premium-status" id="premiumStatus" style="display:none;">⭐ ПРЕМИУМ АКТИВЕН</div>
             </div>
             <div class="feature-grid">
-                <div class="feature-card" onclick="openBot()">
+                <div class="feature-card" onclick="showScreen('tariffs')">
                     <div class="feature-icon green">💳</div>
-                    <div class="feature-info"><div class="feature-name">Пополнить баланс</div><div class="feature-desc">50 запросов за 100 ⭐ или Безлимит за 500 ⭐</div></div>
+                    <div class="feature-info"><div class="feature-name">Пополнить баланс</div><div class="feature-desc">Оплата Telegram Stars прямо здесь</div></div>
+                </div>
+                <div class="feature-card" onclick="showScreen('payments')">
+                    <div class="feature-icon blue">🧾</div>
+                    <div class="feature-info"><div class="feature-name">История операций</div><div class="feature-desc">Все платежи и начисления</div></div>
                 </div>
                 <div class="feature-card" onclick="showScreen('tracker')">
-                    <div class="feature-icon blue">📊</div>
+                    <div class="feature-icon purple">📊</div>
                     <div class="feature-info"><div class="feature-name">Мой трекер</div><div class="feature-desc">История разборов вакансий</div></div>
                 </div>
+                <div class="switch-row" onclick="toggleDigest()">
+                    <div><div class="switch-label">🌅 Дайджест вакансий</div><div class="switch-sub">Топ-5 вакансий каждые 12 часов в чат</div></div>
+                    <div class="switch-state" id="digestState">ВЫКЛ</div>
+                </div>
+                <div class="feature-card" onclick="location.href='mailto:a.lemus@ya.ru'">
+                    <div class="feature-icon orange">📧</div>
+                    <div class="feature-info"><div class="feature-name">Поддержка</div><div class="feature-desc">a.lemus@ya.ru</div></div>
+                </div>
             </div>
+        </div>
+
+        <!-- ТАРИФЫ -->
+        <div class="screen" id="screen-tariffs">
+            <div class="back-button" onclick="showScreen('balance')">← Назад</div>
+            <div class="screen-title">💳 Тарифы</div>
+            <div class="screen-subtitle">Оплата Telegram Stars — зачисление мгновенное</div>
+            <div class="tariff-card">
+                <div class="tariff-name">📦 Пакет 50 запросов</div>
+                <div class="tariff-desc">Хватит на 25 разборов вакансий или 50 питчей/поисков</div>
+                <div class="tariff-price">100 ⭐</div>
+                <button class="action-button primary" onclick="payTariff('pack50')">Оплатить Stars</button>
+            </div>
+            <div class="tariff-card">
+                <div class="tariff-name">♾ Безлимит 10 дней</div>
+                <div class="tariff-desc">До 50 запросов в день без ограничений баланса</div>
+                <div class="tariff-price">500 ⭐</div>
+                <button class="action-button primary" onclick="payTariff('unl10')">Оплатить Stars</button>
+            </div>
+            <div class="info-box">Альтернатива: оплата по СБП через бота (кнопка «💎 Оплата и Баланс»).</div>
+        </div>
+
+        <!-- ИСТОРИЯ ПЛАТЕЖЕЙ -->
+        <div class="screen" id="screen-payments">
+            <div class="back-button" onclick="showScreen('balance')">← Назад</div>
+            <div class="screen-title">🧾 История операций</div>
+            <div class="screen-subtitle">Платежи и начисления</div>
+            <div id="paymentsList"><div class="empty-state"><div class="empty-state-icon"></div><div>Операций пока нет</div></div></div>
         </div>
 
         <!-- ТРЕКЕР -->
@@ -240,10 +304,15 @@
             <div class="screen-title">💼 Я ищу работу</div>
             <div class="screen-subtitle">Инструменты для эффективного поиска работы</div>
             <div class="feature-grid">
-                <div class="feature-card highlight" onclick="showScreen('search')">
-                    <div class="feature-icon purple">🔍</div>🔍</div>
-                    <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">Подбор по резюме и региону с % соответствия</div></div>
+                <div class="feature-card" onclick="showScreen('search')">
+                    <div class="feature-icon purple">🔍</div>
+                    <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">Нажми: подбор по резюме, региону и отрасли</div></div>
                     <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('upload')">
+                    <div class="feature-icon green">📥</div>
+                    <div class="feature-info"><div class="feature-name">Загрузить резюме</div><div class="feature-desc">PDF, DOCX, TXT или фото — для точного подбора</div></div>
+                    <span class="feature-badge new">Новое</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('analyze')">
                     <div class="feature-icon blue">🔗</div>
@@ -265,31 +334,45 @@
                     <div class="feature-info"><div class="feature-name">Анализ навыков</div><div class="feature-desc">Skill Gap анализ и рекомендации</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
+                <div class="feature-card" onclick="showScreen('referral')">
+                    <div class="feature-icon orange">🎁</div>
+                    <div class="feature-info"><div class="feature-name">Бонусы и друзья</div><div class="feature-desc">+7 запросов за каждого друга</div></div>
+                    <span class="feature-badge free">+7 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('premium')">
+                    <div class="feature-icon pink">🎓</div>
+                    <div class="feature-info"><div class="feature-name">Курсы и шаблоны</div><div class="feature-desc">Премиум-контент для поиска работы</div></div>
+                    <span class="feature-badge premium">Премиум</span>
+                </div>
                 <div class="feature-card" onclick="openBot()">
                     <div class="feature-icon green">🎤</div>
                     <div class="feature-info"><div class="feature-name">Тренажёр собеседований</div><div class="feature-desc">Практика ответов с ИИ (в чате бота)</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
-                <div class="feature-card" onclick="openBot()">
-                    <div class="feature-icon pink">🎓</div>
-                    <div class="feature-info"><div class="feature-name">Курсы по трудоустройству</div><div class="feature-desc">3 курса: резюме, собеседование, переговоры</div></div>
-                    <span class="feature-badge premium">Премиум</span>
-                </div>
-                <div class="feature-card" onclick="openBot()">
-                    <div class="feature-icon orange">🎯</div>
-                    <div class="feature-info"><div class="feature-name">План поиска работы</div><div class="feature-desc">Персональный план на неделю</div></div>
-                    <span class="feature-badge premium">Премиум</span>
-                </div>
             </div>
+        </div>
+
+        <!-- ЗАГРУЗКА РЕЗЮМЕ -->
+        <div class="screen" id="screen-upload">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">📥 Загрузить резюме</div>
+            <div class="screen-subtitle">Файл станет основой для подбора вакансий</div>
+            <label class="file-drop" for="resumeFile">📄 Нажми, чтобы выбрать файл<br><small>PDF, DOCX, DOC, TXT, RTF, ODT, JPG, PNG • до 5 МБ</small></label>
+            <input type="file" id="resumeFile" accept=".pdf,.docx,.doc,.txt,.rtf,.odt,.jpg,.jpeg,.png" style="display:none;" onchange="onFilePicked(this)">
+            <div id="uploadResult"></div>
         </div>
 
         <!-- ПОИСК ВАКАНСИЙ -->
         <div class="screen" id="screen-search">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🔍 Поиск вакансий</div>
-            <div class="screen-subtitle">Подбор по вашему резюме и региону</div>
-            <button class="action-button primary" id="searchBtn" onclick="runSearch()">🔍 Найти вакансии (1 ⭐)</button>
-            <div id="searchResult" style="margin-top: 24px;"></div>
+            <div class="screen-subtitle">Подбор по резюме, региону и целевым отраслям</div>
+            <div class="feature-card" onclick="runSearch()" style="margin-bottom:16px;">
+                <div class="feature-icon purple">🔍</div>
+                <div class="feature-info"><div class="feature-name">Запустить поиск</div><div class="feature-desc">ИИ подберёт вакансии твоего уровня • 1 ⭐</div></div>
+            </div>
+            <div id="searchMeta"></div>
+            <div id="searchResult" style="margin-top: 16px;"></div>
         </div>
 
         <!-- РАЗБОР ВАКАНСИИ -->
@@ -307,7 +390,7 @@
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🕵️ Найти ЛПР</div>
             <div class="screen-subtitle">Поиск контактов нанимающих менеджеров</div>
-            <input type="text" class="input-field" id="lprCompany" placeholder="Компания (например: Сбер)">
+            <input type="text" class="input-field" id="lprCompany" placeholder="Компания (например: МегаФон)">
             <input type="text" class="input-field" id="lprPosition" placeholder="Должность (необязательно)">
             <button class="action-button primary" id="lprBtn" onclick="runFindLPR()">🕵️ Найти контакты (1 ⭐)</button>
             <div id="lprResult" style="margin-top: 24px;"></div>
@@ -318,8 +401,8 @@
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📝 Генерация питча</div>
             <div class="screen-subtitle">Цепляющее сообщение для рекрутера</div>
-            <input type="text" class="input-field" id="pitchCompany" placeholder="Компания (например: Яндекс)">
-            <input type="text" class="input-field" id="pitchTitle" placeholder="Должность (например: Product Manager)">
+            <input type="text" class="input-field" id="pitchCompany" placeholder="Компания (например: Сбер)">
+            <input type="text" class="input-field" id="pitchTitle" placeholder="Должность (например: Директор по развитию)">
             <button class="action-button primary" id="pitchBtn" onclick="runPitch()">📝 Сгенерировать питч (1 ⭐)</button>
             <div id="pitchResult" style="margin-top: 24px;"></div>
         </div>
@@ -331,6 +414,37 @@
             <div class="screen-subtitle">Skill Gap анализ вашего резюме</div>
             <button class="action-button primary" id="skillGapBtn" onclick="runSkillGap()">📊 Провести анализ (1 ⭐)</button>
             <div id="skillGapResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- РЕФЕРАЛКА -->
+        <div class="screen" id="screen-referral">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">🎁 Бонусы и друзья</div>
+            <div class="screen-subtitle">+7 запросов тебе и другу за каждого приглашённого</div>
+            <div class="result-card">
+                <div class="result-section-title">Твоя ссылка</div>
+                <div class="analysis-block" id="refLink">Загружаем...</div>
+                <button class="copy-btn" onclick="copyRefLink()">📋 Скопировать ссылку</button>
+            </div>
+            <div class="result-card">
+                <div class="result-section-title">Статистика</div>
+                <div id="refStats">Приглашено друзей: —</div>
+            </div>
+        </div>
+
+        <!-- ПРЕМИУМ -->
+        <div class="screen" id="screen-premium">
+            <div class="back-button" onclick="showScreen('home')">← Назад</div>
+            <div class="screen-title">🎓 Премиум-контент</div>
+            <div class="screen-subtitle">Курсы и шаблоны писем</div>
+            <div id="premiumGate" style="display:none;">
+                <div class="premium-banner">
+                    <div class="premium-title">🔒 Контент для премиум-пользователей</div>
+                    <div class="premium-text">Оформи безлимит, чтобы открыть 3 курса и 10 шаблонов писем</div>
+                    <div class="premium-button" onclick="showScreen('tariffs')">Перейти к тарифам</div>
+                </div>
+            </div>
+            <div id="premiumContent"></div>
         </div>
 
         <!-- РЕКРУТЕР -->
@@ -396,8 +510,10 @@
 
     <script>
         const BOT_API_URL = "https://lemus-career-bot.onrender.com";
+        const SUPPORT_EMAIL = "a.lemus@ya.ru";
         const tg = window.Telegram && window.Telegram.WebApp;
         let currentUserId = null;
+        let userData = null;
 
         if (tg) {
             try {
@@ -411,19 +527,41 @@
             } catch(e) {}
         }
 
+        // ---------- ОНБОРДИНГ ----------
+        const OB_SLIDES = [
+            { icon: '🚀', title: 'Lemus Career Agent', text: 'ИИ-агент анализирует вакансии, находит контакты руководителей и пишет питчи за тебя.' },
+            { icon: '📄', title: 'Загрузи резюме', text: 'Приложение подберёт вакансии твоего уровня и отрасли с процентом соответствия.' },
+            { icon: '⭐', title: 'Баланс и тарифы', text: '7 запросов бесплатно. Пополнение — Telegram Stars прямо в приложении.' }
+        ];
+        let obIndex = 0;
+
+        function onboardRender() {
+            const s = OB_SLIDES[obIndex];
+            document.getElementById('obIcon').textContent = s.icon;
+            document.getElementById('obTitle').textContent = s.title;
+            document.getElementById('obText').textContent = s.text;
+            document.getElementById('obNext').textContent = (obIndex === OB_SLIDES.length - 1) ? 'Начать 🚀' : 'Далее →';
+            const dots = document.getElementById('obDots').children;
+            for (let i = 0; i < dots.length; i++) dots[i].className = 'dot' + (i === obIndex ? ' active' : '');
+        }
+        function onboardNext() {
+            if (obIndex < OB_SLIDES.length - 1) { obIndex++; onboardRender(); return; }
+            onboardSkip();
+        }
+        function onboardSkip() {
+            try { localStorage.setItem('lc_onboarded_v1', '1'); } catch(e) {}
+            showScreen('home');
+        }
+
+        // ---------- БАЗА ----------
         function showLoader(text, show) {
             document.getElementById('loaderStatus').textContent = text || '';
             document.getElementById('loaderOverlay').style.display = show ? 'flex' : 'none';
         }
-
         function escapeHtml(str) {
             if (str === null || str === undefined) return '';
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
         }
-
-        // ЕДИНАЯ ТОЧКА ЗАПРОСОВ К СЕРВЕРУ.
-        // Content-Type: text/plain => браузер НЕ шлёт preflight OPTIONS.
-        // Ответ читаем как текст и парсим вручную => обходим баги WebView.
         async function api(path, payload) {
             const opts = (payload === undefined)
                 ? { method: 'GET' }
@@ -435,7 +573,6 @@
             if (!res.ok) throw new Error(data.error || ('Ошибка сервера: ' + res.status));
             return data;
         }
-
         async function ensureAuth() {
             if (currentUserId) return true;
             if (!tg || !tg.initData) { alert('⚠️ Откройте приложение из Telegram.'); return false; }
@@ -447,24 +584,22 @@
             } catch (e) {
                 alert('⚠️ Ошибка входа: ' + e.message);
                 return false;
-            } finally {
-                showLoader('', false);
-            }
+            } finally { showLoader('', false); }
         }
-
         async function loadUserData() {
             if (!currentUserId) return;
             try {
-                const d = await api('/miniapp/data?user_id=' + currentUserId);
-                document.getElementById('homeBalance').textContent = d.balance;
-                document.getElementById('balanceNum').textContent = d.balance;
-                if (d.is_premium) document.getElementById('premiumStatus').style.display = 'inline-block';
-                const cnt = (d.tracker || []).length;
-                document.getElementById('homeTracker').textContent = cnt;
-                renderTracker(d.tracker || []);
+                userData = await api('/miniapp/data?user_id=' + currentUserId);
+                document.getElementById('homeBalance').textContent = userData.balance;
+                document.getElementById('balanceNum').textContent = userData.balance;
+                document.getElementById('premiumStatus').style.display = userData.is_premium ? 'inline-block' : 'none';
+                document.getElementById('homeTracker').textContent = (userData.tracker || []).length;
+                const ds = document.getElementById('digestState');
+                ds.textContent = userData.digest_active ? 'ВКЛ' : 'ВЫКЛ';
+                ds.className = 'switch-state' + (userData.digest_active ? ' on' : '');
+                renderTracker(userData.tracker || []);
             } catch (e) { console.warn('loadUserData:', e.message); }
         }
-
         function renderTracker(items) {
             const box = document.getElementById('trackerList');
             if (!items.length) {
@@ -480,30 +615,27 @@
             });
             box.innerHTML = html;
         }
-
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             const t = document.getElementById('screen-' + id);
             if (t) t.classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             if (tg && tg.HapticFeedback) { try { tg.HapticFeedback.selectionChanged(); } catch(e) {} }
-            if (tg && tg.BackButton) {
-                try { (id === 'home') ? tg.BackButton.hide() : tg.BackButton.show(); } catch(e) {}
+            if (tg && tg.BackButton) { try { (id === 'home') ? tg.BackButton.hide() : tg.BackButton.show(); } catch(e) {} }
+            if (currentUserId) {
+                if (id === 'balance' || id === 'tracker') loadUserData();
+                if (id === 'payments') loadPayments();
+                if (id === 'referral') loadReferral();
+                if (id === 'premium') loadPremium();
             }
-            if ((id === 'balance' || id === 'tracker') && currentUserId) loadUserData();
         }
-
         if (tg && tg.onEvent) {
-            try {
-                tg.onEvent('backButtonClicked', function() { showScreen('home'); });
-            } catch(e) {}
+            try { tg.onEvent('backButtonClicked', function() { showScreen('home'); }); } catch(e) {}
         }
-
         function openBot() {
             if (tg && tg.openTelegramLink) { try { tg.openTelegramLink('https://t.me/LemusCareer_Bot'); return; } catch(e) {} }
             window.open('https://t.me/LemusCareer_Bot', '_blank');
         }
-
         function shareBot() {
             const shareText = '🚀 Нашёл крутой ИИ-карьерный агент! Помогает искать работу и нанимать. Попробуй: ';
             const botLink = 'https://t.me/LemusCareer_Bot';
@@ -511,43 +643,120 @@
             if (navigator.share) { try { navigator.share({ title: 'Lemus Career Agent', text: shareText, url: botLink }); return; } catch(e) {} }
             try { navigator.clipboard.writeText(botLink); alert('Ссылка скопирована!'); } catch(e) { alert('Ссылка: ' + botLink); }
         }
-
-        function errorBox(msg, withBotButton) {
+        function errorBox(msg, withBot) {
             return '<div class="error-box">⚠️ ' + escapeHtml(msg) + '</div>' +
-                (withBotButton ? '<button class="action-button secondary" style="margin-top:12px;" onclick="openBot()">💬 Открыть бота</button>' : '');
+                (withBot ? '<button class="action-button secondary" style="margin-top:12px;" onclick="openBot()">💬 Открыть бота</button>' : '');
         }
 
-        // --- ПОИСК ВАКАНСИЙ ---
-        async function runSearch() {
-            const btn = document.getElementById('searchBtn');
-            const box = document.getElementById('searchResult');
+        // ---------- ОПЛАТА STARS ----------
+        async function payTariff(tariff) {
             if (!await ensureAuth()) return;
-            btn.disabled = true;
-            showLoader('Ищу вакансии по резюме... Это может занять до минуты', true);
-            box.innerHTML = '';
+            showLoader('Создаю счёт Stars...', true);
             try {
-                const data = await api('/miniapp/search', { user_id: currentUserId });
-                renderVacancies(data.vacancies || [], box);
+                const d = await api('/miniapp/invoice', { user_id: currentUserId, tariff: tariff });
+                showLoader('', false);
+                if (tg && tg.openInvoice) {
+                    tg.openInvoice(d.invoice_link, async function(status) {
+                        if (status === 'paid') {
+                            alert('✅ Оплата прошла! Баланс обновлён.');
+                            await loadUserData();
+                        } else {
+                            alert('Оплата не завершена.');
+                        }
+                    });
+                } else {
+                    window.open(d.invoice_link, '_blank');
+                }
+            } catch (e) {
+                showLoader('', false);
+                alert('⚠️ ' + e.message);
+            }
+        }
+
+        async function loadPayments() {
+            if (!currentUserId) return;
+            try {
+                const d = await api('/miniapp/payments?user_id=' + currentUserId);
+                const box = document.getElementById('paymentsList');
+                if (!d.payments || !d.payments.length) {
+                    box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div>Операций пока нет</div></div>';
+                    return;
+                }
+                let html = '';
+                d.payments.forEach(p => {
+                    html += '<div class="tracker-item"><div class="tracker-title">⭐ ' + escapeHtml(p.amount) + ' Stars</div><span class="tracker-status contact">' + escapeHtml(p.status) + '</span><div class="switch-sub" style="margin-top:6px;">' + escapeHtml(p.created_at || '') + '</div></div>';
+                });
+                box.innerHTML = html;
+            } catch (e) { console.warn(e.message); }
+        }
+
+        // ---------- ДАЙДЖЕСТ ----------
+        async function toggleDigest() {
+            if (!await ensureAuth()) return;
+            const next = userData && userData.digest_active ? 0 : 1;
+            try {
+                await api('/miniapp/digest', { user_id: currentUserId, active: next });
+                await loadUserData();
+                alert(next ? '✅ Дайджест включён: топ-5 вакансий каждые 12 часов.' : 'Дайджест выключен.');
+            } catch (e) { alert('⚠️ ' + e.message); }
+        }
+
+        // ---------- ЗАГРУЗКА РЕЗЮМЕ ----------
+        function onFilePicked(input) {
+            const f = input.files && input.files[0];
+            if (!f) return;
+            if (f.size > 5 * 1024 * 1024) { alert('⚠️ Файл больше 5 МБ'); input.value = ''; return; }
+            const reader = new FileReader();
+            reader.onload = async function() {
+                const b64 = String(reader.result).split(',')[1] || '';
+                if (!await ensureAuth()) { input.value = ''; return; }
+                showLoader('Распознаю резюме...', true);
+                try {
+                    const d = await api('/miniapp/upload-resume', { user_id: currentUserId, filename: f.name, content_base64: b64 });
+                    document.getElementById('uploadResult').innerHTML = '<div class="info-box">✅ Резюме «' + escapeHtml(f.name) + '» сохранено и активно. Всего резюме: ' + escapeHtml(d.resumes_count) + '</div>';
+                    await loadUserData();
+                } catch (e) {
+                    document.getElementById('uploadResult').innerHTML = errorBox(e.message, false);
+                } finally {
+                    showLoader('', false);
+                    input.value = '';
+                }
+            };
+            reader.readAsDataURL(f);
+        }
+
+        // ---------- ПОИСК ВАКАНСИЙ ----------
+        async function runSearch() {
+            if (!await ensureAuth()) return;
+            const box = document.getElementById('searchResult');
+            const meta = document.getElementById('searchMeta');
+            box.innerHTML = ''; meta.innerHTML = '';
+            showLoader('Ищу вакансии по резюме: регион, отрасль, уровень. Это до 60 секунд...', true);
+            try {
+                const d = await api('/miniapp/search', { user_id: currentUserId });
+                if (d.queries && d.queries.length) {
+                    meta.innerHTML = '<div class="info-box">🎯 Запросы: ' + escapeHtml(d.queries.join(', ')) +
+                        (d.industries && d.industries.length ? '<br>🏭 Отрасли: ' + escapeHtml(d.industries.join(', ')) : '') + '</div>';
+                }
+                renderVacancies(d.vacancies || [], box);
             } catch (e) {
                 box.innerHTML = errorBox(e.message, true);
             } finally {
                 showLoader('', false);
-                btn.disabled = false;
                 await loadUserData();
             }
         }
-
         function renderVacancies(list, box) {
             if (!list.length) {
-                box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div>Вакансий не найдено.</div></div>';
+                box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div>Вакансий не найдено. Проверь резюме или попробуй позже.</div></div>';
                 return;
             }
             let html = '<div class="result-section-title">Найдено: ' + list.length + ' (отсортировано по соответствию)</div>';
             list.forEach(v => {
-                const cls = (v.match_score >= 70) ? '' : ' low';
+                const sc = v.match_score || 0;
+                const cls = sc >= 75 ? '' : (sc >= 60 ? ' mid' : ' low');
                 html += '<div class="vacancy-card">' +
-                    '<div class="vacancy-header"><div class="vacancy-title">' + escapeHtml(v.title) + '</div>' +
-                    '<span class="vacancy-score' + cls + '">' + escapeHtml(v.match_score) + '%</span></div>' +
+                    '<div class="vacancy-header"><div class="vacancy-title">' + escapeHtml(v.title) + '</div><span class="vacancy-score' + cls + '">' + escapeHtml(sc) + '%</span></div>' +
                     '<div class="vacancy-company">🏢 ' + escapeHtml(v.company) + '</div>' +
                     (v.salary ? '<div class="vacancy-salary">' + escapeHtml(v.salary) + '</div>' : '') +
                     '<div class="vacancy-reason">' + escapeHtml(v.match_reason) + '</div>' +
@@ -557,7 +766,7 @@
             box.innerHTML = html;
         }
 
-        // --- РАЗБОР ВАКАНСИИ ---
+        // ---------- РАЗБОР ВАКАНСИИ ----------
         async function runAnalyze() {
             const txt = document.getElementById('vacancyInput').value.trim();
             const btn = document.getElementById('analyzeBtn');
@@ -569,8 +778,7 @@
             box.innerHTML = '';
             try {
                 const d = await api('/miniapp/analyze', { user_id: currentUserId, vacancy_text: txt });
-                let html = '<div class="result-card"><div class="result-company">🏢 ' + escapeHtml(d.company) + '</div>' +
-                    '<div class="result-title">💼 ' + escapeHtml(d.title) + '</div>' +
+                let html = '<div class="result-card"><div class="result-company">🏢 ' + escapeHtml(d.company) + '</div><div class="result-title">💼 ' + escapeHtml(d.title) + '</div>' +
                     (d.contact_name ? '<div class="result-title">👤 Контакт: ' + escapeHtml(d.contact_name) + '</div>' : '') + '</div>';
                 if (d.contacts && d.contacts.length) {
                     html += '<div class="result-card"><div class="result-section-title">✅ Найденные контакты</div>';
@@ -588,9 +796,7 @@
                     html += '</div>';
                 }
                 if (d.pitch) {
-                    html += '<div class="result-card"><div class="result-section-title">📝 Питч для отправки</div>' +
-                        '<div class="result-pitch" id="pitchText">' + escapeHtml(d.pitch) + '</div>' +
-                        '<button class="copy-btn" onclick="copyPitch()">📋 Скопировать питч</button></div>';
+                    html += '<div class="result-card"><div class="result-section-title">📝 Питч для отправки</div><div class="result-pitch" id="pitchText">' + escapeHtml(d.pitch) + '</div><button class="copy-btn" onclick="copyPitch()">📋 Скопировать питч</button></div>';
                 }
                 box.innerHTML = html;
             } catch (e) {
@@ -601,14 +807,13 @@
                 await loadUserData();
             }
         }
-
         function copyPitch() {
             const el = document.getElementById('pitchText');
             if (!el) return;
             navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
-        // --- ЛПР ---
+        // ---------- ЛПР ----------
         async function runFindLPR() {
             const company = document.getElementById('lprCompany').value.trim();
             const position = document.getElementById('lprPosition').value.trim();
@@ -621,8 +826,7 @@
             box.innerHTML = '';
             try {
                 const d = await api('/miniapp/find-lpr', { user_id: currentUserId, company: company, position: position });
-                let html = '<div class="result-card"><div class="result-company">🏢 ' + escapeHtml(d.company) + '</div>' +
-                    (d.position ? '<div class="result-title">💼 ' + escapeHtml(d.position) + '</div>' : '') + '</div>';
+                let html = '<div class="result-card"><div class="result-company">🏢 ' + escapeHtml(d.company) + '</div>' + (d.position ? '<div class="result-title">💼 ' + escapeHtml(d.position) + '</div>' : '') + '</div>';
                 if (d.contacts && d.contacts.length) {
                     html += '<div class="result-card"><div class="result-section-title">✅ Контакты</div>';
                     d.contacts.forEach(c => {
@@ -655,7 +859,7 @@
             }
         }
 
-        // --- ПИТЧ ---
+        // ---------- ПИТЧ ----------
         async function runPitch() {
             const company = document.getElementById('pitchCompany').value.trim();
             const title = document.getElementById('pitchTitle').value.trim();
@@ -681,14 +885,13 @@
                 await loadUserData();
             }
         }
-
         function copyGeneratedPitch() {
             const el = document.getElementById('generatedPitch');
             if (!el) return;
             navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
-        // --- SKILL GAP ---
+        // ---------- SKILL GAP ----------
         async function runSkillGap() {
             const btn = document.getElementById('skillGapBtn');
             const box = document.getElementById('skillGapResult');
@@ -708,7 +911,69 @@
             }
         }
 
-        // --- HR MATCH ---
+        // ---------- РЕФЕРАЛКА ----------
+        async function loadReferral() {
+            if (!currentUserId) return;
+            try {
+                const d = await api('/miniapp/referral?user_id=' + currentUserId);
+                document.getElementById('refLink').textContent = d.link;
+                document.getElementById('refStats').innerHTML = 'Приглашено друзей: <strong>' + escapeHtml(d.referred_count) + '</strong><br>Бонус за друга: +' + escapeHtml(d.bonus_per_friend) + ' запросов';
+            } catch (e) { console.warn(e.message); }
+        }
+        function copyRefLink() {
+            const el = document.getElementById('refLink');
+            navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Ссылка скопирована!')).catch(() => alert('Скопируй вручную'));
+        }
+
+        // ---------- ПРЕМИУМ ----------
+        async function loadPremium() {
+            const gate = document.getElementById('premiumGate');
+            const content = document.getElementById('premiumContent');
+            if (!userData) { await loadUserData(); }
+            if (!userData || !userData.is_premium) {
+                gate.style.display = 'block';
+                content.innerHTML = '';
+                return;
+            }
+            gate.style.display = 'none';
+            try {
+                const c = await api('/miniapp/courses?user_id=' + currentUserId);
+                const t = await api('/miniapp/templates?user_id=' + currentUserId);
+                let html = '<div class="result-section-title">🎓 Курсы</div>';
+                (c.courses || []).forEach(course => {
+                    html += '<div class="result-card"><div class="result-company">' + escapeHtml(course.title) + '</div><div class="result-title">' + escapeHtml(course.description) + '</div>';
+                    course.lessons.forEach((l, i) => {
+                        html += '<div class="link-item" style="cursor:pointer;" onclick="openLesson(\'' + course.id + '\',' + (i + 1) + ')">' + escapeHtml(l) + '</div>';
+                    });
+                    html += '</div>';
+                });
+                html += '<div class="result-section-title">📝 Шаблоны писем</div>';
+                (t.templates || []).forEach(tp => {
+                    html += '<div class="link-item" style="cursor:pointer;" onclick="openTemplate(' + tp.num + ')">' + escapeHtml(tp.name) + '</div>';
+                });
+                content.innerHTML = html;
+            } catch (e) {
+                content.innerHTML = errorBox(e.message, false);
+            }
+        }
+        async function openLesson(courseId, num) {
+            showLoader('Открываю урок...', true);
+            try {
+                const d = await api('/miniapp/lesson', { user_id: currentUserId, course: courseId, num: num });
+                alert(d.content);
+            } catch (e) { alert('⚠️ ' + e.message); }
+            finally { showLoader('', false); }
+        }
+        async function openTemplate(num) {
+            showLoader('Открываю шаблон...', true);
+            try {
+                const d = await api('/miniapp/template', { user_id: currentUserId, num: num });
+                alert(d.name + '\n\n' + d.content);
+            } catch (e) { alert('⚠️ ' + e.message); }
+            finally { showLoader('', false); }
+        }
+
+        // ---------- HR ----------
         async function runHRMatch() {
             const resume = document.getElementById('hrMatchResume').value.trim();
             const vacancy = document.getElementById('hrMatchVacancy').value.trim();
@@ -732,8 +997,6 @@
                 await loadUserData();
             }
         }
-
-        // --- HR SCORING ---
         async function runHRScoring() {
             const resume = document.getElementById('hrScoringResume').value.trim();
             const btn = document.getElementById('hrScoringBtn');
@@ -756,9 +1019,15 @@
             }
         }
 
-        // --- СТАРТ ---
+        // ---------- СТАРТ ----------
         (async function startApp() {
-            // Тихая авторизация при открытии (без алертов), чтобы сразу показать баланс
+            let onboarded = false;
+            try { onboarded = localStorage.getItem('lc_onboarded_v1') === '1'; } catch(e) {}
+            if (!onboarded) {
+                onboardRender();
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('screen-onboard').classList.add('active');
+            }
             try {
                 if (tg && tg.initData) {
                     const d = await api('/miniapp/verify', { initData: tg.initData });
