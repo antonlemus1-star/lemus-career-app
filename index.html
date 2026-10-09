@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Lemus Career Agent</title>
-    
-    <!-- Защита от кэша -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -18,9 +15,13 @@
             --bg-card: rgba(255, 255, 255, 0.05);
             --text-primary: #ffffff;
             --text-secondary: #a0a0b0;
-            --accent-blue: #4facfe;
             --gradient-main: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --radius-card: 16px;
+            --gradient-accent: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --gradient-premium: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gradient-seeker: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-recruiter: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --radius-card: 20px;
+            --radius-button: 16px;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -29,464 +30,742 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-        .container { max-width: 480px; margin: 0 auto; padding: 20px; padding-bottom: 40px; }
-        
-        /* Header */
-        .header { text-align: center; margin-bottom: 30px; }
-        .logo { width: 70px; height: 70px; margin: 0 auto 12px; background: var(--gradient-main); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 34px; box-shadow: 0 4px 20px rgba(102,126,234,0.3); }
-        h1 { font-size: 24px; font-weight: 700; }
-        .user-info { font-size: 13px; color: var(--text-secondary); margin-top: 6px; }
-
-        /* Screens */
-        .screen { display: none; animation: fadeInUp 0.3s ease; }
-        .screen.active { display: block; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Role Selection Buttons (Main Screen) */
-        .role-buttons { display: flex; flex-direction: column; gap: 16px; margin-top: 20px; }
-        .role-btn {
-            display: flex; align-items: center; gap: 16px;
-            padding: 24px; border-radius: var(--radius-card);
-            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08);
-            cursor: pointer; transition: all 0.2s; text-align: left;
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden; }
+        .bg-animation::before {
+            content: '';
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background: radial-gradient(circle at 20% 50%, rgba(102,126,234,0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(118,75,162,0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(240,147,251,0.1) 0%, transparent 50%);
+            animation: rotate 30s linear infinite;
         }
-        .role-btn:active { transform: scale(0.98); background: rgba(255,255,255,0.1); }
-        .role-icon { font-size: 36px; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 14px; flex-shrink: 0; }
-        .role-text h3 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
-        .role-text p { font-size: 13px; color: var(--text-secondary); line-height: 1.3; }
-
-        /* Function Grid (Sub-screens) */
-        .grid-menu { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-top: 15px; }
-        .menu-item {
-            background: var(--bg-card); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card);
-            padding: 16px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; cursor: pointer; transition: transform 0.2s, background 0.2s; min-height: 100px;
-        }
-        .menu-item:active { transform: scale(0.96); background: rgba(255,255,255,0.1); }
-        .menu-icon { font-size: 28px; margin-bottom: 8px; }
-        .menu-text { font-size: 13px; font-weight: 500; line-height: 1.2; color: #ddd; }
-
-        /* Back Button */
-        .btn-back { 
-            background: transparent; border: 1px solid rgba(255,255,255,0.2); color: white; 
-            padding: 10px 18px; border-radius: 10px; cursor: pointer; margin-bottom: 15px; display: inline-block; font-size: 14px;
-        }
-        .btn-back:active { background: rgba(255,255,255,0.1); }
-
-        /* Loader Overlay */
-        .overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85);
-            z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px;
-        }
-        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .container { max-width: 480px; margin: 0 auto; padding: 20px; padding-bottom: calc(60px + env(safe-area-inset-bottom)); }
+        .header { text-align: center; padding: 24px 0 12px; }
+        .logo { width: 80px; height: 80px; margin: 0 auto 16px; background: var(--gradient-main); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 10px 40px rgba(102,126,234,0.4); animation: pulse 3s ease-in-out infinite; }
+        .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; background: linear-gradient(135deg, #fff 0%, #a0a0ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header .subtitle { color: var(--text-secondary); font-size: 15px; line-height: 1.5; }
+        .user-greeting { display: inline-block; margin-top: 12px; padding: 8px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); font-size: 14px; color: var(--text-secondary); }
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
+        .stat-card { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); padding: 16px 12px; text-align: center; cursor: pointer; }
+        .stat-card:active { transform: scale(0.95); }
+        .stat-number { font-size: 24px; font-weight: 700; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .mode-cards { display: grid; gap: 16px; margin: 20px 0; }
+        .mode-card { position: relative; border-radius: var(--radius-card); padding: 24px; padding-right: 56px; cursor: pointer; overflow: hidden; color: #fff; }
+        .mode-card.seeker { background: var(--gradient-seeker); }
+        .mode-card.recruiter { background: var(--gradient-recruiter); }
+        .mode-card:active { transform: scale(0.98); }
+        .mode-icon { font-size: 48px; margin-bottom: 12px; }
+        .mode-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .mode-description { font-size: 14px; opacity: 0.9; line-height: 1.5; margin-bottom: 16px; }
+        .mode-features { display: flex; flex-wrap: wrap; gap: 8px; }
+        .feature-tag { padding: 6px 12px; background: rgba(255,255,255,0.15); border-radius: 20px; font-size: 12px; font-weight: 500; }
+        .mode-arrow { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); font-size: 24px; opacity: 0.6; }
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeInUp 0.35s ease; }
+        .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-button); color: var(--text-primary); font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 20px; }
+        .back-button:active { transform: scale(0.95); }
+        .screen-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+        .screen-subtitle { color: var(--text-secondary); font-size: 15px; margin-bottom: 24px; line-height: 1.5; }
+        .feature-grid { display: grid; gap: 12px; }
+        .feature-card { display: flex; align-items: center; gap: 16px; padding: 18px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); cursor: pointer; }
+        .feature-card:active { transform: scale(0.98); background: rgba(255,255,255,0.08); }
+        .feature-card.highlight { background: linear-gradient(135deg, rgba(102,126,234,0.25), rgba(118,75,162,0.25)); border: 1px solid rgba(102,126,234,0.5); }
+        .feature-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+        .feature-icon.purple { background: rgba(102,126,234,0.2); }
+        .feature-icon.blue { background: rgba(79,172,254,0.2); }
+        .feature-icon.pink { background: rgba(240,147,251,0.2); }
+        .feature-icon.green { background: rgba(17,153,142,0.2); }
+        .feature-icon.orange { background: rgba(255,154,63,0.2); }
+        .feature-info { flex: 1; }
+        .feature-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+        .feature-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.4; }
+        .feature-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .feature-badge.free { background: rgba(17,153,142,0.2); color: #38ef7d; }
+        .feature-badge.premium { background: rgba(240,147,251,0.2); color: #f093fb; }
+        .feature-badge.new { background: rgba(79,172,254,0.2); color: #4facfe; }
+        .premium-banner { position: relative; background: var(--gradient-premium); border-radius: var(--radius-card); padding: 24px; margin: 24px 0; overflow: hidden; }
+        .premium-banner::after { content: '✨'; position: absolute; right: 20px; top: 20px; font-size: 40px; opacity: 0.3; }
+        .premium-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+        .premium-text { font-size: 14px; opacity: 0.9; line-height: 1.5; margin-bottom: 16px; }
+        .premium-button { display: inline-block; padding: 12px 24px; background: rgba(255,255,255,0.2); border-radius: var(--radius-button); font-size: 15px; font-weight: 600; cursor: pointer; }
+        .premium-button:active { transform: scale(0.95); }
+        .action-buttons { display: grid; gap: 12px; margin-top: 24px; }
+        .action-button { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 24px; border-radius: var(--radius-button); font-size: 16px; font-weight: 600; cursor: pointer; color: white; border: none; width: 100%; }
+        .action-button.primary { background: var(--gradient-main); box-shadow: 0 8px 24px rgba(102,126,234,0.3); }
+        .action-button.secondary { background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .footer { text-align: center; color: var(--text-secondary); font-size: 13px; padding: 24px 0; }
+        .balance-big { text-align: center; padding: 40px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 24px; }
+        .balance-num { font-size: 64px; font-weight: 800; background: var(--gradient-accent); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .balance-label { font-size: 16px; color: var(--text-secondary); margin-top: 8px; }
+        .premium-status { display: inline-block; margin-top: 12px; padding: 8px 20px; background: rgba(240,147,251,0.2); border-radius: 30px; font-size: 14px; color: #f093fb; font-weight: 600; }
+        .tracker-item { padding: 16px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; }
+        .tracker-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+        .tracker-status { display: inline-block; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .tracker-status.contact { background: rgba(17,153,142,0.2); color: #38ef7d; }
+        .tracker-status.responded { background: rgba(79,172,254,0.2); color: #4facfe; }
+        .tracker-status.other { background: rgba(255,255,255,0.1); color: var(--text-secondary); }
+        .input-field { width: 100%; padding: 16px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-card); color: var(--text-primary); font-size: 15px; font-family: inherit; outline: none; margin-bottom: 16px; }
+        .input-field:focus { border-color: #667eea; }
+        textarea.input-field { min-height: 200px; resize: vertical; }
+        .result-card { padding: 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 16px; }
+        .result-company { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .result-title { font-size: 14px; color: var(--text-secondary); margin-bottom: 12px; }
+        .result-section-title { font-size: 13px; font-weight: 600; color: #4facfe; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .result-pitch { padding: 16px; background: rgba(102,126,234,0.1); border-left: 3px solid #667eea; border-radius: 8px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+        .result-contact { padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
+        .analysis-block { padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 12px; white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.6; }
+        .vacancy-card { padding: 16px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; }
+        .vacancy-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
+        .vacancy-score { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; background: rgba(17,153,142,0.2); color: #38ef7d; flex-shrink: 0; }
+        .vacancy-score.low { background: rgba(255,154,63,0.2); color: #ff9a3f; }
+        .vacancy-title { font-size: 16px; font-weight: 600; }
+        .vacancy-company { font-size: 14px; color: var(--text-secondary); margin-bottom: 6px; }
+        .vacancy-salary { font-size: 14px; color: #4facfe; margin-bottom: 6px; }
+        .vacancy-reason { font-size: 12px; color: var(--text-secondary); font-style: italic; }
+        .link-item { display: block; padding: 12px 16px; background: rgba(79,172,254,0.1); border-radius: 12px; color: #4facfe; text-decoration: none; font-size: 14px; margin-top: 8px; }
+        .copy-btn { display: inline-block; padding: 8px 16px; margin-top: 8px; background: rgba(255,255,255,0.1); border-radius: 12px; font-size: 13px; cursor: pointer; border: none; color: var(--text-primary); }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+        .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .error-box { padding: 16px; background: rgba(245,87,108,0.12); border: 1px solid rgba(245,87,108,0.4); border-radius: 12px; color: #ff8a94; font-size: 14px; margin-top: 12px; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top-color: #fff; border-radius: 50%; animation: spin 1s linear infinite; }
         .status-text { font-size: 14px; color: #ddd; text-align: center; max-width: 80%; }
-
-        /* Feature Detail Area */
-        .feature-detail { display: none; margin-top: 15px; }
-        .card-result { background: var(--bg-card); border-radius: 12px; padding: 16px; margin-bottom: 12px; border-left: 4px solid var(--accent-blue); word-break: break-word; white-space: pre-wrap; }
-        
-        input[type=text], textarea {
-            width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-            color: white; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 14px; resize: vertical;
-        }
-        button.primary { 
-            width: 100%; padding: 14px; background: var(--gradient-main); color: white; 
-            border: none; border-radius: 10px; font-weight: bold; font-size: 16px; cursor: pointer; transition: opacity 0.2s;
-        }
-        button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
-        
-        .error-msg { color: #ff6b6b; font-size: 13px; margin-top: 10px; text-align: center; }
+        ::-webkit-scrollbar { width: 0; }
     </style>
 </head>
 <body>
-
-<div class="overlay" id="loaderOverlay">
-    <div class="spinner"></div>
-    <div class="status-text" id="loaderStatus">Подключение...</div>
-</div>
-
-<div class="container">
-    <div class="header">
-        <div class="logo">🚀</div>
-        <h1>Lemus Career</h1>
-        <div class="user-info" id="userNameDisplay">Загрузка профиля...</div>
+    <div class="bg-animation"></div>
+    <div class="overlay" id="loaderOverlay">
+        <div class="spinner"></div>
+        <div class="status-text" id="loaderStatus">Подключение...</div>
     </div>
 
-    <!-- ЭКРАН 1: Выбор роли -->
-    <div class="screen active" id="screen-role-select">
-        <div class="role-buttons">
-            <div class="role-btn" onclick="showRoleMenu('seeker')">
-                <div class="role-icon">💼</div>
-                <div class="role-text">
-                    <h3>Ищу работу</h3>
-                    <p>Поиск вакансий, разбор офферов, подготовка к собеседованию</p>
+    <div class="container">
+        <!-- ГЛАВНЫЙ ЭКРАН -->
+        <div class="screen active" id="screen-home">
+            <div class="header">
+                <div class="logo">🚀</div>
+                <h1>Lemus Career Agent</h1>
+                <p class="subtitle">ИИ-карьерный агент для соискателей и рекрутеров</p>
+                <div class="user-greeting" id="userGreeting">👋 Добро пожаловать!</div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-card" onclick="showScreen('balance')">
+                    <div class="stat-number" id="homeBalance">—</div>
+                    <div class="stat-label">Запросов</div>
+                </div>
+                <div class="stat-card" onclick="showScreen('tracker')">
+                    <div class="stat-number" id="homeTracker">—</div>
+                    <div class="stat-label">Вакансий</div>
+                </div>
+                <div class="stat-card" onclick="showScreen('seeker')">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Работа</div>
                 </div>
             </div>
-            <div class="role-btn" onclick="showRoleMenu('recruiter')">
-                <div class="role-icon">🏢</div>
-                <div class="role-text">
-                    <h3>Нанимаю сотрудников</h3>
-                    <p>Скоринг кандидатов, генерация вопросов, описание вакансий</p>
+            <div class="mode-cards">
+                <div class="mode-card seeker" onclick="showScreen('seeker')">
+                    <div class="mode-icon">💼</div>
+                    <div class="mode-title">Я ищу работу</div>
+                    <div class="mode-description">Поиск вакансий, разбор, контакты ЛПР, питчи</div>
+                    <div class="mode-features">
+                        <span class="feature-tag">🔍 Поиск вакансий</span>
+                        <span class="feature-tag">🔗 Разбор</span>
+                        <span class="feature-tag">🕵️ ЛПР</span>
+                    </div>
+                    <div class="mode-arrow">→</div>
+                </div>
+                <div class="mode-card recruiter" onclick="showScreen('recruiter')">
+                    <div class="mode-icon">🏢</div>
+                    <div class="mode-title">Я нанимаю</div>
+                    <div class="mode-description">Оценка кандидатов, тестовые задания, описания вакансий</div>
+                    <div class="mode-features">
+                        <span class="feature-tag">📊 Соответствие</span>
+                        <span class="feature-tag">🎯 Скоринг</span>
+                    </div>
+                    <div class="mode-arrow">→</div>
+                </div>
+            </div>
+            <div class="premium-banner">
+                <div class="premium-title">🎓 Премиум возможности</div>
+                <div class="premium-text">3 курса по трудоустройству, 10 шаблонов писем, аналитика откликов и план поиска работы</div>
+                <div class="premium-button" onclick="openBot()">Узнать больше</div>
+            </div>
+            <div class="action-buttons">
+                <button class="action-button primary" onclick="openBot()">🚀 Открыть бота</button>
+                <button class="action-button secondary" onclick="shareBot()">📤 Поделиться ботом</button>
+            </div>
+            <div class="footer">Сделано с ❤️ для поиска работы мечты</div>
+        </div>
+
+        <!-- БАЛАНС -->
+        <div class="screen" id="screen-balance">
+            <div class="back-button" onclick="showScreen('home')">← Назад</div>
+            <div class="screen-title">💎 Мой баланс</div>
+            <div class="screen-subtitle">Количество доступных запросов к ИИ</div>
+            <div class="balance-big">
+                <div class="balance-num" id="balanceNum">—</div>
+                <div class="balance-label">запросов осталось</div>
+                <div class="premium-status" id="premiumStatus" style="display:none;">⭐ ПРЕМИУМ АКТИВЕН</div>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="openBot()">
+                    <div class="feature-icon green">💳</div>
+                    <div class="feature-info"><div class="feature-name">Пополнить баланс</div><div class="feature-desc">50 запросов за 100 ⭐ или Безлимит за 500 ⭐</div></div>
+                </div>
+                <div class="feature-card" onclick="showScreen('tracker')">
+                    <div class="feature-icon blue">📊</div>
+                    <div class="feature-info"><div class="feature-name">Мой трекер</div><div class="feature-desc">История разборов вакансий</div></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- ЭКРАН 2: Меню соискателя -->
-    <div class="screen" id="screen-seeker">
-        <button class="btn-back" onclick="goHome()">← Назад</button>
-        <h2 style="margin-bottom:15px;">💼 Инструменты соискателя</h2>
-        <div class="grid-menu">
-            <div class="menu-item" onclick="openFeature('search')"><span class="menu-icon">🔍</span><span class="menu-text">Поиск вакансий</span></div>
-            <div class="menu-item" onclick="openFeature('analyze')"><span class="menu-icon">🔗</span><span class="menu-text">Разобрать вакансию</span></div>
-            <div class="menu-item" onclick="openFeature('lpr')"><span class="menu-icon">🕵️</span><span class="menu-text">Найти ЛПР</span></div>
-            <div class="menu-item" onclick="openFeature('pitch')"><span class="menu-icon">📝</span><span class="menu-text">Короткий питч</span></div>
-            <div class="menu-item" onclick="alert('Для работы с резюме используйте бота в чате')"><span class="menu-icon">📄</span><span class="menu-text">Моё резюме</span></div>
-            <div class="menu-item" onclick="alert('Тренажер доступен через бота')"><span class="menu-icon">🎤</span><span class="menu-text">Собеседование</span></div>
-            <div class="menu-item" onclick="alert('Трекер доступен через бота')"><span class="menu-icon">📊</span><span class="menu-text">Трекер</span></div>
-            <div class="menu-item" onclick="alert('Премиум функции доступны через бота')"><span class="menu-icon">🎓</span><span class="menu-text">Премиум</span></div>
+        <!-- ТРЕКЕР -->
+        <div class="screen" id="screen-tracker">
+            <div class="back-button" onclick="showScreen('home')">← Назад</div>
+            <div class="screen-title">📌 Трекер откликов</div>
+            <div class="screen-subtitle">Все разобранные вакансии в одном месте</div>
+            <div id="trackerList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Загружаем...</div></div></div>
         </div>
-        <div class="feature-detail" id="detail-seeker"></div>
-    </div>
 
-    <!-- ЭКРАН 3: Меню рекрутера -->
-    <div class="screen" id="screen-recruiter">
-        <button class="btn-back" onclick="goHome()">← Назад</button>
-        <h2 style="margin-bottom:15px;">🏢 Инструменты рекрутера</h2>
-        <div class="grid-menu">
-            <div class="menu-item" onclick="openFeature('hr_match')"><span class="menu-icon">📊</span><span class="menu-text">Соответствие</span></div>
-            <div class="menu-item" onclick="openFeature('hr_scoring')"><span class="menu-icon">🎯</span><span class="menu-text">Скоринг кандидата</span></div>
-            <div class="menu-item" onclick="alert('Генерация вопросов доступна через бота')"><span class="menu-icon">❓</span><span class="menu-text">Вопросы интервью</span></div>
-            <div class="menu-item" onclick="alert('Тестовые задания доступны через бота')"><span class="menu-icon">📝</span><span class="menu-text">Тестовое задание</span></div>
-            <div class="menu-item" onclick="alert('Описание вакансии доступно через бота')"><span class="menu-icon">📋</span><span class="menu-text">Описание вакансии</span></div>
-            <div class="menu-item" onclick="alert('Шаблон отказа доступен через бота')"><span class="menu-icon">✉️</span><span class="menu-text">Вежливый отказ</span></div>
-            <div class="menu-item" onclick="alert('Шаблон оффера доступен через бота')"><span class="menu-icon">📄</span><span class="menu-text">Шаблон оффера</span></div>
-            <div class="menu-item" onclick="alert('Оценка зарплаты доступна через бота')"><span class="menu-icon">💰</span><span class="menu-text">Оценка зарплаты</span></div>
+        <!-- СОИСКАТЕЛЬ -->
+        <div class="screen" id="screen-seeker">
+            <div class="back-button" onclick="showScreen('home')">← Назад</div>
+            <div class="screen-title">💼 Я ищу работу</div>
+            <div class="screen-subtitle">Инструменты для эффективного поиска работы</div>
+            <div class="feature-grid">
+                <div class="feature-card highlight" onclick="showScreen('search')">
+                    <div class="feature-icon purple">🔍</div>🔍</div>
+                    <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">Подбор по резюме и региону с % соответствия</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('analyze')">
+                    <div class="feature-icon blue">🔗</div>
+                    <div class="feature-info"><div class="feature-name">Разобрать вакансию</div><div class="feature-desc">Контакты ЛПР и питч по тексту вакансии</div></div>
+                    <span class="feature-badge free">2 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('lpr')">
+                    <div class="feature-icon purple">🕵️</div>
+                    <div class="feature-info"><div class="feature-name">Найти ЛПР</div><div class="feature-desc">OSINT-поиск контактов менеджеров</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('pitch')">
+                    <div class="feature-icon blue">📝</div>
+                    <div class="feature-info"><div class="feature-name">Короткие питчи</div><div class="feature-desc">Цепляющие сообщения для рекрутеров</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('skillgap')">
+                    <div class="feature-icon purple">📊</div>
+                    <div class="feature-info"><div class="feature-name">Анализ навыков</div><div class="feature-desc">Skill Gap анализ и рекомендации</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="openBot()">
+                    <div class="feature-icon green">🎤</div>
+                    <div class="feature-info"><div class="feature-name">Тренажёр собеседований</div><div class="feature-desc">Практика ответов с ИИ (в чате бота)</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="openBot()">
+                    <div class="feature-icon pink">🎓</div>
+                    <div class="feature-info"><div class="feature-name">Курсы по трудоустройству</div><div class="feature-desc">3 курса: резюме, собеседование, переговоры</div></div>
+                    <span class="feature-badge premium">Премиум</span>
+                </div>
+                <div class="feature-card" onclick="openBot()">
+                    <div class="feature-icon orange">🎯</div>
+                    <div class="feature-info"><div class="feature-name">План поиска работы</div><div class="feature-desc">Персональный план на неделю</div></div>
+                    <span class="feature-badge premium">Премиум</span>
+                </div>
+            </div>
         </div>
-        <div class="feature-detail" id="detail-recruiter"></div>
+
+        <!-- ПОИСК ВАКАНСИЙ -->
+        <div class="screen" id="screen-search">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">🔍 Поиск вакансий</div>
+            <div class="screen-subtitle">Подбор по вашему резюме и региону</div>
+            <button class="action-button primary" id="searchBtn" onclick="runSearch()">🔍 Найти вакансии (1 ⭐)</button>
+            <div id="searchResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- РАЗБОР ВАКАНСИИ -->
+        <div class="screen" id="screen-analyze">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">🔗 Разбор вакансии</div>
+            <div class="screen-subtitle">Скопируй текст вакансии из hh.ru и вставь сюда</div>
+            <textarea class="input-field" id="vacancyInput" placeholder="Вставь полный текст вакансии сюда...&#10;&#10;Должность, компания, обязанности, требования, условия..."></textarea>
+            <button class="action-button primary" id="analyzeBtn" onclick="runAnalyze()">🔍 Разобрать вакансию (2 ⭐)</button>
+            <div id="analyzeResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- ЛПР -->
+        <div class="screen" id="screen-lpr">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">🕵️ Найти ЛПР</div>
+            <div class="screen-subtitle">Поиск контактов нанимающих менеджеров</div>
+            <input type="text" class="input-field" id="lprCompany" placeholder="Компания (например: Сбер)">
+            <input type="text" class="input-field" id="lprPosition" placeholder="Должность (необязательно)">
+            <button class="action-button primary" id="lprBtn" onclick="runFindLPR()">🕵️ Найти контакты (1 ⭐)</button>
+            <div id="lprResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- ПИТЧ -->
+        <div class="screen" id="screen-pitch">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">📝 Генерация питча</div>
+            <div class="screen-subtitle">Цепляющее сообщение для рекрутера</div>
+            <input type="text" class="input-field" id="pitchCompany" placeholder="Компания (например: Яндекс)">
+            <input type="text" class="input-field" id="pitchTitle" placeholder="Должность (например: Product Manager)">
+            <button class="action-button primary" id="pitchBtn" onclick="runPitch()">📝 Сгенерировать питч (1 ⭐)</button>
+            <div id="pitchResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- SKILL GAP -->
+        <div class="screen" id="screen-skillgap">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">📊 Анализ навыков</div>
+            <div class="screen-subtitle">Skill Gap анализ вашего резюме</div>
+            <button class="action-button primary" id="skillGapBtn" onclick="runSkillGap()">📊 Провести анализ (1 ⭐)</button>
+            <div id="skillGapResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- РЕКРУТЕР -->
+        <div class="screen" id="screen-recruiter">
+            <div class="back-button" onclick="showScreen('home')">← Назад</div>
+            <div class="screen-title">🏢 Я нанимаю</div>
+            <div class="screen-subtitle">Инструменты для оценки кандидатов</div>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="showScreen('hr-match')">
+                    <div class="feature-icon purple">📊</div>
+                    <div class="feature-info"><div class="feature-name">Соответствие резюме вакансии</div><div class="feature-desc">Процент соответствия с вердиктом</div></div>
+                    <span class="feature-badge free">2 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('hr-scoring')">
+                    <div class="feature-icon blue">🎯</div>
+                    <div class="feature-info"><div class="feature-name">Скоринг кандидата</div><div class="feature-desc">Сильные стороны, флаги, оценка 1-10</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="openBot()">
+                    <div class="feature-icon purple">❓</div>
+                    <div class="feature-info"><div class="feature-name">Вопросы для интервью</div><div class="feature-desc">Персональные вопросы (в чате бота)</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="openBot()">
+                    <div class="feature-icon orange">📝</div>
+                    <div class="feature-info"><div class="feature-name">Тестовое задание</div><div class="feature-desc">Задание на основе резюме (в чате бота)</div></div>
+                    <span class="feature-badge new">Новое</span>
+                </div>
+                <div class="feature-card" onclick="openBot()">
+                    <div class="feature-icon green">📋</div>
+                    <div class="feature-info"><div class="feature-name">Описание вакансии</div><div class="feature-desc">Текст по структуре hh.ru (в чате бота)</div></div>
+                    <span class="feature-badge new">Новое</span>
+                </div>
+                <div class="feature-card" onclick="openBot()">
+                    <div class="feature-icon blue">💰</div>
+                    <div class="feature-info"><div class="feature-name">Оценка зарплаты</div><div class="feature-desc">Рыночная вилка и тренды (в чате бота)</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- HR MATCH -->
+        <div class="screen" id="screen-hr-match">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">📊 Соответствие</div>
+            <div class="screen-subtitle">Резюме кандидата против вакансии</div>
+            <textarea class="input-field" id="hrMatchResume" placeholder="Текст резюме кандидата..." style="min-height:140px;"></textarea>
+            <textarea class="input-field" id="hrMatchVacancy" placeholder="Текст вакансии..." style="min-height:140px;"></textarea>
+            <button class="action-button primary" id="hrMatchBtn" onclick="runHRMatch()">📊 Проанализировать (2 ⭐)</button>
+            <div id="hrMatchResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- HR SCORING -->
+        <div class="screen" id="screen-hr-scoring">
+            <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
+            <div class="screen-title">🎯 Скоринг кандидата</div>
+            <div class="screen-subtitle">Вставьте текст резюме кандидата</div>
+            <textarea class="input-field" id="hrScoringResume" placeholder="Текст резюме кандидата..."></textarea>
+            <button class="action-button primary" id="hrScoringBtn" onclick="runHRScoring()">🎯 Оценить кандидата (1 ⭐)</button>
+            <div id="hrScoringResult" style="margin-top: 24px;"></div>
+        </div>
     </div>
-</div>
 
-<script>
-    const API_URL = "https://lemus-career-bot.onrender.com";
-    let userId = null;
-    let currentRole = 'seeker'; 
+    <script>
+        const BOT_API_URL = "https://lemus-career-bot.onrender.com";
+        const tg = window.Telegram && window.Telegram.WebApp;
+        let currentUserId = null;
 
-    // 1. Инициализация Telegram WebApp
-    if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('userNameDisplay').textContent = `${user.first_name} ${user.last_name || ''}`;
-        } else {
-            document.getElementById('userNameDisplay').textContent = "Открой через Telegram!";
-        }
-    }
-
-    // 2. САМАЯ ПРОСТАЯ АВТОРИЗАЦИЯ (БЕЗ СЛОЖНЫХ ПРОВЕРОК)
-    async function ensureAuth() {
-        if (userId) return true;
-        
-        showLoader("Авторизация...", true);
-        try {
-            if (!window.Telegram || !window.Telegram.WebApp.initData) {
-                throw new Error("Нет данных Telegram");
-            }
-
-            // Делаем запрос и ждем любой JSON ответ
-            const res = await fetch(`${API_URL}/miniapp/verify`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ initData: window.Telegram.WebApp.initData })
-            });
-            
-            // Читаем тело ответа как текст (это обходит проблемы с парсингом JSON в WebView)
-            const textResponse = await res.text();
-            console.log("Raw response:", textResponse);
-            
-            // Пробуем распарсить вручную
-            let data;
+        if (tg) {
             try {
-                data = JSON.parse(textResponse);
-            } catch(e) {
-                throw new Error("Некорректный ответ от сервера");
+                tg.ready();
+                tg.expand();
+                if (tg.enableClosingConfirmation) tg.enableClosingConfirmation();
+                const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+                if (u && u.first_name) document.getElementById('userGreeting').textContent = '👋 Привет, ' + u.first_name + '!';
+                try { tg.setHeaderColor('#0f0f1a'); } catch(e) {}
+                try { tg.setBackgroundColor('#0f0f1a'); } catch(e) {}
+            } catch(e) {}
+        }
+
+        function showLoader(text, show) {
+            document.getElementById('loaderStatus').textContent = text || '';
+            document.getElementById('loaderOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        // ЕДИНАЯ ТОЧКА ЗАПРОСОВ К СЕРВЕРУ.
+        // Content-Type: text/plain => браузер НЕ шлёт preflight OPTIONS.
+        // Ответ читаем как текст и парсим вручную => обходим баги WebView.
+        async function api(path, payload) {
+            const opts = (payload === undefined)
+                ? { method: 'GET' }
+                : { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify(payload) };
+            const res = await fetch(BOT_API_URL + path, opts);
+            const raw = await res.text();
+            let data = {};
+            try { data = JSON.parse(raw); } catch (e) { throw new Error('Сервер вернул не JSON (код ' + res.status + ')'); }
+            if (!res.ok) throw new Error(data.error || ('Ошибка сервера: ' + res.status));
+            return data;
+        }
+
+        async function ensureAuth() {
+            if (currentUserId) return true;
+            if (!tg || !tg.initData) { alert('⚠️ Откройте приложение из Telegram.'); return false; }
+            showLoader('Авторизация...', true);
+            try {
+                const data = await api('/miniapp/verify', { initData: tg.initData });
+                if (data && data.user_id) { currentUserId = data.user_id; return true; }
+                throw new Error('Сервер не вернул user_id');
+            } catch (e) {
+                alert('⚠️ Ошибка входа: ' + e.message);
+                return false;
+            } finally {
+                showLoader('', false);
             }
+        }
 
-            if (data.user_id) {
-                userId = data.user_id;
-                return true;
-            } else {
-                throw new Error(data.error || "Ошибка авторизации");
+        async function loadUserData() {
+            if (!currentUserId) return;
+            try {
+                const d = await api('/miniapp/data?user_id=' + currentUserId);
+                document.getElementById('homeBalance').textContent = d.balance;
+                document.getElementById('balanceNum').textContent = d.balance;
+                if (d.is_premium) document.getElementById('premiumStatus').style.display = 'inline-block';
+                const cnt = (d.tracker || []).length;
+                document.getElementById('homeTracker').textContent = cnt;
+                renderTracker(d.tracker || []);
+            } catch (e) { console.warn('loadUserData:', e.message); }
+        }
+
+        function renderTracker(items) {
+            const box = document.getElementById('trackerList');
+            if (!items.length) {
+                box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div>Трекер пуст. Разбери первую вакансию!</div></div>';
+                return;
             }
-        } catch (e) {
-            alert("Ошибка входа:\n" + e.message);
-            return false;
-        } finally {
-            showLoader("", false);
-        }
-    }
-
-    function switchMode(mode) {
-        currentRole = mode;
-        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        
-        document.getElementById('menu-seeker').style.display = mode === 'seeker' ? 'grid' : 'none';
-        document.getElementById('menu-recruiter').style.display = mode === 'recruiter' ? 'grid' : 'none';
-        closeAllDetails();
-    }
-
-    function goHome() {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-role-select').classList.add('active');
-        closeAllDetails();
-    }
-
-    function showRoleMenu(role) {
-        currentRole = role;
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(`screen-${role}`).classList.add('active');
-        closeAllDetails();
-    }
-
-    function closeAllDetails() {
-        document.querySelectorAll('.feature-detail').forEach(d => d.style.display = 'none');
-        document.querySelectorAll('.grid-menu').forEach(g => g.style.display = 'grid');
-    }
-
-    function openFeature(featureId) {
-        const menuEl = document.querySelector(`#screen-${currentRole} .grid-menu`);
-        const detailEl = document.getElementById(`detail-${currentRole}`);
-        
-        if(menuEl) menuEl.style.display = 'none';
-        if(detailEl) {
-            detailEl.style.display = 'block';
-            detailEl.innerHTML = ''; 
-            
-            if (featureId === 'search') renderSearchForm(detailEl);
-            else if (featureId === 'analyze') renderAnalyzeForm(detailEl);
-            else if (featureId === 'lpr') renderLprForm(detailEl);
-            else if (featureId === 'pitch') renderPitchForm(detailEl);
-            else if (featureId === 'skillgap') runSkillGap(detailEl);
-            else if (featureId === 'hr_match') renderHrMatchForm(detailEl);
-            else if (featureId === 'hr_scoring') renderHrScoringForm(detailEl);
-        }
-    }
-
-    function backToGrid() {
-        const menuEl = document.querySelector(`#screen-${currentRole} .grid-menu`);
-        const detailEl = document.getElementById(`detail-${currentRole}`);
-        if(menuEl) menuEl.style.display = 'grid';
-        if(detailEl) { detailEl.style.display = 'none'; detailEl.innerHTML = ''; }
-    }
-
-    function showLoader(text, show) {
-        const overlay = document.getElementById('loaderOverlay');
-        const status = document.getElementById('loaderStatus');
-        if (show) {
-            status.textContent = text;
-            overlay.style.display = 'flex';
-        } else {
-            overlay.style.display = 'none';
-        }
-    }
-
-    // --- ФОРМЫ И ЛОГИКА ДЕЙСТВИЙ ---
-
-    function renderSearchForm(container) {
-        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
-        <h3 style="margin-bottom:15px;">🔍 Поиск вакансий</h3>
-        <p style="font-size:13px;color:#aaa;margin-bottom:15px;">Поиск по вашему активному резюме.</p>
-        <button class="primary" onclick="doSearch(this)">Найти вакансии (1 ⭐)</button>
-        <div id="searchResults" style="margin-top:15px;"></div>`;
-    }
-
-    async function doSearch(btn) {
-        btn.disabled = true; btn.innerText = "Поиск...";
-        if (!await ensureAuth()) { btn.disabled=false; btn.innerText="Найти вакансии (1 ⭐)"; return; }
-        
-        showLoader("Анализирую резюме и ищу...", true);
-        try {
-            const res = await fetch(`${API_URL}/miniapp/search`, {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ user_id: userId })
+            let html = '';
+            items.forEach(it => {
+                let cls = 'other';
+                if ((it.status || '').includes('Контакт')) cls = 'contact';
+                else if ((it.status || '').includes('Откликнулся') || (it.status || '').includes('Разобрана')) cls = 'responded';
+                html += '<div class="tracker-item"><div class="tracker-title">' + escapeHtml(it.title) + '</div><span class="tracker-status ' + cls + '">' + escapeHtml(it.status) + '</span></div>';
             });
-            const data = await res.json();
-            
-            const list = data.vacancies || [];
-            let html = "";
-            if(list.length === 0) html = "<p>Ничего не найдено. Загрузите резюме через бота.</p>";
-            else {
-                list.forEach(v => {
-                    html += `<div class="card-result">
-                        <strong>${v.title}</strong><br>
-                        <small>${v.company} • ${v.salary || 'З/П не указана'}</small><br>
-                        <a href="${v.url}" target="_blank" style="color:#4facfe; font-size:12px;">Открыть на HH.ru ↗</a>
-                    </div>`;
-                });
+            box.innerHTML = html;
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const t = document.getElementById('screen-' + id);
+            if (t) t.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (tg && tg.HapticFeedback) { try { tg.HapticFeedback.selectionChanged(); } catch(e) {} }
+            if (tg && tg.BackButton) {
+                try { (id === 'home') ? tg.BackButton.hide() : tg.BackButton.show(); } catch(e) {}
             }
-            document.getElementById('searchResults').innerHTML = html;
-        } catch(e) { 
-            document.getElementById('searchResults').innerHTML = `<div class="error-msg">${e.message}</div>`;
+            if ((id === 'balance' || id === 'tracker') && currentUserId) loadUserData();
         }
-        finally { showLoader("", false); btn.disabled=false; btn.innerText="Найти вакансии (1 ⭐)"; }
-    }
 
-    function renderAnalyzeForm(container) {
-        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
-        <h3 style="margin-bottom:15px;">🔗 Разбор вакансии</h3>
-        <textarea id="vacText" placeholder="Вставьте текст вакансии сюда..." rows="6"></textarea>
-        <button class="primary" onclick="doAnalyze(this)">Разобрать (2 ⭐)</button>
-        <div id="analyzeRes" style="margin-top:15px;"></div>`;
-    }
-
-    async function doAnalyze(btn) {
-        const txt = document.getElementById('vacText').value.trim();
-        if(txt.length < 50) return alert("Слишком короткий текст");
-        
-        btn.disabled = true;
-        if (!await ensureAuth()) { btn.disabled=false; return; }
-        
-        showLoader("AI анализирует контакты...", true);
-        try {
-            const res = await fetch(`${API_URL}/miniapp/analyze`, {
-                method: 'POST', headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({ user_id: userId, vacancy_text: txt })
-            });
-            const data = await res.json();
-            
-            document.getElementById('analyzeRes').innerHTML = `
-                <div class="card-result">
-                    <strong>${data.company} — ${data.title}</strong><br><br>
-                    <em>Питч:</em><br>"${data.pitch}"<br><br>
-                    ${data.contacts && data.contacts.length > 0 ? '<strong>Контакты:</strong>' + data.contacts.map(c=>`${c.name}: ${c.email||''}`).join('<br>') : 'Контакты не найдены'}
-                </div>`;
-        } catch(e) { 
-            document.getElementById('analyzeRes').innerHTML = `<div class="error-msg">${e.message}</div>`;
+        if (tg && tg.onEvent) {
+            try {
+                tg.onEvent('backButtonClicked', function() { showScreen('home'); });
+            } catch(e) {}
         }
-        finally { showLoader("", false); btn.disabled=false; }
-    }
 
-    function renderLprForm(container) {
-        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
-        <h3 style="margin-bottom:15px;">🕵️ Найти ЛПР</h3>
-        <input type="text" id="lprComp" placeholder="Компания (например: Сбер)">
-        <input type="text" id="lprPos" placeholder="Должность (например: HR Director)">
-        <button class="primary" onclick="doFindLpr(this)">Искать контакты (1 ⭐)</button>
-        <div id="lprRes" style="margin-top:15px;"></div>`;
-    }
+        function openBot() {
+            if (tg && tg.openTelegramLink) { try { tg.openTelegramLink('https://t.me/LemusCareer_Bot'); return; } catch(e) {} }
+            window.open('https://t.me/LemusCareer_Bot', '_blank');
+        }
 
-    async function doFindLpr(btn) {
-        const comp = document.getElementById('lprComp').value;
-        const pos = document.getElementById('lprPos').value;
-        if(!comp) return alert("Укажите компанию");
-        
-        btn.disabled=true;
-        if (!await ensureAuth()) { btn.disabled=false; return; }
-        
-        showLoader("Поиск в открытых источниках...", true);
-        try {
-            const res = await fetch(`${API_URL}/miniapp/find-lpr`, {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({ user_id: userId, company: comp, position: pos })
-            });
-            const data = await res.json();
-            
-            let html = `<div class="card-result"><strong>Результаты по ${comp}</strong><br>`;
-            if(data.contacts && data.contacts.length > 0) {
-                data.contacts.forEach(c => html += `<br>👤 ${c.name}<br>📧 ${c.email || '-'}<br>📱 ${c.phone || '-'}`);
-            } else {
-                html += "Прямых контактов не найдено.<br>Рекомендуемые ссылки:<br>";
-                if(data.links) data.links.forEach(l => html += `<a href="${l.url}" target="_blank" style="display:block;color:#4facfe;margin-top:5px;">${l.text}</a>`);
+        function shareBot() {
+            const shareText = '🚀 Нашёл крутой ИИ-карьерный агент! Помогает искать работу и нанимать. Попробуй: ';
+            const botLink = 'https://t.me/LemusCareer_Bot';
+            if (tg && tg.switchInlineQuery) { try { tg.switchInlineQuery(shareText + botLink, ['users', 'groups']); return; } catch(e) {} }
+            if (navigator.share) { try { navigator.share({ title: 'Lemus Career Agent', text: shareText, url: botLink }); return; } catch(e) {} }
+            try { navigator.clipboard.writeText(botLink); alert('Ссылка скопирована!'); } catch(e) { alert('Ссылка: ' + botLink); }
+        }
+
+        function errorBox(msg, withBotButton) {
+            return '<div class="error-box">⚠️ ' + escapeHtml(msg) + '</div>' +
+                (withBotButton ? '<button class="action-button secondary" style="margin-top:12px;" onclick="openBot()">💬 Открыть бота</button>' : '');
+        }
+
+        // --- ПОИСК ВАКАНСИЙ ---
+        async function runSearch() {
+            const btn = document.getElementById('searchBtn');
+            const box = document.getElementById('searchResult');
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Ищу вакансии по резюме... Это может занять до минуты', true);
+            box.innerHTML = '';
+            try {
+                const data = await api('/miniapp/search', { user_id: currentUserId });
+                renderVacancies(data.vacancies || [], box);
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
             }
-            html += "</div>";
-            document.getElementById('lprRes').innerHTML = html;
-        } catch(e) { document.getElementById('lprRes').innerHTML = `<div class="error-msg">${e.message}</div>`; }
-        finally { showLoader("",false); btn.disabled=false; }
-    }
+        }
 
-    function renderPitchForm(container) {
-        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
-        <h3 style="margin-bottom:15px;">📝 Короткий Питч</h3>
-        <input type="text" id="pitchComp" placeholder="Компания">
-        <input type="text" id="pitchTitle" placeholder="Должность">
-        <button class="primary" onclick="doPitch(this)">Сгенерировать (1 ⭐)</button>
-        <div id="pitchRes" style="margin-top:15px;"></div>`;
-    }
-
-    async function doPitch(btn) {
-        btn.disabled=true;
-        if (!await ensureAuth()) { btn.disabled=false; return; }
-        showLoader("Генерация текста...", true);
-        try {
-            const res = await fetch(`${API_URL}/miniapp/pitch`, {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({ user_id: userId, company: document.getElementById('pitchComp').value, title: document.getElementById('pitchTitle').value })
+        function renderVacancies(list, box) {
+            if (!list.length) {
+                box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div>Вакансий не найдено.</div></div>';
+                return;
+            }
+            let html = '<div class="result-section-title">Найдено: ' + list.length + ' (отсортировано по соответствию)</div>';
+            list.forEach(v => {
+                const cls = (v.match_score >= 70) ? '' : ' low';
+                html += '<div class="vacancy-card">' +
+                    '<div class="vacancy-header"><div class="vacancy-title">' + escapeHtml(v.title) + '</div>' +
+                    '<span class="vacancy-score' + cls + '">' + escapeHtml(v.match_score) + '%</span></div>' +
+                    '<div class="vacancy-company">🏢 ' + escapeHtml(v.company) + '</div>' +
+                    (v.salary ? '<div class="vacancy-salary">' + escapeHtml(v.salary) + '</div>' : '') +
+                    '<div class="vacancy-reason">' + escapeHtml(v.match_reason) + '</div>' +
+                    (v.url ? '<a class="link-item" href="' + escapeHtml(v.url) + '" target="_blank">🔗 Открыть вакансию</a>' : '') +
+                    '</div>';
             });
-            const data = await res.json();
-            document.getElementById('pitchRes').innerHTML = `<div class="card-result">${data.pitch}</div>`;
-        } catch(e){ document.getElementById('pitchRes').innerHTML = `<div class="error-msg">${e.message}</div>`; }
-        finally { showLoader("",false); btn.disabled=false; }
-    }
+            box.innerHTML = html;
+        }
 
-    async function runSkillGap(container) {
-        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
-        <h3>Skill Gap Анализ</h3><p>Проверка...</p>`;
-        if (!await ensureAuth()) { container.innerHTML="<p>Ошибка входа</p>"; return; }
-        showLoader("Анализ навыков...", true);
-        try {
-            const res = await fetch(`${API_URL}/miniapp/skill-gap`, {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({ user_id: userId })
-            });
-            const data = await res.json();
-            container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button><div class="card-result">${data.analysis}</div>`;
-        } catch(e){ container.innerHTML=`<button class="btn-back" onclick="backToGrid()">← Назад</button><div class="error-msg">${e.message}</div>`; }
-        finally { showLoader("",false); }
-    }
+        // --- РАЗБОР ВАКАНСИИ ---
+        async function runAnalyze() {
+            const txt = document.getElementById('vacancyInput').value.trim();
+            const btn = document.getElementById('analyzeBtn');
+            const box = document.getElementById('analyzeResult');
+            if (txt.length < 100) { alert('⚠️ Текст вакансии слишком короткий. Скопируй полный текст из hh.ru'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Разбираю вакансию и ищу контакты...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/analyze', { user_id: currentUserId, vacancy_text: txt });
+                let html = '<div class="result-card"><div class="result-company">🏢 ' + escapeHtml(d.company) + '</div>' +
+                    '<div class="result-title">💼 ' + escapeHtml(d.title) + '</div>' +
+                    (d.contact_name ? '<div class="result-title">👤 Контакт: ' + escapeHtml(d.contact_name) + '</div>' : '') + '</div>';
+                if (d.contacts && d.contacts.length) {
+                    html += '<div class="result-card"><div class="result-section-title">✅ Найденные контакты</div>';
+                    d.contacts.forEach(c => {
+                        html += '<div class="result-contact">' + (c.name ? '<strong>' + escapeHtml(c.name) + '</strong><br>' : '') +
+                            (c.email ? '📧 ' + escapeHtml(c.email) + '<br>' : '') +
+                            (c.phone ? '📱 ' + escapeHtml(c.phone) + '<br>' : '') +
+                            (c.url ? '<a href="' + escapeHtml(c.url) + '" target="_blank" style="color:#4facfe;">🔗 Профиль</a>' : '') + '</div>';
+                    });
+                    html += '</div>';
+                }
+                if (d.email_templates && d.email_templates.length) {
+                    html += '<div class="result-card"><div class="result-section-title">📧 Шаблоны корпоративных почт</div>';
+                    d.email_templates.forEach(t => { html += '<div class="result-contact">' + escapeHtml(t) + '</div>'; });
+                    html += '</div>';
+                }
+                if (d.pitch) {
+                    html += '<div class="result-card"><div class="result-section-title">📝 Питч для отправки</div>' +
+                        '<div class="result-pitch" id="pitchText">' + escapeHtml(d.pitch) + '</div>' +
+                        '<button class="copy-btn" onclick="copyPitch()">📋 Скопировать питч</button></div>';
+                }
+                box.innerHTML = html;
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
 
-    // --- HR FORMS ---
-    function renderHrMatchForm(container) {
-        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
-        <h3>HR: Соответствие</h3>
-        <textarea id="hrResume" placeholder="Текст резюме кандидата" rows="5"></textarea>
-        <textarea id="hrVacancy" placeholder="Текст вакансии" rows="5"></textarea>
-        <button class="primary" onclick="doHrMatch(this)">Проверить (2 ⭐)</button>
-        <div id="hrMatchRes"></div>`;
-    }
-    async function doHrMatch(btn) {
-        btn.disabled=true;
-        if(!await ensureAuth()){btn.disabled=false;return;}
-        showLoader("Сравнение...",true);
-        try{
-            const res = await fetch(`${API_URL}/miniapp/hr-match`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrResume').value,vacancy_text:document.getElementById('hrVacancy').value})});
-            const data = await res.json();
-            document.getElementById('hrMatchRes').innerHTML=`<div class="card-result">${data.analysis}</div>`;
-        }catch(e){document.getElementById('hrMatchRes').innerHTML=`<div class="error-msg">${e.message}</div>`;}finally{showLoader("",false);btn.disabled=false;}
-    }
+        function copyPitch() {
+            const el = document.getElementById('pitchText');
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
+        }
 
-    function renderHrScoringForm(container) {
-        container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
-        <h3>HR: Скоринг</h3>
-        <textarea id="hrScoreResume" placeholder="Текст резюме" rows="8"></textarea>
-        <button class="primary" onclick="doHrScore(this)">Оценить (1 ⭐)</button>
-        <div id="hrScoreRes"></div>`;
-    }
-    async function doHrScore(btn) {
-        btn.disabled=true;
-        if(!await ensureAuth()){btn.disabled=false;return;}
-        showLoader("Оценка...",true);
-        try{
-            const res = await fetch(`${API_URL}/miniapp/hr-scoring`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrScoreResume').value})});
-            const data = await res.json();
-            document.getElementById('hrScoreRes').innerHTML=`<div class="card-result">${data.scoring}</div>`;
-        }catch(e){document.getElementById('hrScoreRes').innerHTML=`<div class="error-msg">${e.message}</div>`;}finally{showLoader("",false);btn.disabled=false;}
-    }
+        // --- ЛПР ---
+        async function runFindLPR() {
+            const company = document.getElementById('lprCompany').value.trim();
+            const position = document.getElementById('lprPosition').value.trim();
+            const btn = document.getElementById('lprBtn');
+            const box = document.getElementById('lprResult');
+            if (!company) { alert('⚠️ Укажите компанию'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Ищу контакты ЛПР...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/find-lpr', { user_id: currentUserId, company: company, position: position });
+                let html = '<div class="result-card"><div class="result-company">🏢 ' + escapeHtml(d.company) + '</div>' +
+                    (d.position ? '<div class="result-title">💼 ' + escapeHtml(d.position) + '</div>' : '') + '</div>';
+                if (d.contacts && d.contacts.length) {
+                    html += '<div class="result-card"><div class="result-section-title">✅ Контакты</div>';
+                    d.contacts.forEach(c => {
+                        html += '<div class="result-contact">' + (c.name ? '<strong>' + escapeHtml(c.name) + '</strong><br>' : '') +
+                            (c.email ? '📧 ' + escapeHtml(c.email) + '<br>' : '') +
+                            (c.phone ? '📱 ' + escapeHtml(c.phone) + '<br>' : '') +
+                            (c.url ? '<a href="' + escapeHtml(c.url) + '" target="_blank" style="color:#4facfe;">🔗 Профиль</a>' : '') + '</div>';
+                    });
+                    html += '</div>';
+                } else {
+                    html += '<div class="result-card"><div class="result-section-title">ℹ️ Прямых контактов не найдено</div><div class="analysis-block">Используй ссылки ниже для ручного поиска.</div></div>';
+                }
+                if (d.email_templates && d.email_templates.length) {
+                    html += '<div class="result-card"><div class="result-section-title">📧 Шаблоны почт</div>';
+                    d.email_templates.forEach(t => { html += '<div class="result-contact">' + escapeHtml(t) + '</div>'; });
+                    html += '</div>';
+                }
+                if (d.links && d.links.length) {
+                    html += '<div class="result-card"><div class="result-section-title">🔗 Быстрые ссылки</div>';
+                    d.links.forEach(l => { html += '<a class="link-item" href="' + escapeHtml(l.url) + '" target="_blank">' + escapeHtml(l.text) + '</a>'; });
+                    html += '</div>';
+                }
+                box.innerHTML = html;
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
 
-</script>
+        // --- ПИТЧ ---
+        async function runPitch() {
+            const company = document.getElementById('pitchCompany').value.trim();
+            const title = document.getElementById('pitchTitle').value.trim();
+            const btn = document.getElementById('pitchBtn');
+            const box = document.getElementById('pitchResult');
+            if (!company) { alert('⚠️ Укажите компанию'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Генерирую питч...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/pitch', { user_id: currentUserId, company: company, title: title });
+                box.innerHTML = '<div class="result-card"><div class="result-company">🏢 ' + escapeHtml(d.company) + '</div>' +
+                    (d.title ? '<div class="result-title">💼 ' + escapeHtml(d.title) + '</div>' : '') +
+                    '<div class="result-section-title" style="margin-top:12px;">📝 Ваш питч</div>' +
+                    '<div class="result-pitch" id="generatedPitch">' + escapeHtml(d.pitch) + '</div>' +
+                    '<button class="copy-btn" onclick="copyGeneratedPitch()">📋 Скопировать</button></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        function copyGeneratedPitch() {
+            const el = document.getElementById('generatedPitch');
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).then(() => alert('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
+        }
+
+        // --- SKILL GAP ---
+        async function runSkillGap() {
+            const btn = document.getElementById('skillGapBtn');
+            const box = document.getElementById('skillGapResult');
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Анализирую навыки по резюме...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/skill-gap', { user_id: currentUserId });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">📊 Результат анализа</div><div class="analysis-block">' + escapeHtml(d.analysis) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // --- HR MATCH ---
+        async function runHRMatch() {
+            const resume = document.getElementById('hrMatchResume').value.trim();
+            const vacancy = document.getElementById('hrMatchVacancy').value.trim();
+            const btn = document.getElementById('hrMatchBtn');
+            const box = document.getElementById('hrMatchResult');
+            if (resume.length < 100) { alert('⚠️ Текст резюме слишком короткий'); return; }
+            if (vacancy.length < 100) { alert('⚠️ Текст вакансии слишком короткий'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Сравниваю резюме и вакансию...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-match', { user_id: currentUserId, resume_text: resume, vacancy_text: vacancy });
+                box.innerHTML = '<div class="result-card" style="text-align:center;"><div class="balance-num" style="font-size:48px;">' + escapeHtml(d.overall_percent) + '%</div><div class="balance-label">общее соответствие</div></div>' +
+                    '<div class="result-card"><div class="result-section-title">📊 Детальный анализ</div><div class="analysis-block">' + escapeHtml(d.analysis) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // --- HR SCORING ---
+        async function runHRScoring() {
+            const resume = document.getElementById('hrScoringResume').value.trim();
+            const btn = document.getElementById('hrScoringBtn');
+            const box = document.getElementById('hrScoringResult');
+            if (resume.length < 100) { alert('⚠️ Текст резюме слишком короткий'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Оцениваю кандидата...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/hr-scoring', { user_id: currentUserId, resume_text: resume });
+                box.innerHTML = '<div class="result-card" style="text-align:center;"><div class="balance-num" style="font-size:48px;">' + escapeHtml(d.rating) + '/10</div><div class="balance-label">оценка кандидата</div></div>' +
+                    '<div class="result-card"><div class="result-section-title">🎯 Скоринг</div><div class="analysis-block">' + escapeHtml(d.scoring) + '</div></div>';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        // --- СТАРТ ---
+        (async function startApp() {
+            // Тихая авторизация при открытии (без алертов), чтобы сразу показать баланс
+            try {
+                if (tg && tg.initData) {
+                    const d = await api('/miniapp/verify', { initData: tg.initData });
+                    if (d && d.user_id) { currentUserId = d.user_id; await loadUserData(); }
+                }
+            } catch (e) { console.warn('silent auth failed:', e.message); }
+        })();
+    </script>
 </body>
 </html>
