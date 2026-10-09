@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Lemus Career Agent</title>
-    <!-- Жёсткая защита от кэша -->
+    
+    <!-- Защита от кэша -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -48,8 +49,9 @@
         .feature-card {
             display: flex; align-items: center; gap: 16px; padding: 18px;
             background: var(--bg-card); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); cursor: pointer;
+            border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); cursor: pointer; transition: all 0.2s;
         }
+        .feature-card:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
         .feature-card.highlight {
             background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(118,75,162,0.2));
             border: 1px solid rgba(102,126,234,0.4);
@@ -63,8 +65,9 @@
             display: flex; align-items: center; justify-content: center; gap: 10px;
             padding: 16px 24px; border-radius: var(--radius-button);
             font-size: 16px; font-weight: 600; cursor: pointer; color: white; border: none; width: 100%;
-            background: var(--gradient-main); margin-top: 20px;
+            background: var(--gradient-main); margin-top: 20px; transition: opacity 0.2s;
         }
+        .action-button:disabled { opacity: 0.5; cursor: not-allowed; }
         .back-button {
             display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px;
             background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-button);
@@ -79,6 +82,14 @@
         .link-item { display: block; padding: 12px 16px; background: rgba(79,172,254,0.1); border-radius: 12px; color: #4facfe; text-decoration: none; font-size: 14px; margin-top: 8px; }
         
         .error-msg { color: #ff6b6b; font-size: 14px; margin-top: 10px; text-align: center; }
+        .success-msg { color: #51cf66; font-size: 14px; margin-top: 10px; text-align: center; }
+        
+        textarea.input-field {
+            width: 100%; height: 150px; background: var(--bg-card); 
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; 
+            padding: 16px; color: white; resize: none; font-size: 14px;
+        }
+        textarea.input-field:focus { outline: none; border-color: #667eea; }
     </style>
 </head>
 <body>
@@ -131,8 +142,8 @@
         <div class="screen" id="screen-analyze">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title" style="font-size: 24px; font-weight: bold; margin-bottom: 16px;">🔗 Разбор вакансии</div>
-            <textarea class="input-field" id="vacancyInput" placeholder="Вставь текст вакансии..." style="width: 100%; height: 150px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; color: white; resize: none;"></textarea>
-            <button class="action-button" onclick="runAnalyze()">🔍 Разобрать (2 ⭐)</button>
+            <textarea class="input-field" id="vacancyInput" placeholder="Вставь текст вакансии..."></textarea>
+            <button class="action-button" onclick="runAnalyze()" id="btnAnalyze">🔍 Разобрать (2 ⭐)</button>
             <div id="analyzeResult"></div>
         </div>
     </div>
@@ -140,6 +151,8 @@
     <script>
         const BOT_API_URL = "https://lemus-career-bot.onrender.com"; 
         const tg = window.Telegram && window.Telegram.WebApp;
+        
+        // Хранилище текущего пользователя
         let currentUserId = null;
 
         // === ИНИЦИАЛИЗАЦИЯ ===
@@ -149,7 +162,7 @@
                 tg.expand();
                 const user = tg.initDataUnsafe?.user;
                 if (user) document.getElementById('userGreeting').textContent = `👋 Привет, ${user.first_name}!`;
-            } catch(e) {}
+            } catch(e) { console.error("TG init error", e); }
         }
 
         function showLoader(show) {
@@ -160,11 +173,23 @@
             const el = document.getElementById(containerId);
             if(el) el.innerHTML = `<div class="error-msg">❌ ${msg}</div>`;
         }
+        
+        function showSuccess(containerId, msg) {
+             const el = document.getElementById(containerId);
+             if(el) el.innerHTML = `<div class="success-msg">✅ ${msg}</div>`;
+        }
 
-        // === АВТОРИЗАЦИЯ (ЖЁСТКАЯ ПРОВЕРКА) ===
+        // === АВТОРИЗАЦИЯ (ЖЁСТКАЯ ПРОВЕРКА С ОТВЕТОМ СЕРВЕРА) ===
         async function authenticate() {
-            if (!tg || !tg.initData) return false;
+            // Если мы уже авторизованы в этой сессии — пропускаем запрос
+            if (currentUserId) return true;
+
+            if (!tg || !tg.initData) {
+                console.warn("No Telegram initData available");
+                return false;
+            }
             
+            showLoader(true);
             try {
                 const res = await fetch(`${BOT_API_URL}/miniapp/verify`, {
                     method: 'POST',
@@ -172,34 +197,38 @@
                     body: JSON.stringify({ initData: tg.initData })
                 });
                 
+                // Читаем тело ответа независимо от статуса
                 const data = await res.json();
                 
-                if (data.ok && data.user_id) {
+                if (res.ok && data.ok && data.user_id) {
                     currentUserId = data.user_id;
+                    console.log("Auth success:", currentUserId);
                     return true;
                 } else {
                     console.error("Auth failed:", data);
+                    alert("Ошибка входа: " + (data.error || "Неизвестная ошибка"));
                     return false;
                 }
             } catch (e) {
                 console.error("Network error during auth:", e);
+                alert("Сеть недоступна. Проверьте интернет.");
                 return false;
+            } finally {
+                showLoader(false);
             }
         }
 
         // === ПОИСК ВАКАНСИЙ ===
         async function runSearch() {
-            showLoader(true);
             document.getElementById('homeResult').innerHTML = '';
             
+            // 1. Авторизация
             const isAuthed = await authenticate();
-            if (!isAuthed) {
-                showLoader(false);
-                alert("⚠️ Не удалось войти. Попробуй закрыть приложение и открыть заново.");
-                return;
-            }
+            if (!isAuthed) return; // Прерываем, если вход не удался
 
+            showLoader(true);
             try {
+                // 2. Запрос данных
                 const res = await fetch(`${BOT_API_URL}/miniapp/search`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -207,14 +236,14 @@
                 });
                 
                 const data = await res.json();
-                showLoader(false);
-
+                
                 if (!res.ok) throw new Error(data.error || "Ошибка сервера");
                 
                 renderVacancies(data.vacancies || []);
             } catch (e) {
-                showLoader(false);
                 showError('homeResult', e.message);
+            } finally {
+                showLoader(false);
             }
         }
 
@@ -245,15 +274,18 @@
                 return;
             }
             
-            showLoader(true);
+            // 1. Авторизация
             const isAuthed = await authenticate();
-            if (!isAuthed) {
-                showLoader(false);
-                alert("Ошибка входа.");
-                return;
-            }
+            if (!isAuthed) return;
+
+            const btn = document.getElementById('btnAnalyze');
+            btn.disabled = true;
+            btn.textContent = "Обработка...";
+            showLoader(true);
+            document.getElementById('analyzeResult').innerHTML = '';
 
             try {
+                // 2. Запрос анализа
                 const res = await fetch(`${BOT_API_URL}/miniapp/analyze`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -261,8 +293,7 @@
                 });
                 
                 const data = await res.json();
-                showLoader(false);
-
+                
                 if (!res.ok) throw new Error(data.error || "Ошибка анализа");
                 
                 document.getElementById('analyzeResult').innerHTML = `
@@ -271,11 +302,18 @@
                         <div style="background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;margin-top:10px;">
                             <strong>Питч:</strong><br>${data.pitch}
                         </div>
+                        ${data.contacts && data.contacts.length > 0 ? `
+                        <div style="margin-top:10px;"><strong>Контакты:</strong><ul>
+                        ${data.contacts.map(c => `<li>${c.name}: ${c.email || c.phone || ''}</li>`).join('')}
+                        </ul></div>` : ''}
                     </div>`;
                     
             } catch (e) {
-                showLoader(false);
                 showError('analyzeResult', e.message);
+            } finally {
+                showLoader(false);
+                btn.disabled = false;
+                btn.textContent = "🔍 Разобрать (2 ⭐)";
             }
         }
 
