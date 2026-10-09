@@ -171,8 +171,7 @@
 <script>
     const API_URL = "https://lemus-career-bot.onrender.com";
     let userId = null;
-    let currentRole = 'seeker'; // seeker | recruiter
-    let isAuthenticating = false;
+    let currentRole = 'seeker'; 
 
     // 1. Инициализация Telegram WebApp
     if (window.Telegram && window.Telegram.WebApp) {
@@ -188,53 +187,31 @@
         }
     }
 
-    // 2. Умный Fetch с обработкой ошибок сети и таймаутов
-    async function safeFetch(url, options = {}) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // Таймаут 15 секунд
-        
+    // 2. Простой Fetch (Без сложных обработок ошибок сети)
+    async function simpleFetch(url, options = {}) {
         try {
-            const response = await fetch(url, {
-                ...options,
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            
+            const response = await fetch(url, options);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-            
             return await response.json();
         } catch (err) {
-            clearTimeout(timeoutId);
-            if (err.name === 'AbortError') {
-                throw new Error("Превышено время ожидания ответа от сервера.");
-            }
-            if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
-                throw new Error("Не удалось подключиться к серверу. Проверьте интернет.");
-            }
+            console.error("Fetch failed:", err);
             throw err;
         }
     }
 
-    // 3. Авторизация (вызывается один раз при первом действии)
-    async function ensureAuth() {
+    // 3. Авторизация (Вызывается один раз при старте приложения)
+    async function initAuth() {
         if (userId) return true;
-        if (isAuthenticating) {
-            while(isAuthenticating) await new Promise(r => setTimeout(r, 100));
-            return !!userId;
-        }
-
-        isAuthenticating = true;
-        showLoader("Авторизация...", true);
         
+        showLoader("Авторизация...", true);
         try {
             if (!window.Telegram || !window.Telegram.WebApp.initData) {
                 throw new Error("Нет данных Telegram");
             }
 
-            const data = await safeFetch(`${API_URL}/miniapp/verify`, {
+            const data = await simpleFetch(`${API_URL}/miniapp/verify`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ initData: window.Telegram.WebApp.initData })
@@ -247,16 +224,23 @@
                 throw new Error(data.error || "Ошибка авторизации");
             }
         } catch (e) {
-            console.error("Auth Error:", e);
-            alert("Ошибка входа:\n" + e.message);
+            alert("Не удалось подключиться.\n\nПричина: " + e.message);
             return false;
         } finally {
-            isAuthenticating = false;
             showLoader("", false);
         }
     }
 
-    // --- НАВИГАЦИЯ ПО ЭКРАНАМ ---
+    function switchMode(mode) {
+        currentRole = mode;
+        document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        document.getElementById('menu-seeker').style.display = mode === 'seeker' ? 'grid' : 'none';
+        document.getElementById('menu-recruiter').style.display = mode === 'recruiter' ? 'grid' : 'none';
+        closeAllDetails();
+    }
+
     function goHome() {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById('screen-role-select').classList.add('active');
@@ -276,16 +260,14 @@
     }
 
     function openFeature(featureId) {
-        // Скрываем сетку меню текущего роля
         const menuEl = document.querySelector(`#screen-${currentRole} .grid-menu`);
         const detailEl = document.getElementById(`detail-${currentRole}`);
         
         if(menuEl) menuEl.style.display = 'none';
         if(detailEl) {
             detailEl.style.display = 'block';
-            detailEl.innerHTML = ''; // Очищаем старое
+            detailEl.innerHTML = ''; 
             
-            // Рендерим форму в зависимости от featureId
             if (featureId === 'search') renderSearchForm(detailEl);
             else if (featureId === 'analyze') renderAnalyzeForm(detailEl);
             else if (featureId === 'lpr') renderLprForm(detailEl);
@@ -326,11 +308,11 @@
 
     async function doSearch(btn) {
         btn.disabled = true; btn.innerText = "Поиск...";
-        if (!await ensureAuth()) { btn.disabled=false; btn.innerText="Найти вакансии (1 ⭐)"; return; }
+        if (!await initAuth()) { btn.disabled=false; btn.innerText="Найти вакансии (1 ⭐)"; return; }
         
         showLoader("Анализирую резюме и ищу...", true);
         try {
-            const res = await safeFetch(`${API_URL}/miniapp/search`, {
+            const res = await simpleFetch(`${API_URL}/miniapp/search`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId })
             });
@@ -367,11 +349,11 @@
         if(txt.length < 50) return alert("Слишком короткий текст");
         
         btn.disabled = true;
-        if (!await ensureAuth()) { btn.disabled=false; return; }
+        if (!await initAuth()) { btn.disabled=false; return; }
         
         showLoader("AI анализирует контакты...", true);
         try {
-            const res = await safeFetch(`${API_URL}/miniapp/analyze`, {
+            const res = await simpleFetch(`${API_URL}/miniapp/analyze`, {
                 method: 'POST', headers: {'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId, vacancy_text: txt })
             });
@@ -403,11 +385,11 @@
         if(!comp) return alert("Укажите компанию");
         
         btn.disabled=true;
-        if (!await ensureAuth()) { btn.disabled=false; return; }
+        if (!await initAuth()) { btn.disabled=false; return; }
         
         showLoader("Поиск в открытых источниках...", true);
         try {
-            const res = await safeFetch(`${API_URL}/miniapp/find-lpr`, {
+            const res = await simpleFetch(`${API_URL}/miniapp/find-lpr`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId, company: comp, position: pos })
             });
@@ -436,10 +418,10 @@
 
     async function doPitch(btn) {
         btn.disabled=true;
-        if (!await ensureAuth()) { btn.disabled=false; return; }
+        if (!await initAuth()) { btn.disabled=false; return; }
         showLoader("Генерация текста...", true);
         try {
-            const res = await safeFetch(`${API_URL}/miniapp/pitch`, {
+            const res = await simpleFetch(`${API_URL}/miniapp/pitch`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId, company: document.getElementById('pitchComp').value, title: document.getElementById('pitchTitle').value })
             });
@@ -451,10 +433,10 @@
     async function runSkillGap(container) {
         container.innerHTML = `<button class="btn-back" onclick="backToGrid()">← Назад</button>
         <h3>Skill Gap Анализ</h3><p>Проверка...</p>`;
-        if (!await ensureAuth()) { container.innerHTML="<p>Ошибка входа</p>"; return; }
+        if (!await initAuth()) { container.innerHTML="<p>Ошибка входа</p>"; return; }
         showLoader("Анализ навыков...", true);
         try {
-            const res = await safeFetch(`${API_URL}/miniapp/skill-gap`, {
+            const res = await simpleFetch(`${API_URL}/miniapp/skill-gap`, {
                 method:'POST', headers:{'Content-Type':'application/json'},
                 body: JSON.stringify({ user_id: userId })
             });
@@ -474,10 +456,10 @@
     }
     async function doHrMatch(btn) {
         btn.disabled=true;
-        if(!await ensureAuth()){btn.disabled=false;return;}
+        if(!await initAuth()){btn.disabled=false;return;}
         showLoader("Сравнение...",true);
         try{
-            const res = await safeFetch(`${API_URL}/miniapp/hr-match`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrResume').value,vacancy_text:document.getElementById('hrVacancy').value})});
+            const res = await simpleFetch(`${API_URL}/miniapp/hr-match`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrResume').value,vacancy_text:document.getElementById('hrVacancy').value})});
             document.getElementById('hrMatchRes').innerHTML=`<div class="card-result">${res.analysis}</div>`;
         }catch(e){document.getElementById('hrMatchRes').innerHTML=`<div class="error-msg">${e.message}</div>`;}finally{showLoader("",false);btn.disabled=false;}
     }
@@ -491,10 +473,10 @@
     }
     async function doHrScore(btn) {
         btn.disabled=true;
-        if(!await ensureAuth()){btn.disabled=false;return;}
+        if(!await initAuth()){btn.disabled=false;return;}
         showLoader("Оценка...",true);
         try{
-            const res = await safeFetch(`${API_URL}/miniapp/hr-scoring`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrScoreResume').value})});
+            const res = await simpleFetch(`${API_URL}/miniapp/hr-scoring`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:userId,resume_text:document.getElementById('hrScoreResume').value})});
             document.getElementById('hrScoreRes').innerHTML=`<div class="card-result">${res.scoring}</div>`;
         }catch(e){document.getElementById('hrScoreRes').innerHTML=`<div class="error-msg">${e.message}</div>`;}finally{showLoader("",false);btn.disabled=false;}
     }
