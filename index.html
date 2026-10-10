@@ -155,6 +155,8 @@
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px; backdrop-filter: blur(4px); }
         .spinner { width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.12); border-top-color: #fff; border-bottom-color: #667eea; border-radius: 50%; animation: spin .9s linear infinite; }
         .status-text { font-size: 14px; color: #ddd; text-align: center; max-width: 80%; }
+        .pbar-wrap { width: 80%; height: 6px; background: rgba(255,255,255,.12); border-radius: 3px; margin-top: 12px; overflow: hidden; }
+        .pbar { height: 100%; width: 5%; background: linear-gradient(90deg,#667eea,#00f2fe); border-radius: 3px; transition: width .8s ease; }
         .onboard-slide { text-align: center; padding: 30px 10px; animation: fadeInUp .4s ease; }
         .onboard-icon { font-size: 72px; margin-bottom: 24px; animation: pulse 2.5s ease-in-out infinite; }
         .onboard-title { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
@@ -193,6 +195,7 @@
     <div class="overlay" id="loaderOverlay">
         <div class="spinner"></div>
         <div class="status-text" id="loaderStatus">Подключение...</div>
+        <div class="pbar-wrap"><div class="pbar" id="pbar"></div></div>
     </div>
 
     <div class="container">
@@ -336,7 +339,7 @@
             <div id="paymentsList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Операций пока нет</div></div></div>
         </div>
 
-        <!-- 👑 АДМИН-ПАНЕЛЬ -->
+        <!-- 👑 АДМИН -->
         <div class="screen" id="screen-admin">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">👑 Админ-панель</div>
@@ -432,9 +435,9 @@
                     <div class="feature-info"><div class="feature-name">Запустить бота</div><div class="feature-desc">Бот сам напишет в чат — работает на iPhone</div></div>
                     <span class="feature-badge free">Чат</span>
                 </div>
-                <div class="feature-card" onclick="launchBot()">
+                <div class="feature-card" onclick="launchBot('interview')">
                     <div class="feature-icon green">🎤</div>
-                    <div class="feature-info"><div class="feature-name">Тренажёр собеседований</div><div class="feature-desc">Практика ответов с ИИ (в чате бота)</div></div>
+                    <div class="feature-info"><div class="feature-name">Тренажёр собеседований</div><div class="feature-desc">Стартует сразу: бот задаст вопрос в чате</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
             </div>
@@ -472,7 +475,7 @@
             <div id="searchResult" style="margin-top: 16px;"></div>
         </div>
 
-        <!-- СОПРОВОДИТЕЛЬНОЕ ПИСЬМО -->
+        <!-- СОПРОВОДИТЕЛЬНОЕ -->
         <div class="screen" id="screen-letter">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">✍️ Сопроводительное письмо</div>
@@ -525,7 +528,19 @@
             <div id="skillGapResult" style="margin-top: 24px;"></div>
         </div>
 
-        <!-- 🆘 АНТИКРИЗИСНЫЙ ПАКЕТ -->
+        <!-- ЧИТАЛКА УРОКОВ/ШАБЛОНОВ -->
+        <div class="screen" id="screen-reader">
+            <div class="back-button" onclick="showScreen('premium')">← К курсам</div>
+            <div class="screen-title" id="readerTitle">📖</div>
+            <div class="analysis-block" id="readerContent"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;">
+                <button class="action-button secondary" id="readerPrev" onclick="readerNav(-1)">← Назад</button>
+                <button class="action-button secondary" id="readerNext" onclick="readerNav(1)">Вперёд →</button>
+            </div>
+            <button class="copy-btn" style="margin-top:12px;" onclick="copyReader()">📋 Скопировать</button>
+        </div>
+
+        <!-- 🆘 АНТИКРИЗИС -->
         <div class="screen" id="screen-crisis">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🆘 Антикризисный пакет</div>
@@ -727,6 +742,7 @@
         let userData = null;
         let currentCrisisTool = null;
         let lastVacancies = [];
+        let readerState = null;
 
         if (tg) {
             try {
@@ -778,23 +794,76 @@
             setTimeout(() => s.remove(), 650);
         }, true);
 
+        // ---------- ПРОГРЕСС-СТАТУС (ЧТОБЫ НЕ КАЗАЛОСЬ, ЧТО ЗАВИСЛО) ----------
+        let progressTimer = null;
+        let progressStart = 0;
+        function startProgress(stages) {
+            progressStart = Date.now();
+            let i = 0;
+            const ov = document.getElementById('loaderOverlay');
+            ov.style.display = 'flex';
+            function render() {
+                const sec = Math.floor((Date.now() - progressStart) / 1000);
+                const idx = Math.min(i, stages.length - 1);
+                document.getElementById('loaderStatus').innerHTML =
+                    stages[idx] + '<br><small style="color:#9ed2ff;">⏱ ' + sec + ' сек • этап ' + (idx + 1) + ' из ' + stages.length + '</small>';
+                document.getElementById('pbar').style.width = Math.round(((idx + 1) / stages.length) * 100) + '%';
+            }
+            render();
+            if (progressTimer) clearInterval(progressTimer);
+            progressTimer = setInterval(() => {
+                const sec = Math.floor((Date.now() - progressStart) / 1000);
+                if (i < stages.length - 1 && sec >= (i + 1) * 8) i++;
+                render();
+            }, 1000);
+        }
+        function stopProgress() {
+            if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+            document.getElementById('loaderOverlay').style.display = 'none';
+        }
+        function showLoader(text, show) {
+            if (show) { stopProgress(); }
+            document.getElementById('loaderStatus').textContent = text || '';
+            document.getElementById('loaderOverlay').style.display = show ? 'flex' : 'none';
+        }
+
+        const SEARCH_STAGES = [
+            '🌍 Определяю регион и уровень кандидата...',
+            '🧠 Составляю план поиска (должности, отрасли, компании)...',
+            '📥 Скачиваю вакансии с hh.ru...',
+            '🚫 Убираю стажёрские и нерелевантные роли...',
+            '🎯 ИИ оценивает соответствие каждой вакансии...',
+            '🏆 Сортирую: топ-компании и максимальное соответствие...'
+        ];
+        const ANALYZE_STAGES = [
+            '📄 Читаю текст вакансии...',
+            '🏢 Определяю компанию и должность...',
+            '🕵️ Ищу контакты ЛПР и корпоративные почты...',
+            '✍️ Пишу питч под твоё резюме...'
+        ];
+        const LETTER_STAGES = [
+            '📄 Беру факты из твоего резюме...',
+            '🎯 Сопоставляю с задачами вакансии...',
+            '✍️ Пишу письмо готовое к отправке...'
+        ];
+
         async function wakeServer() {
             try {
                 await fetch(BOT_API_URL + '/?ping=' + Date.now(), { method: 'GET', cache: 'no-store' });
             } catch (e) {}
         }
 
-        async function launchBot() {
-            toast('🚀 Бот пишет тебе в чат...');
+        async function launchBot(action) {
+            toast(action === 'interview' ? '🎤 Запускаю тренажёр в чате...' : '🚀 Бот пишет тебе в чат...');
             wakeServer();
             if (!currentUserId) {
                 await ensureAuth();
             }
             if (currentUserId) {
                 try {
-                    const d = await api('/miniapp/wake-bot', { user_id: currentUserId });
+                    const d = await api('/miniapp/wake-bot', { user_id: currentUserId, action: action || '' });
                     if (d && d.sent) {
-                        toast('✅ Смотри сообщение от бота в чате!');
+                        toast(action === 'interview' ? '🎤 Первый вопрос уже в чате!' : '✅ Смотри сообщение от бота в чате!');
                     } else {
                         toast('⚠️ Открываю чат бота...');
                     }
@@ -838,10 +907,6 @@
         }
 
         // ---------- БАЗА ----------
-        function showLoader(text, show) {
-            document.getElementById('loaderStatus').textContent = text || '';
-            document.getElementById('loaderOverlay').style.display = show ? 'flex' : 'none';
-        }
         function escapeHtml(str) {
             if (str === null || str === undefined) return '';
             return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -1107,7 +1172,7 @@
             finally { showLoader('', false); }
         }
 
-        // ---------- ПОИСК + СЧЁТЧИК ----------
+        // ---------- ПОИСК + СЧЁТЧИК + ПРОГРЕСС ----------
         async function runSearch() {
             if (!await ensureAuth()) return;
             if (!userData || !userData.has_active_resume) {
@@ -1117,7 +1182,7 @@
             const box = document.getElementById('searchResult');
             const meta = document.getElementById('searchMeta');
             box.innerHTML = ''; meta.innerHTML = '';
-            showLoader('Ищу вакансии по резюме: регион, отрасль, уровень, топ-компании. До 60 секунд...', true);
+            startProgress(SEARCH_STAGES);
             try {
                 const d = await api('/miniapp/search', { user_id: currentUserId });
                 const count = (d.vacancies || []).length;
@@ -1132,7 +1197,7 @@
             } catch (e) {
                 box.innerHTML = errorBox(e.message, true);
             } finally {
-                showLoader('', false);
+                stopProgress();
                 await loadUserData();
             }
         }
@@ -1179,7 +1244,7 @@
             if (!title && !vtext) { alert('⚠️ Укажи должность или вставь текст вакансии'); return; }
             if (!await ensureAuth()) return;
             btn.disabled = true;
-            showLoader('Пишу письмо из резюме под вакансию...', true);
+            startProgress(LETTER_STAGES);
             box.innerHTML = '';
             try {
                 const d = await api('/miniapp/cover-letter', {
@@ -1197,7 +1262,7 @@
             } catch (e) {
                 box.innerHTML = errorBox(e.message, true);
             } finally {
-                showLoader('', false);
+                stopProgress();
                 btn.disabled = false;
                 await loadUserData();
             }
@@ -1216,7 +1281,7 @@
             if (txt.length < 100) { alert('⚠️ Текст вакансии слишком короткий. Скопируй полный текст из hh.ru'); return; }
             if (!await ensureAuth()) return;
             btn.disabled = true;
-            showLoader('Разбираю вакансию и ищу контакты...', true);
+            startProgress(ANALYZE_STAGES);
             box.innerHTML = '';
             try {
                 const d = await api('/miniapp/analyze', { user_id: currentUserId, vacancy_text: txt });
@@ -1244,7 +1309,7 @@
             } catch (e) {
                 box.innerHTML = errorBox(e.message, false);
             } finally {
-                showLoader('', false);
+                stopProgress();
                 btn.disabled = false;
                 await loadUserData();
             }
@@ -1264,7 +1329,7 @@
             if (!company) { alert('⚠️ Укажите компанию'); return; }
             if (!await ensureAuth()) return;
             btn.disabled = true;
-            showLoader('Ищу контакты ЛПР...', true);
+            startProgress(['🏢 Собираю данные о компании...', '🕵️ Ищу профили HR и ЛПР...', ' Формирую контакты и шаблоны почт...']);
             box.innerHTML = '';
             try {
                 const d = await api('/miniapp/find-lpr', { user_id: currentUserId, company: company, position: position });
@@ -1295,7 +1360,7 @@
             } catch (e) {
                 box.innerHTML = errorBox(e.message, false);
             } finally {
-                showLoader('', false);
+                stopProgress();
                 btn.disabled = false;
                 await loadUserData();
             }
@@ -1351,6 +1416,53 @@
                 btn.disabled = false;
                 await loadUserData();
             }
+        }
+
+        // ----------  ЧИТАЛКА УРОКОВ И ШАБЛОНОВ ----------
+        async function openLesson(courseId, num) {
+            if (!await ensureAuth()) return;
+            showLoader('Открываю урок...', true);
+            try {
+                const d = await api('/miniapp/lesson', { user_id: currentUserId, course: courseId, num: num });
+                readerState = { type: 'lesson', course: courseId, num: num, total: d.total || num };
+                document.getElementById('readerTitle').textContent = d.title;
+                document.getElementById('readerContent').textContent = d.content;
+                updateReaderNav();
+                showScreen('reader');
+            } catch (e) { alert('⚠️ ' + e.message); }
+            finally { showLoader('', false); }
+        }
+        async function openTemplate(num) {
+            if (!await ensureAuth()) return;
+            showLoader('Открываю шаблон...', true);
+            try {
+                const d = await api('/miniapp/template', { user_id: currentUserId, num: num });
+                readerState = { type: 'template', num: num, total: 10 };
+                document.getElementById('readerTitle').textContent = d.name;
+                document.getElementById('readerContent').textContent = d.content;
+                updateReaderNav();
+                showScreen('reader');
+            } catch (e) { alert('⚠️ ' + e.message); }
+            finally { showLoader('', false); }
+        }
+        function updateReaderNav() {
+            const prev = document.getElementById('readerPrev');
+            const next = document.getElementById('readerNext');
+            if (!readerState) return;
+            prev.style.visibility = readerState.num > 1 ? 'visible' : 'hidden';
+            next.style.visibility = readerState.num < readerState.total ? 'visible' : 'hidden';
+        }
+        function readerNav(dir) {
+            if (!readerState) return;
+            const nextNum = readerState.num + dir;
+            if (nextNum < 1 || nextNum > readerState.total) return;
+            if (readerState.type === 'lesson') openLesson(readerState.course, nextNum);
+            else openTemplate(nextNum);
+        }
+        function copyReader() {
+            const el = document.getElementById('readerContent');
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
         // ---------- 🆘 АНТИКРИЗИС ----------
@@ -1486,22 +1598,6 @@
             } catch (e) {
                 content.innerHTML = errorBox(e.message, false);
             }
-        }
-        async function openLesson(courseId, num) {
-            showLoader('Открываю урок...', true);
-            try {
-                const d = await api('/miniapp/lesson', { user_id: currentUserId, course: courseId, num: num });
-                alert(d.content);
-            } catch (e) { alert('⚠️ ' + e.message); }
-            finally { showLoader('', false); }
-        }
-        async function openTemplate(num) {
-            showLoader('Открываю шаблон...', true);
-            try {
-                const d = await api('/miniapp/template', { user_id: currentUserId, num: num });
-                alert(d.name + '\n\n' + d.content);
-            } catch (e) { alert('⚠️ ' + e.message); }
-            finally { showLoader('', false); }
         }
 
         // ---------- HR ----------
