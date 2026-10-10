@@ -75,6 +75,7 @@
         .screen.active .feature-card:nth-child(10) { animation-delay: .40s; }
         .screen.active .feature-card:nth-child(11) { animation-delay: .44s; }
         .screen.active .feature-card:nth-child(12) { animation-delay: .48s; }
+        .screen.active .feature-card:nth-child(13) { animation-delay: .52s; }
         .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-button); color: var(--text-primary); font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 20px; transition: transform .15s, background .15s; }
         .back-button:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
         .screen-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
@@ -150,6 +151,7 @@
         .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
         .error-box { padding: 16px; background: rgba(245,87,108,0.12); border: 1px solid rgba(245,87,108,0.4); border-radius: 12px; color: #ff8a94; font-size: 14px; margin-top: 12px; animation: cardIn .35s ease both; }
         .info-box { padding: 12px 16px; background: rgba(79,172,254,0.08); border: 1px solid rgba(79,172,254,0.25); border-radius: 12px; color: #9ed2ff; font-size: 13px; margin-top: 12px; animation: cardIn .35s ease both; }
+        .count-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: rgba(56,239,125,.15); border: 1px solid rgba(56,239,125,.4); color: #38ef7d; font-size: 14px; font-weight: 700; margin-bottom: 12px; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 15px; backdrop-filter: blur(4px); }
         .spinner { width: 44px; height: 44px; border: 3px solid rgba(255,255,255,0.12); border-top-color: #fff; border-bottom-color: #667eea; border-radius: 50%; animation: spin .9s linear infinite; }
         .status-text { font-size: 14px; color: #ddd; text-align: center; max-width: 80%; }
@@ -194,6 +196,7 @@
     </div>
 
     <div class="container">
+        <!-- ОНБОРДИНГ -->
         <div class="screen" id="screen-onboard">
             <div class="onboard-slide">
                 <div class="onboard-icon" id="obIcon">🚀</div>
@@ -209,6 +212,7 @@
             </div>
         </div>
 
+        <!-- ГЛАВНЫЙ -->
         <div class="screen active" id="screen-home">
             <div class="header">
                 <div class="logo">🚀</div>
@@ -265,6 +269,7 @@
             <div class="footer">Сделано с ❤️ • Поддержка: <a href="mailto:a.lemus@ya.ru">a.lemus@ya.ru</a></div>
         </div>
 
+        <!-- БАЛАНС -->
         <div class="screen" id="screen-balance">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">💎 Мой баланс</div>
@@ -298,6 +303,7 @@
             </div>
         </div>
 
+        <!-- ТАРИФЫ -->
         <div class="screen" id="screen-tariffs">
             <div class="back-button" onclick="showScreen('balance')">← Назад</div>
             <div class="screen-title">💳 Тарифы</div>
@@ -317,6 +323,7 @@
             <div class="info-box">Альтернатива: оплата по СБП через бота (кнопка «💎 Оплата и Баланс»).</div>
         </div>
 
+        <!-- ИСТОРИЯ ПЛАТЕЖЕЙ -->
         <div class="screen" id="screen-payments">
             <div class="back-button" onclick="showScreen('balance')">← Назад</div>
             <div class="screen-title">🧾 История операций</div>
@@ -324,6 +331,7 @@
             <div id="paymentsList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Операций пока нет</div></div></div>
         </div>
 
+        <!-- ТРЕКЕР -->
         <div class="screen" id="screen-tracker">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">📌 Трекер откликов</div>
@@ -331,6 +339,7 @@
             <div id="trackerList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Загружаем...</div></div></div>
         </div>
 
+        <!-- СОИСКАТЕЛЬ -->
         <div class="screen" id="screen-seeker">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">💼 Я ищу работу</div>
@@ -339,6 +348,11 @@
                 <div class="feature-card" onclick="showScreen('search')">
                     <div class="feature-icon purple">🔍</div>
                     <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">Нажми: подбор по резюме, региону и отрасли</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('letter')">
+                    <div class="feature-icon blue">✍️</div>
+                    <div class="feature-info"><div class="feature-name">Сопроводительное письмо</div><div class="feature-desc">Из твоего резюме под конкретную вакансию</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('upload')">
@@ -399,6 +413,7 @@
             </div>
         </div>
 
+        <!-- ЗАГРУЗКА РЕЗЮМЕ -->
         <div class="screen" id="screen-upload">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📥 Загрузить резюме</div>
@@ -408,6 +423,7 @@
             <div id="uploadResult"></div>
         </div>
 
+        <!-- МОИ РЕЗЮМЕ -->
         <div class="screen" id="screen-resumes">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📁 Мои резюме</div>
@@ -416,6 +432,7 @@
             <button class="action-button secondary" onclick="showScreen('upload')" style="margin-top:16px;">📥 Загрузить новое резюме</button>
         </div>
 
+        <!-- ПОИСК ВАКАНСИЙ -->
         <div class="screen" id="screen-search">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🔍 Поиск вакансий</div>
@@ -428,6 +445,19 @@
             <div id="searchResult" style="margin-top: 16px;"></div>
         </div>
 
+        <!-- 🆕 СОПРОВОДИТЕЛЬНОЕ ПИСЬМО -->
+        <div class="screen" id="screen-letter">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">✍️ Сопроводительное письмо</div>
+            <div class="screen-subtitle">Генерируется из твоего активного резюме под конкретную вакансию — готово к копированию</div>
+            <input type="text" class="input-field" id="letterCompany" placeholder="Компания (например: Сбер)">
+            <input type="text" class="input-field" id="letterTitle" placeholder="Должность (например: Руководитель направления)">
+            <textarea class="input-field" id="letterText" placeholder="Необязательно: вставь текст вакансии для максимальной точности" style="min-height:110px;"></textarea>
+            <button class="action-button primary" id="letterBtn" onclick="runCoverLetter()">✍️ Сгенерировать письмо (1 ⭐)</button>
+            <div id="letterResult" style="margin-top: 24px;"></div>
+        </div>
+
+        <!-- РАЗБОР ВАКАНСИИ -->
         <div class="screen" id="screen-analyze">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🔗 Разбор вакансии</div>
@@ -437,6 +467,7 @@
             <div id="analyzeResult" style="margin-top: 24px;"></div>
         </div>
 
+        <!-- ЛПР -->
         <div class="screen" id="screen-lpr">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🕵️ Найти ЛПР</div>
@@ -447,6 +478,7 @@
             <div id="lprResult" style="margin-top: 24px;"></div>
         </div>
 
+        <!-- ПИТЧ -->
         <div class="screen" id="screen-pitch">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📝 Генерация питча</div>
@@ -457,6 +489,7 @@
             <div id="pitchResult" style="margin-top: 24px;"></div>
         </div>
 
+        <!-- SKILL GAP -->
         <div class="screen" id="screen-skillgap">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📊 Анализ навыков</div>
@@ -465,6 +498,7 @@
             <div id="skillGapResult" style="margin-top: 24px;"></div>
         </div>
 
+        <!-- 🆘 АНТИКРИЗИСНЫЙ ПАКЕТ -->
         <div class="screen" id="screen-crisis">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🆘 Антикризисный пакет</div>
@@ -483,6 +517,7 @@
             </div>
         </div>
 
+        <!-- РЕФЕРАЛКА -->
         <div class="screen" id="screen-referral">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🎁 Бонусы и друзья</div>
@@ -498,6 +533,7 @@
             </div>
         </div>
 
+        <!-- ПРЕМИУМ -->
         <div class="screen" id="screen-premium">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">🎓 Премиум-контент</div>
@@ -512,6 +548,7 @@
             <div id="premiumContent"></div>
         </div>
 
+        <!-- РЕКРУТЕР -->
         <div class="screen" id="screen-recruiter">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
             <div class="screen-title">🏢 Я нанимаю</div>
@@ -570,6 +607,7 @@
             </div>
         </div>
 
+        <!-- HR ЭКРАНЫ -->
         <div class="screen" id="screen-hr-match">
             <div class="back-button" onclick="showScreen('recruiter')">← Назад</div>
             <div class="screen-title">📊 Соответствие</div>
@@ -655,11 +693,13 @@
 
     <script>
         const BOT_API_URL = "https://lemus-career-bot.onrender.com";
+        const BOT_LINK = "https://t.me/LemusCareer_Bot";
         const SUPPORT_EMAIL = "a.lemus@ya.ru";
         const tg = window.Telegram && window.Telegram.WebApp;
         let currentUserId = null;
         let userData = null;
         let currentCrisisTool = null;
+        let lastVacancies = [];
 
         if (tg) {
             try {
@@ -673,6 +713,7 @@
             } catch(e) {}
         }
 
+        // ---------- ЭФФЕКТЫ ----------
         function toast(msg) {
             let t = document.getElementById('toast');
             if (!t) {
@@ -716,48 +757,34 @@
             } catch (e) {}
         }
 
-        // 🆕 ГЛАВНАЯ ФУНКЦИЯ: бот сам пишет в чат — работает на iPhone
         async function launchBot() {
             toast('🚀 Бот пишет тебе в чат...');
             wakeServer();
-            
+            if (!currentUserId) {
+                await ensureAuth();
+            }
             if (currentUserId) {
                 try {
-                    const res = await fetch(BOT_API_URL + '/miniapp/wake-bot', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-                        body: JSON.stringify({ user_id: currentUserId })
-                    });
-                    if (res.ok) {
+                    const d = await api('/miniapp/wake-bot', { user_id: currentUserId });
+                    if (d && d.sent) {
                         toast('✅ Смотри сообщение от бота в чате!');
                     } else {
-                        toast('⚠️ Не удалось разбудить бота');
+                        toast('⚠️ Открываю чат бота...');
                     }
                 } catch (e) {
-                    toast('⚠️ Сервер не отвечает');
-                }
-            } else {
-                if (await ensureAuth()) {
-                    try {
-                        await fetch(BOT_API_URL + '/miniapp/wake-bot', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-                            body: JSON.stringify({ user_id: currentUserId })
-                        });
-                        toast('✅ Смотри сообщение от бота в чате!');
-                    } catch (e) {}
+                    toast('⚠️ Открываю чат бота...');
                 }
             }
-            
             setTimeout(() => {
                 try {
                     if (tg && tg.openTelegramLink) {
-                        tg.openTelegramLink('https://t.me/LemusCareer_Bot');
+                        tg.openTelegramLink(BOT_LINK);
                     }
                 } catch (e) {}
             }, 800);
         }
 
+        // ---------- ОНБОРДИНГ ----------
         const OB_SLIDES = [
             { icon: '🚀', title: 'Lemus Career Agent', text: 'ИИ-агент анализирует вакансии, находит контакты руководителей и пишет питчи за тебя.' },
             { icon: '📄', title: 'Загрузи резюме', text: 'Приложение подберёт вакансии твоего уровня и отрасли с процентом соответствия.' },
@@ -783,6 +810,7 @@
             showScreen('home');
         }
 
+        // ---------- БАЗА ----------
         function showLoader(text, show) {
             document.getElementById('loaderStatus').textContent = text || '';
             document.getElementById('loaderOverlay').style.display = show ? 'flex' : 'none';
@@ -865,10 +893,9 @@
         }
         function shareBot() {
             const shareText = '🚀 Нашёл крутой ИИ-карьерный агент! Помогает искать работу и нанимать. Попробуй: ';
-            const botLink = 'https://t.me/LemusCareer_Bot';
-            if (tg && tg.switchInlineQuery) { try { tg.switchInlineQuery(shareText + botLink, ['users', 'groups']); return; } catch(e) {} }
-            if (navigator.share) { try { navigator.share({ title: 'Lemus Career Agent', text: shareText, url: botLink }); return; } catch(e) {} }
-            try { navigator.clipboard.writeText(botLink); toast('Ссылка скопирована!'); } catch(e) { alert('Ссылка: ' + botLink); }
+            if (tg && tg.switchInlineQuery) { try { tg.switchInlineQuery(shareText + BOT_LINK, ['users', 'groups']); return; } catch(e) {} }
+            if (navigator.share) { try { navigator.share({ title: 'Lemus Career Agent', text: shareText, url: BOT_LINK }); return; } catch(e) {} }
+            try { navigator.clipboard.writeText(BOT_LINK); toast('Ссылка скопирована!'); } catch(e) { alert('Ссылка: ' + BOT_LINK); }
         }
         function errorBox(msg, withUpload) {
             let btnHtml = '';
@@ -878,6 +905,7 @@
             return '<div class="error-box">⚠️ ' + escapeHtml(msg) + '</div>' + btnHtml;
         }
 
+        // ---------- ОПЛАТА ----------
         async function payTariff(tariff) {
             if (!await ensureAuth()) return;
             showLoader('Создаю счёт Stars...', true);
@@ -929,6 +957,7 @@
             } catch (e) { alert('⚠️ ' + e.message); }
         }
 
+        // ---------- РЕЗЮМЕ ----------
         function onFilePicked(input) {
             const f = input.files && input.files[0];
             if (!f) return;
@@ -984,6 +1013,7 @@
             finally { showLoader('', false); }
         }
 
+        // ---------- ПОИСК ВАКАНСИЙ + СЧЁТЧИК ----------
         async function runSearch() {
             if (!await ensureAuth()) return;
             if (!userData || !userData.has_active_resume) {
@@ -996,11 +1026,15 @@
             showLoader('Ищу вакансии по резюме: регион, отрасль, уровень, топ-компании. До 60 секунд...', true);
             try {
                 const d = await api('/miniapp/search', { user_id: currentUserId });
+                const count = (d.vacancies || []).length;
+                let metaHtml = '<div class="count-badge">📊 Найдено вакансий: ' + count + '</div>';
                 if (d.queries && d.queries.length) {
-                    meta.innerHTML = '<div class="info-box">🎯 Запросы: ' + escapeHtml(d.queries.join(', ')) +
+                    metaHtml += '<div class="info-box">🎯 Запросы: ' + escapeHtml(d.queries.join(', ')) +
                         (d.industries && d.industries.length ? '<br>🏭 Отрасли: ' + escapeHtml(d.industries.join(', ')) : '') + '</div>';
                 }
+                meta.innerHTML = metaHtml;
                 renderVacancies(d.vacancies || [], box);
+                toast('✅ Найдено вакансий: ' + count);
             } catch (e) {
                 box.innerHTML = errorBox(e.message, true);
             } finally {
@@ -1009,11 +1043,12 @@
             }
         }
         function renderVacancies(list, box) {
+            lastVacancies = list || [];
             if (!list.length) {
                 box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div>Вакансий не найдено. Проверь резюме или попробуй позже.</div></div>';
                 return;
             }
-            let html = '<div class="result-section-title">Найдено: ' + list.length + ' (отсортировано по соответствию)</div>';
+            let html = '<div class="result-section-title">Найдено: ' + list.length + ' вакансий (отсортировано по соответствию)</div>';
             list.forEach((v, i) => {
                 const sc = v.match_score || 0;
                 const cls = sc >= 75 ? ' hot' : (sc >= 60 ? ' mid' : ' low');
@@ -1023,11 +1058,63 @@
                     (v.salary ? '<div class="vacancy-salary">' + escapeHtml(v.salary) + '</div>' : '') +
                     '<div class="vacancy-reason">' + escapeHtml(v.match_reason) + '</div>' +
                     (v.url ? '<a class="link-item" href="' + escapeHtml(v.url) + '" target="_blank">🔗 Открыть вакансию</a>' : '') +
+                    '<button class="copy-btn" onclick="openLetterFor(' + i + ')">✍️ Сопроводительное письмо</button>' +
                     '</div>';
             });
             box.innerHTML = html;
         }
 
+        // ---------- 🆕 СОПРОВОДИТЕЛЬНОЕ ПИСЬМО ----------
+        function openLetterFor(i) {
+            const v = lastVacancies[i];
+            if (!v) return;
+            showScreen('letter');
+            document.getElementById('letterCompany').value = v.company || '';
+            document.getElementById('letterTitle').value = v.title || '';
+            document.getElementById('letterText').value = '';
+            document.getElementById('letterResult').innerHTML = '';
+            runCoverLetter();
+        }
+
+        async function runCoverLetter() {
+            const company = document.getElementById('letterCompany').value.trim();
+            const title = document.getElementById('letterTitle').value.trim();
+            const vtext = document.getElementById('letterText').value.trim();
+            const btn = document.getElementById('letterBtn');
+            const box = document.getElementById('letterResult');
+            if (!title && !vtext) { alert('⚠️ Укажи должность или вставь текст вакансии'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Пишу письмо из резюме под вакансию...', true);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/cover-letter', {
+                    user_id: currentUserId,
+                    vacancy_title: title,
+                    vacancy_company: company,
+                    vacancy_text: vtext
+                });
+                box.innerHTML = '<div class="result-card">' +
+                    '<div class="result-section-title">✍️ Письмо готово — скопируй и отправляй</div>' +
+                    (d.company || d.title ? '<div class="result-title">🏢 ' + escapeHtml(d.company || '') + (d.company && d.title ? ' • ' : '') + escapeHtml(d.title || '') + '</div>' : '') +
+                    '<div class="result-pitch" id="letterOut">' + escapeHtml(d.letter) + '</div>' +
+                    '<button class="copy-btn" onclick="copyLetter()">📋 Скопировать письмо</button></div>';
+                toast('✅ Письмо готово');
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+        function copyLetter() {
+            const el = document.getElementById('letterOut');
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Письмо скопировано!')).catch(() => alert('Выдели текст вручную'));
+        }
+
+        // ---------- РАЗБОР ВАКАНСИИ ----------
         async function runAnalyze() {
             const txt = document.getElementById('vacancyInput').value.trim();
             const btn = document.getElementById('analyzeBtn');
@@ -1074,6 +1161,7 @@
             navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
+        // ---------- ЛПР ----------
         async function runFindLPR() {
             const company = document.getElementById('lprCompany').value.trim();
             const position = document.getElementById('lprPosition').value.trim();
@@ -1119,6 +1207,7 @@
             }
         }
 
+        // ---------- ПИТЧ ----------
         async function runPitch() {
             const company = document.getElementById('pitchCompany').value.trim();
             const title = document.getElementById('pitchTitle').value.trim();
@@ -1150,6 +1239,7 @@
             navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
+        // ---------- SKILL GAP ----------
         async function runSkillGap() {
             const btn = document.getElementById('skillGapBtn');
             const box = document.getElementById('skillGapResult');
@@ -1169,6 +1259,7 @@
             }
         }
 
+        // ---------- 🆘 АНТИКРИЗИС ----------
         const CRISIS_TOOLS = {
             day:      { icon: '📅', name: 'План на сегодня', hint: '3 микро-шага на сегодня по твоему резюме. Ввод не нужен.', params: false, ph: '' },
             gap:      { icon: '🕳', name: 'Объяснение пробела', hint: 'Сколько длился пробел и причина своими словами', params: true, ph: '8 месяцев, сокращение + уход за болеющим родственником' },
@@ -1257,6 +1348,7 @@
             navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
+        // ---------- РЕФЕРАЛКА ----------
         async function loadReferral() {
             if (!currentUserId) return;
             try {
@@ -1270,6 +1362,7 @@
             navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Ссылка скопирована!')).catch(() => alert('Скопируй вручную'));
         }
 
+        // ---------- ПРЕМИУМ ----------
         async function loadPremium() {
             const gate = document.getElementById('premiumGate');
             const content = document.getElementById('premiumContent');
@@ -1317,6 +1410,7 @@
             finally { showLoader('', false); }
         }
 
+        // ---------- HR ----------
         async function runHRMatch() {
             const resume = document.getElementById('hrMatchResume').value.trim();
             const vacancy = document.getElementById('hrMatchVacancy').value.trim();
@@ -1410,6 +1504,7 @@
         function runHRCandidatePitch() { runHRParams('/miniapp/hr-candidate-pitch', 'hrCandidatePitchParams', 'hrCandidatePitchBtn', 'hrCandidatePitchResult', '💬 Питч кандидату', 20, 'pitch'); }
         function runHRFollowup() { runHRParams('/miniapp/hr-followup', 'hrFollowupParams', 'hrFollowupBtn', 'hrFollowupResult', '📅 Фоллоу-ап', 20, 'followup'); }
 
+        // ---------- АВТО-ЗАПУСК ----------
         (async function startApp() {
             wakeServer();
             let onboarded = false;
