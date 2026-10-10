@@ -75,6 +75,7 @@
         .screen.active .feature-card:nth-child(10) { animation-delay: .40s; }
         .screen.active .feature-card:nth-child(11) { animation-delay: .44s; }
         .screen.active .feature-card:nth-child(12) { animation-delay: .48s; }
+        .screen.active .feature-card:nth-child(13) { animation-delay: .52s; }
         .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-button); color: var(--text-primary); font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 20px; transition: transform .15s, background .15s; }
         .back-button:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
         .screen-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
@@ -130,7 +131,7 @@
         .result-section-title { font-size: 13px; font-weight: 600; color: #4facfe; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
         .result-pitch { padding: 16px; background: rgba(102,126,234,0.1); border-left: 3px solid #667eea; border-radius: 8px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
         .result-contact { padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 8px; font-size: 14px; }
-        .analysis-block { padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 12px; white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.6; }
+        .analysis-block { padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; margin-bottom: 12px; white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height: 1.6; max-height: 380px; overflow-y: auto; }
         .vacancy-card { padding: 16px; background: var(--bg-card); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-card); margin-bottom: 12px; animation: cardIn .4s ease both; transition: transform .15s, border-color .15s; }
         .vacancy-card:active { transform: scale(0.98); border-color: rgba(79,172,254,.4); }
         .vacancy-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 8px; }
@@ -261,7 +262,7 @@
             </div>
             <div class="premium-banner">
                 <div class="premium-title">🎓 Премиум возможности</div>
-                <div class="premium-text">4 курса (включая 🆘 антикризисный), 10 шаблонов писем, аналитика и план поиска</div>
+                <div class="premium-text">Курсы, шаблоны писем, аналитика, план поиска и 🆘 антикризисный пакет</div>
                 <div class="premium-button" onclick="showScreen('premium')">Открыть</div>
             </div>
             <div class="action-buttons">
@@ -322,7 +323,7 @@
             </div>
             <div class="tariff-card">
                 <div class="tariff-name">♾ Безлимит 10 дней = ПРЕМИУМ</div>
-                <div class="tariff-desc">До 50 запросов в день + 4 курса (включая 🆘 антикризисный), 10 шаблонов, аналитика, план поиска</div>
+                <div class="tariff-desc">До 50 запросов в день + курсы, шаблоны, аналитика, план поиска и 🆘 пакет</div>
                 <div class="tariff-price">500 ⭐</div>
                 <button class="action-button primary" onclick="payTariff('unl10')">Оплатить Stars</button>
             </div>
@@ -375,12 +376,22 @@
             <div class="feature-grid">
                 <div class="feature-card" onclick="showScreen('search')">
                     <div class="feature-icon purple">🔍</div>
-                    <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">Нажми: подбор по резюме, региону и отрасли</div></div>
+                    <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">Подбор по резюме, региону и отрасли</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
                 <div class="feature-card" onclick="startTrainer()">
                     <div class="feature-icon green">🎤</div>
                     <div class="feature-info"><div class="feature-name">Тренажёр собеседований</div><div class="feature-desc">3 каверзных вопроса с разбором — стартует в чате</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('skillgap')">
+                    <div class="feature-icon purple">📊</div>
+                    <div class="feature-info"><div class="feature-name">Анализ навыков (Skill Gap)</div><div class="feature-desc">Аудит → исправленное резюме в Word + PDF</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
+                <div class="feature-card" onclick="showScreen('adapt')">
+                    <div class="feature-icon orange">🛠</div>
+                    <div class="feature-info"><div class="feature-name">Адаптация под вакансию</div><div class="feature-desc">Перепишу резюме под требования + Word и PDF в чат</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('letter')">
@@ -395,7 +406,7 @@
                 </div>
                 <div class="feature-card" onclick="showScreen('resumes')">
                     <div class="feature-icon blue">📁</div>
-                    <div class="feature-info"><div class="feature-name">Мои резюме</div><div class="feature-desc">Список и переключение между резюме</div></div>
+                    <div class="feature-info"><div class="feature-name">Мои резюме</div><div class="feature-desc">Список, активация и отправка файлов в чат</div></div>
                     <span class="feature-badge new">Новое</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('analyze')">
@@ -411,11 +422,6 @@
                 <div class="feature-card" onclick="showScreen('pitch')">
                     <div class="feature-icon blue">📝</div>
                     <div class="feature-info"><div class="feature-name">Короткие питчи</div><div class="feature-desc">Цепляющие сообщения для рекрутеров</div></div>
-                    <span class="feature-badge free">1 ⭐</span>
-                </div>
-                <div class="feature-card" onclick="showScreen('skillgap')">
-                    <div class="feature-icon purple">📊</div>
-                    <div class="feature-info"><div class="feature-name">Анализ навыков</div><div class="feature-desc">Skill Gap анализ и рекомендации</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('crisis')">
@@ -452,7 +458,8 @@
             <div class="screen-title">📁 Мои резюме</div>
             <div class="screen-subtitle">Нажми на резюме, чтобы сделать его активным для поиска</div>
             <div id="resumesList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Загружаем...</div></div></div>
-            <button class="action-button secondary" onclick="showScreen('upload')" style="margin-top:16px;">📥 Загрузить новое резюме</button>
+            <button class="action-button primary" onclick="exportResume()" style="margin-top:16px;">📤 Отправить резюме в чат (Word + PDF)</button>
+            <button class="action-button secondary" onclick="showScreen('upload')" style="margin-top:12px;">📥 Загрузить новое резюме</button>
         </div>
 
         <!-- ПОИСК ВАКАНСИЙ -->
@@ -466,6 +473,27 @@
             </div>
             <div id="searchMeta"></div>
             <div id="searchResult" style="margin-top: 16px;"></div>
+        </div>
+
+        <!-- SKILL GAP -->
+        <div class="screen" id="screen-skillgap">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">📊 Анализ навыков</div>
+            <div class="screen-subtitle">Skill Gap аудит резюме → исправленная версия файлами</div>
+            <button class="action-button primary" id="skillGapBtn" onclick="runSkillGap()">📊 Провести анализ (1 ⭐)</button>
+            <div id="skillGapResult" style="margin-top: 24px;"></div>
+            <button class="action-button secondary" id="fixResumeBtn" style="display:none;margin-top:12px;" onclick="runFixResume()">🚀 Исправить резюме → Word + PDF в чат</button>
+            <div id="fixResumeResult" style="margin-top: 16px;"></div>
+        </div>
+
+        <!-- АДАПТАЦИЯ ПОД ВАКАНСИЮ -->
+        <div class="screen" id="screen-adapt">
+            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
+            <div class="screen-title">🛠 Адаптация под вакансию</div>
+            <div class="screen-subtitle">Вставь текст вакансии — резюме перепишется под её требования и придёт файлами Word + PDF</div>
+            <textarea class="input-field" id="adaptInput" placeholder="Вставь полный текст вакансии (обязанности, требования, условия)..." style="min-height:180px;"></textarea>
+            <button class="action-button primary" id="adaptBtn" onclick="runAdapt()">🛠 Адаптировать резюме (1 ⭐)</button>
+            <div id="adaptResult" style="margin-top: 24px;"></div>
         </div>
 
         <!-- СОПРОВОДИТЕЛЬНОЕ -->
@@ -510,15 +538,6 @@
             <input type="text" class="input-field" id="pitchTitle" placeholder="Должность (например: Директор по развитию)">
             <button class="action-button primary" id="pitchBtn" onclick="runPitch()">📝 Сгенерировать питч (1 ⭐)</button>
             <div id="pitchResult" style="margin-top: 24px;"></div>
-        </div>
-
-        <!-- SKILL GAP -->
-        <div class="screen" id="screen-skillgap">
-            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
-            <div class="screen-title">📊 Анализ навыков</div>
-            <div class="screen-subtitle">Skill Gap анализ вашего резюме</div>
-            <button class="action-button primary" id="skillGapBtn" onclick="runSkillGap()">📊 Провести анализ (1 ⭐)</button>
-            <div id="skillGapResult" style="margin-top: 24px;"></div>
         </div>
 
         <!-- ЧИТАЛКА УРОКОВ/ШАБЛОНОВ -->
@@ -576,7 +595,7 @@
             <div id="premiumGate" style="display:none;">
                 <div class="premium-banner">
                     <div class="premium-title">🔒 Контент для премиум-пользователей</div>
-                    <div class="premium-text">Оформи безлимит, чтобы открыть 4 курса (включая 🆘 антикризисный) и 10 шаблонов писем</div>
+                    <div class="premium-text">Оформи безлимит, чтобы открыть все курсы (включая 🆘 антикризисный) и 10 шаблонов писем</div>
                     <div class="premium-button" onclick="showScreen('tariffs')">Перейти к тарифам</div>
                 </div>
             </div>
@@ -839,6 +858,18 @@
             '🎯 Сопоставляю с задачами вакансии...',
             '✍️ Пишу письмо, готовое к отправке...'
         ];
+        const FIX_STAGES = [
+            '📊 Беру выводы Skill Gap...',
+            '✍️ Переписываю достижения и формулировки...',
+            '📦 Собираю файлы Word и PDF...',
+            '📎 Отправляю файлы в чат бота...'
+        ];
+        const ADAPT_STAGES = [
+            '📄 Читаю требования вакансии...',
+            '🎯 Сопоставляю с твоим опытом...',
+            '✍️ Переписываю резюме под вакансию...',
+            '📦 Собираю Word и PDF и отправляю в чат...'
+        ];
 
         async function wakeServer() {
             try {
@@ -853,13 +884,13 @@
             try { window.open(BOT_LINK, '_blank'); } catch (e) {}
         }
 
-        // ---------- 🎤 ТРЕНАЖЁР: ПРОВЕРКА РЕЗЮМЕ → СТАРТ В ЧАТЕ ----------
+        // ---------- 🎤 ТРЕНАЖЁР ----------
         async function startTrainer() {
             if (!await ensureAuth()) return;
             if (!userData || !userData.has_active_resume) {
                 showScreen('upload');
                 document.getElementById('uploadResult').innerHTML =
-                    errorBox('Для тренажёра нужно резюме. Загрузи файл (PDF, DOCX или фото) — и вернись к карточке «🎤 Тренажёр собеседований».', false);
+                    errorBox('Для тренажёра нужно резюме. Загрузи файл — и вернись к карточке «🎤 Тренажёр собеседований».', false);
                 toast('📥 Сначала загрузи резюме');
                 return;
             }
@@ -1167,7 +1198,22 @@
             finally { showLoader('', false); }
         }
 
-        // ---------- ПОИСК + СЧЁТЧИК + ПРОГРЕСС ----------
+        // ---------- 📤 ЭКСПОРТ WORD+PDF ----------
+        async function exportResume() {
+            if (!await ensureAuth()) return;
+            showLoader('Готовлю Word и PDF...', true);
+            try {
+                await api('/miniapp/export-resume', { user_id: currentUserId });
+                toast('✅ Word и PDF отправлены в чат бота');
+                setTimeout(openChat, 900);
+            } catch (e) {
+                toast('⚠️ ' + e.message);
+            } finally {
+                showLoader('', false);
+            }
+        }
+
+        // ---------- ПОИСК ----------
         async function runSearch() {
             if (!await ensureAuth()) return;
             if (!userData || !userData.has_active_resume) {
@@ -1218,7 +1264,92 @@
             box.innerHTML = html;
         }
 
-        // ---------- СОПРОВОДИТЕЛЬНОЕ ----------
+        // ---------- 📊 SKILL GAP + ИСПРАВЛЕНИЕ ----------
+        async function runSkillGap() {
+            const btn = document.getElementById('skillGapBtn');
+            const box = document.getElementById('skillGapResult');
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            showLoader('Анализирую навыки по резюме...', true);
+            box.innerHTML = '';
+            document.getElementById('fixResumeBtn').style.display = 'none';
+            try {
+                const d = await api('/miniapp/skill-gap', { user_id: currentUserId });
+                box.innerHTML = '<div class="result-card"><div class="result-section-title">📊 Результат анализа</div><div class="analysis-block">' + escapeHtml(d.analysis) + '</div></div>';
+                document.getElementById('fixResumeBtn').style.display = 'flex';
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                showLoader('', false);
+                btn.disabled = false;
+                await loadUserData();
+            }
+        }
+
+        async function runFixResume() {
+            if (!await ensureAuth()) return;
+            const btn = document.getElementById('fixResumeBtn');
+            const box = document.getElementById('fixResumeResult');
+            btn.disabled = true;
+            startProgress(FIX_STAGES);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/fix-resume', { user_id: currentUserId });
+                box.innerHTML = '<div class="result-card">' +
+                    '<div class="result-section-title">💎 Исправленное резюме (копия текста)</div>' +
+                    '<div class="analysis-block" id="fixOut">' + escapeHtml(d.text) + '</div>' +
+                    '<button class="copy-btn" onclick="copyFix()">📋 Скопировать текст</button>' +
+                    '<div class="info-box">📎 Файлы Word и PDF отправлены в чат бота</div></div>';
+                toast('✅ Резюме исправлено, файлы в чате');
+                setTimeout(openChat, 1200);
+                await loadUserData();
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, false);
+            } finally {
+                stopProgress();
+                btn.disabled = false;
+            }
+        }
+        function copyFix() {
+            const el = document.getElementById('fixOut');
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
+        }
+
+        // ---------- 🛠 АДАПТАЦИЯ ПОД ВАКАНСИЮ ----------
+        async function runAdapt() {
+            const txt = document.getElementById('adaptInput').value.trim();
+            const btn = document.getElementById('adaptBtn');
+            const box = document.getElementById('adaptResult');
+            if (txt.length < 100) { alert('⚠️ Вставь полный текст вакансии (минимум 100 символов)'); return; }
+            if (!await ensureAuth()) return;
+            btn.disabled = true;
+            startProgress(ADAPT_STAGES);
+            box.innerHTML = '';
+            try {
+                const d = await api('/miniapp/adapt-resume', { user_id: currentUserId, vacancy_text: txt });
+                box.innerHTML = '<div class="result-card">' +
+                    '<div class="result-section-title">🛠 Адаптированное резюме (копия текста)</div>' +
+                    '<div class="analysis-block" id="adaptOut">' + escapeHtml(d.text) + '</div>' +
+                    '<button class="copy-btn" onclick="copyAdapt()">📋 Скопировать текст</button>' +
+                    '<div class="info-box">📎 Файлы Word и PDF отправлены в чат бота, резюме сохранено как активное</div></div>';
+                toast('✅ Адаптация готова, файлы в чате');
+                setTimeout(openChat, 1200);
+                await loadUserData();
+            } catch (e) {
+                box.innerHTML = errorBox(e.message, true);
+            } finally {
+                stopProgress();
+                btn.disabled = false;
+            }
+        }
+        function copyAdapt() {
+            const el = document.getElementById('adaptOut');
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
+        }
+
+        // ---------- ✍️ СОПРОВОДИТЕЛЬНОЕ ----------
         function openLetterFor(i) {
             const v = lastVacancies[i];
             if (!v) return;
@@ -1393,27 +1524,7 @@
             navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
-        // ---------- SKILL GAP ----------
-        async function runSkillGap() {
-            const btn = document.getElementById('skillGapBtn');
-            const box = document.getElementById('skillGapResult');
-            if (!await ensureAuth()) return;
-            btn.disabled = true;
-            showLoader('Анализирую навыки по резюме...', true);
-            box.innerHTML = '';
-            try {
-                const d = await api('/miniapp/skill-gap', { user_id: currentUserId });
-                box.innerHTML = '<div class="result-card"><div class="result-section-title">📊 Результат анализа</div><div class="analysis-block">' + escapeHtml(d.analysis) + '</div></div>';
-            } catch (e) {
-                box.innerHTML = errorBox(e.message, true);
-            } finally {
-                showLoader('', false);
-                btn.disabled = false;
-                await loadUserData();
-            }
-        }
-
-        // ---------- ЧИТАЛКА УРОКОВ/ШАБЛОНОВ ----------
+        // ---------- ЧИТАЛКА ----------
         async function openLesson(courseId, num) {
             if (!await ensureAuth()) return;
             showLoader('Открываю урок...', true);
