@@ -75,7 +75,6 @@
         .screen.active .feature-card:nth-child(10) { animation-delay: .40s; }
         .screen.active .feature-card:nth-child(11) { animation-delay: .44s; }
         .screen.active .feature-card:nth-child(12) { animation-delay: .48s; }
-        .screen.active .feature-card:nth-child(13) { animation-delay: .52s; }
         .back-button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: var(--bg-card); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-button); color: var(--text-primary); font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 20px; transition: transform .15s, background .15s; }
         .back-button:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
         .screen-title { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
@@ -266,7 +265,6 @@
                 <div class="premium-button" onclick="showScreen('premium')">Открыть</div>
             </div>
             <div class="action-buttons">
-                <button class="action-button primary" onclick="launchBot()">🚀 Запустить бота</button>
                 <button class="action-button secondary" id="adminHomeBtn" style="display:none;" onclick="showScreen('admin')">👑 Админ-панель</button>
                 <button class="action-button secondary" onclick="shareBot()">📤 Поделиться ботом</button>
             </div>
@@ -380,6 +378,11 @@
                     <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">Нажми: подбор по резюме, региону и отрасли</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
+                <div class="feature-card" onclick="startTrainer()">
+                    <div class="feature-icon green">🎤</div>
+                    <div class="feature-info"><div class="feature-name">Тренажёр собеседований</div><div class="feature-desc">3 каверзных вопроса с разбором — стартует в чате</div></div>
+                    <span class="feature-badge free">1 ⭐</span>
+                </div>
                 <div class="feature-card" onclick="showScreen('letter')">
                     <div class="feature-icon blue">✍️</div>
                     <div class="feature-info"><div class="feature-name">Сопроводительное письмо</div><div class="feature-desc">Из твоего резюме под конкретную вакансию</div></div>
@@ -429,16 +432,6 @@
                     <div class="feature-icon pink">🎓</div>
                     <div class="feature-info"><div class="feature-name">Курсы и шаблоны</div><div class="feature-desc">Премиум-контент для поиска работы</div></div>
                     <span class="feature-badge premium">Премиум</span>
-                </div>
-                <div class="feature-card" onclick="launchBot()">
-                    <div class="feature-icon green">🚀</div>
-                    <div class="feature-info"><div class="feature-name">Запустить бота</div><div class="feature-desc">Бот сам напишет в чат — работает на iPhone</div></div>
-                    <span class="feature-badge free">Чат</span>
-                </div>
-                <div class="feature-card" onclick="launchBot('interview')">
-                    <div class="feature-icon green">🎤</div>
-                    <div class="feature-info"><div class="feature-name">Тренажёр собеседований</div><div class="feature-desc">Стартует сразу: бот задаст вопрос в чате</div></div>
-                    <span class="feature-badge free">1 ⭐</span>
                 </div>
             </div>
         </div>
@@ -794,7 +787,7 @@
             setTimeout(() => s.remove(), 650);
         }, true);
 
-        // ---------- ПРОГРЕСС-СТАТУС (ЧТОБЫ НЕ КАЗАЛОСЬ, ЧТО ЗАВИСЛО) ----------
+        // ---------- ПРОГРЕСС-СТАТУС ----------
         let progressTimer = null;
         let progressStart = 0;
         function startProgress(stages) {
@@ -844,7 +837,7 @@
         const LETTER_STAGES = [
             '📄 Беру факты из твоего резюме...',
             '🎯 Сопоставляю с задачами вакансии...',
-            '✍️ Пишу письмо готовое к отправке...'
+            '✍️ Пишу письмо, готовое к отправке...'
         ];
 
         async function wakeServer() {
@@ -853,31 +846,33 @@
             } catch (e) {}
         }
 
-        async function launchBot(action) {
-            toast(action === 'interview' ? '🎤 Запускаю тренажёр в чате...' : '🚀 Бот пишет тебе в чат...');
-            wakeServer();
-            if (!currentUserId) {
-                await ensureAuth();
+        function openChat() {
+            try {
+                if (tg && tg.openTelegramLink) { tg.openTelegramLink(BOT_LINK); return; }
+            } catch (e) {}
+            try { window.open(BOT_LINK, '_blank'); } catch (e) {}
+        }
+
+        // ---------- 🎤 ТРЕНАЖЁР: ПРОВЕРКА РЕЗЮМЕ → СТАРТ В ЧАТЕ ----------
+        async function startTrainer() {
+            if (!await ensureAuth()) return;
+            if (!userData || !userData.has_active_resume) {
+                showScreen('upload');
+                document.getElementById('uploadResult').innerHTML =
+                    errorBox('Для тренажёра нужно резюме. Загрузи файл (PDF, DOCX или фото) — и вернись к карточке «🎤 Тренажёр собеседований».', false);
+                toast('📥 Сначала загрузи резюме');
+                return;
             }
-            if (currentUserId) {
-                try {
-                    const d = await api('/miniapp/wake-bot', { user_id: currentUserId, action: action || '' });
-                    if (d && d.sent) {
-                        toast(action === 'interview' ? '🎤 Первый вопрос уже в чате!' : '✅ Смотри сообщение от бота в чате!');
-                    } else {
-                        toast('⚠️ Открываю чат бота...');
-                    }
-                } catch (e) {
-                    toast('⚠️ Открываю чат бота...');
-                }
+            showLoader('Запускаю тренажёр в чате...', true);
+            try {
+                await api('/miniapp/wake-bot', { user_id: currentUserId, action: 'interview' });
+                toast('🎤 Первый вопрос уже в чате!');
+                setTimeout(openChat, 700);
+            } catch (e) {
+                toast('⚠️ ' + e.message);
+            } finally {
+                showLoader('', false);
             }
-            setTimeout(() => {
-                try {
-                    if (tg && tg.openTelegramLink) {
-                        tg.openTelegramLink(BOT_LINK);
-                    }
-                } catch (e) {}
-            }, 800);
         }
 
         // ---------- ОНБОРДИНГ ----------
@@ -1329,7 +1324,7 @@
             if (!company) { alert('⚠️ Укажите компанию'); return; }
             if (!await ensureAuth()) return;
             btn.disabled = true;
-            startProgress(['🏢 Собираю данные о компании...', '🕵️ Ищу профили HR и ЛПР...', ' Формирую контакты и шаблоны почт...']);
+            startProgress(['🏢 Собираю данные о компании...', '🕵️ Ищу профили HR и ЛПР...', '✉️ Формирую контакты и шаблоны почт...']);
             box.innerHTML = '';
             try {
                 const d = await api('/miniapp/find-lpr', { user_id: currentUserId, company: company, position: position });
@@ -1418,7 +1413,7 @@
             }
         }
 
-        // ----------  ЧИТАЛКА УРОКОВ И ШАБЛОНОВ ----------
+        // ---------- ЧИТАЛКА УРОКОВ/ШАБЛОНОВ ----------
         async function openLesson(courseId, num) {
             if (!await ensureAuth()) return;
             showLoader('Открываю урок...', true);
