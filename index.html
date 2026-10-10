@@ -204,7 +204,7 @@
             <div class="onboard-slide">
                 <div class="onboard-icon" id="obIcon">🚀</div>
                 <div class="onboard-title" id="obTitle">Lemus Career Agent</div>
-                <div class="onboard-text" id="obText">ИИ-агент анализирует вакансии, находит контакты руководителей и пишет питчи за тебя.</div>
+                <div class="onboard-text" id="obText">ИИ-агент анализирует вакансии, пишет сопроводительные и готовит резюме под фильтры hh.ru.</div>
             </div>
             <div class="onboard-dots" id="obDots">
                 <div class="dot active"></div><div class="dot"></div><div class="dot"></div>
@@ -228,9 +228,9 @@
                     <div class="stat-number" id="homeBalance">—</div>
                     <div class="stat-label">Запросов</div>
                 </div>
-                <div class="stat-card" onclick="showScreen('tracker')">
-                    <div class="stat-number" id="homeTracker">—</div>
-                    <div class="stat-label">Вакансий</div>
+                <div class="stat-card" onclick="showScreen('resumes')">
+                    <div class="stat-number" id="homeResumes">—</div>
+                    <div class="stat-label">Резюме</div>
                 </div>
                 <div class="stat-card" onclick="showScreen('seeker')">
                     <div class="stat-number">24/7</div>
@@ -241,11 +241,11 @@
                 <div class="mode-card seeker" onclick="showScreen('seeker')">
                     <div class="mode-icon">💼</div>
                     <div class="mode-title">Я ищу работу</div>
-                    <div class="mode-description">Поиск вакансий, разбор, контакты ЛПР, питчи</div>
+                    <div class="mode-description">До 70 вакансий, разбор, резюме под hh.ru, питчи</div>
                     <div class="mode-features">
                         <span class="feature-tag">🔍 Поиск вакансий</span>
-                        <span class="feature-tag">🔗 Разбор</span>
-                        <span class="feature-tag">🕵️ ЛПР</span>
+                        <span class="feature-tag">📊 Skill Gap</span>
+                        <span class="feature-tag">🛠 Адаптация</span>
                     </div>
                     <div class="mode-arrow">→</div>
                 </div>
@@ -262,7 +262,7 @@
             </div>
             <div class="premium-banner">
                 <div class="premium-title">🎓 Премиум возможности</div>
-                <div class="premium-text">Курсы, шаблоны писем, аналитика, план поиска и 🆘 антикризисный пакет</div>
+                <div class="premium-text">Курсы, шаблоны писем, план поиска и 🆘 антикризисный пакет</div>
                 <div class="premium-button" onclick="showScreen('premium')">Открыть</div>
             </div>
             <div class="action-buttons">
@@ -290,10 +290,6 @@
                 <div class="feature-card" onclick="showScreen('payments')">
                     <div class="feature-icon blue">🧾</div>
                     <div class="feature-info"><div class="feature-name">История операций</div><div class="feature-desc">Все платежи и начисления</div></div>
-                </div>
-                <div class="feature-card" onclick="showScreen('tracker')">
-                    <div class="feature-icon purple">📊</div>
-                    <div class="feature-info"><div class="feature-name">Мой трекер</div><div class="feature-desc">История разборов вакансий</div></div>
                 </div>
                 <div class="switch-row" onclick="toggleDigest()">
                     <div><div class="switch-label">🌅 Дайджест вакансий</div><div class="switch-sub">Топ-5 вакансий каждые 12 часов в чат</div></div>
@@ -323,7 +319,7 @@
             </div>
             <div class="tariff-card">
                 <div class="tariff-name">♾ Безлимит 10 дней = ПРЕМИУМ</div>
-                <div class="tariff-desc">До 50 запросов в день + курсы, шаблоны, аналитика, план поиска и 🆘 пакет</div>
+                <div class="tariff-desc">До 50 запросов в день + курсы, шаблоны, план поиска и 🆘 пакет</div>
                 <div class="tariff-price">500 ⭐</div>
                 <button class="action-button primary" onclick="payTariff('unl10')">Оплатить Stars</button>
             </div>
@@ -360,14 +356,6 @@
             <div id="adminPayments"></div>
         </div>
 
-        <!-- ТРЕКЕР -->
-        <div class="screen" id="screen-tracker">
-            <div class="back-button" onclick="showScreen('home')">← Назад</div>
-            <div class="screen-title">📌 Трекер откликов</div>
-            <div class="screen-subtitle">Все разобранные вакансии в одном месте</div>
-            <div id="trackerList"><div class="empty-state"><div class="empty-state-icon">📭</div><div>Загружаем...</div></div></div>
-        </div>
-
         <!-- СОИСКАТЕЛЬ -->
         <div class="screen" id="screen-seeker">
             <div class="back-button" onclick="showScreen('home')">← Назад</div>
@@ -376,7 +364,7 @@
             <div class="feature-grid">
                 <div class="feature-card" onclick="showScreen('search')">
                     <div class="feature-icon purple">🔍</div>
-                    <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">Подбор по резюме, региону и отрасли</div></div>
+                    <div class="feature-info"><div class="feature-name">Поиск вакансий</div><div class="feature-desc">До 70 вакансий, выдача партиями по 10</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
                 <div class="feature-card" onclick="startTrainer()">
@@ -386,7 +374,7 @@
                 </div>
                 <div class="feature-card" onclick="showScreen('skillgap')">
                     <div class="feature-icon purple">📊</div>
-                    <div class="feature-info"><div class="feature-name">Анализ навыков (Skill Gap)</div><div class="feature-desc">Аудит → исправленное резюме в Word + PDF</div></div>
+                    <div class="feature-info"><div class="feature-name">Анализ навыков (Skill Gap)</div><div class="feature-desc">Аудит → улучшенное резюме под hh.ru в Word + PDF</div></div>
                     <span class="feature-badge free">1 ⭐</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('adapt')">
@@ -406,18 +394,13 @@
                 </div>
                 <div class="feature-card" onclick="showScreen('resumes')">
                     <div class="feature-icon blue">📁</div>
-                    <div class="feature-info"><div class="feature-name">Мои резюме</div><div class="feature-desc">Список, активация и отправка файлов в чат</div></div>
+                    <div class="feature-info"><div class="feature-name">Мои резюме</div><div class="feature-desc">Список, активация и отправка Word + PDF в чат</div></div>
                     <span class="feature-badge new">Новое</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('analyze')">
                     <div class="feature-icon blue">🔗</div>
-                    <div class="feature-info"><div class="feature-name">Разобрать вакансию</div><div class="feature-desc">Контакты ЛПР и питч по тексту вакансии</div></div>
+                    <div class="feature-info"><div class="feature-name">Разобрать вакансию</div><div class="feature-desc">Контакты HR и питч по тексту вакансии</div></div>
                     <span class="feature-badge free">2 ⭐</span>
-                </div>
-                <div class="feature-card" onclick="showScreen('lpr')">
-                    <div class="feature-icon purple">🕵️</div>
-                    <div class="feature-info"><div class="feature-name">Найти ЛПР</div><div class="feature-desc">OSINT-поиск контактов менеджеров</div></div>
-                    <span class="feature-badge free">1 ⭐</span>
                 </div>
                 <div class="feature-card" onclick="showScreen('pitch')">
                     <div class="feature-icon blue">📝</div>
@@ -466,7 +449,7 @@
         <div class="screen" id="screen-search">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🔍 Поиск вакансий</div>
-            <div class="screen-subtitle">Подбор по резюме, региону и целевым отраслям</div>
+            <div class="screen-subtitle">До 70 вакансий по резюме, региону и целевым отраслям — показываем партиями</div>
             <div class="feature-card" onclick="runSearch()" style="margin-bottom:16px;">
                 <div class="feature-icon purple">🔍</div>
                 <div class="feature-info"><div class="feature-name">Запустить поиск</div><div class="feature-desc">ИИ подберёт вакансии твоего уровня • 1 ⭐</div></div>
@@ -475,18 +458,19 @@
             <div id="searchResult" style="margin-top: 16px;"></div>
         </div>
 
-        <!-- SKILL GAP -->
+        <!-- 📊 SKILL GAP -->
         <div class="screen" id="screen-skillgap">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">📊 Анализ навыков</div>
-            <div class="screen-subtitle">Skill Gap аудит резюме → исправленная версия файлами</div>
+            <div class="screen-subtitle">Skill Gap аудит резюме → улучшенная версия под фильтры hh.ru и внимание HR</div>
             <button class="action-button primary" id="skillGapBtn" onclick="runSkillGap()">📊 Провести анализ (1 ⭐)</button>
-            <div id="skillGapResult" style="margin-top: 24px;"></div>
-            <button class="action-button secondary" id="fixResumeBtn" style="display:none;margin-top:12px;" onclick="runFixResume()">🚀 Исправить резюме → Word + PDF в чат</button>
+            <button class="action-button secondary" id="fixResumeBtn" onclick="runFixResume()" style="margin-top:12px;">🚀 Улучшить резюме под hh.ru → Word + PDF в чат</button>
+            <div class="info-box">Улучшенное резюме собирается по правилам ATS hh.ru: структура блоков, поисковые ключевые слова, достижения с метриками — и приходит файлами Word и PDF в чат бота.</div>
+            <div id="skillGapResult" style="margin-top: 16px;"></div>
             <div id="fixResumeResult" style="margin-top: 16px;"></div>
         </div>
 
-        <!-- АДАПТАЦИЯ ПОД ВАКАНСИЮ -->
+        <!-- 🛠 АДАПТАЦИЯ -->
         <div class="screen" id="screen-adapt">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">🛠 Адаптация под вакансию</div>
@@ -496,7 +480,7 @@
             <div id="adaptResult" style="margin-top: 24px;"></div>
         </div>
 
-        <!-- СОПРОВОДИТЕЛЬНОЕ -->
+        <!-- ✍️ СОПРОВОДИТЕЛЬНОЕ -->
         <div class="screen" id="screen-letter">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
             <div class="screen-title">✍️ Сопроводительное письмо</div>
@@ -518,17 +502,6 @@
             <div id="analyzeResult" style="margin-top: 24px;"></div>
         </div>
 
-        <!-- ЛПР -->
-        <div class="screen" id="screen-lpr">
-            <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
-            <div class="screen-title">🕵️ Найти ЛПР</div>
-            <div class="screen-subtitle">Поиск контактов нанимающих менеджеров</div>
-            <input type="text" class="input-field" id="lprCompany" placeholder="Компания (например: МегаФон)">
-            <input type="text" class="input-field" id="lprPosition" placeholder="Должность (необязательно)">
-            <button class="action-button primary" id="lprBtn" onclick="runFindLPR()">🕵️ Найти контакты (1 ⭐)</button>
-            <div id="lprResult" style="margin-top: 24px;"></div>
-        </div>
-
         <!-- ПИТЧ -->
         <div class="screen" id="screen-pitch">
             <div class="back-button" onclick="showScreen('seeker')">← Назад</div>
@@ -540,7 +513,7 @@
             <div id="pitchResult" style="margin-top: 24px;"></div>
         </div>
 
-        <!-- ЧИТАЛКА УРОКОВ/ШАБЛОНОВ -->
+        <!-- ЧИТАЛКА -->
         <div class="screen" id="screen-reader">
             <div class="back-button" onclick="showScreen('premium')">← К курсам</div>
             <div class="screen-title" id="readerTitle">📖</div>
@@ -754,6 +727,8 @@
         let userData = null;
         let currentCrisisTool = null;
         let lastVacancies = [];
+        let vacShown = 0;
+        const VAC_PAGE = 10;
         let readerState = null;
 
         if (tg) {
@@ -842,15 +817,15 @@
         const SEARCH_STAGES = [
             '🌍 Определяю регион и уровень кандидата...',
             '🧠 Составляю план поиска (должности, отрасли, компании)...',
-            '📥 Скачиваю вакансии с hh.ru...',
+            '📥 Скачиваю вакансии с hh.ru (партии с паузами)...',
             '🚫 Убираю стажёрские и нерелевантные роли...',
-            '🎯 ИИ оценивает соответствие каждой вакансии...',
+            '🎯 ИИ оценивает соответствие пакетами по 20...',
             '🏆 Сортирую: топ-компании и максимальное соответствие...'
         ];
         const ANALYZE_STAGES = [
             '📄 Читаю текст вакансии...',
             '🏢 Определяю компанию и должность...',
-            '🕵️ Ищу контакты ЛПР и корпоративные почты...',
+            '🕵️ Ищу контакты HR и корпоративные почты...',
             '✍️ Пишу питч под твоё резюме...'
         ];
         const LETTER_STAGES = [
@@ -860,14 +835,14 @@
         ];
         const FIX_STAGES = [
             '📊 Беру выводы Skill Gap...',
-            '✍️ Переписываю достижения и формулировки...',
+            '✍️ Переписываю достижения под фильтры hh.ru...',
             '📦 Собираю файлы Word и PDF...',
             '📎 Отправляю файлы в чат бота...'
         ];
         const ADAPT_STAGES = [
             '📄 Читаю требования вакансии...',
             '🎯 Сопоставляю с твоим опытом...',
-            '✍️ Переписываю резюме под вакансию...',
+            '✍️ Переписываю резюме под вакансию и hh.ru...',
             '📦 Собираю Word и PDF и отправляю в чат...'
         ];
 
@@ -908,8 +883,8 @@
 
         // ---------- ОНБОРДИНГ ----------
         const OB_SLIDES = [
-            { icon: '🚀', title: 'Lemus Career Agent', text: 'ИИ-агент анализирует вакансии, находит контакты руководителей и пишет питчи за тебя.' },
-            { icon: '📄', title: 'Загрузи резюме', text: 'Приложение подберёт вакансии твоего уровня и отрасли с процентом соответствия.' },
+            { icon: '🚀', title: 'Lemus Career Agent', text: 'ИИ-агент анализирует вакансии, пишет сопроводительные и готовит резюме под фильтры hh.ru.' },
+            { icon: '📄', title: 'Загрузи резюме', text: 'Приложение подберёт до 70 вакансий твоего уровня и отрасли с процентом соответствия.' },
             { icon: '⭐', title: 'Баланс и тарифы', text: '7 запросов бесплатно. Пополнение — Telegram Stars прямо в приложении.' }
         ];
         let obIndex = 0;
@@ -973,29 +948,13 @@
                 userData = await api('/miniapp/data?user_id=' + currentUserId);
                 countUp(document.getElementById('homeBalance'), userData.balance);
                 countUp(document.getElementById('balanceNum'), userData.balance);
+                countUp(document.getElementById('homeResumes'), userData.resumes_count || 0);
                 document.getElementById('premiumStatus').style.display = userData.is_premium ? 'inline-block' : 'none';
-                countUp(document.getElementById('homeTracker'), (userData.tracker || []).length);
                 const ds = document.getElementById('digestState');
                 ds.textContent = userData.digest_active ? 'ВКЛ' : 'ВЫКЛ';
                 ds.className = 'switch-state' + (userData.digest_active ? ' on' : '');
                 adminToggle(!!userData.is_admin);
-                renderTracker(userData.tracker || []);
             } catch (e) { console.warn('loadUserData:', e.message); }
-        }
-        function renderTracker(items) {
-            const box = document.getElementById('trackerList');
-            if (!items.length) {
-                box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div>Трекер пуст. Разбери первую вакансию!</div></div>';
-                return;
-            }
-            let html = '';
-            items.forEach(it => {
-                let cls = 'other';
-                if ((it.status || '').includes('Контакт')) cls = 'contact';
-                else if ((it.status || '').includes('Откликнулся') || (it.status || '').includes('Разобрана')) cls = 'responded';
-                html += '<div class="tracker-item"><div class="tracker-title">' + escapeHtml(it.title) + '</div><span class="tracker-status ' + cls + '">' + escapeHtml(it.status) + '</span></div>';
-            });
-            box.innerHTML = html;
         }
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -1005,7 +964,7 @@
             if (tg && tg.HapticFeedback) { try { tg.HapticFeedback.selectionChanged(); } catch(e) {} }
             if (tg && tg.BackButton) { try { (id === 'home') ? tg.BackButton.hide() : tg.BackButton.show(); } catch(e) {} }
             if (currentUserId) {
-                if (id === 'balance' || id === 'tracker') loadUserData();
+                if (id === 'balance') loadUserData();
                 if (id === 'payments') loadPayments();
                 if (id === 'referral') loadReferral();
                 if (id === 'premium') loadPremium();
@@ -1098,12 +1057,12 @@
                     '<div class="stat-card"><div class="stat-number">' + (t.premium_active || 0) + '</div><div class="stat-label">Премиум</div></div>' +
                     '<div class="stat-card"><div class="stat-number">' + (t.stars || 0) + '</div><div class="stat-label">Stars</div></div>' +
                     '</div>' +
-                    '<div class="info-box">📁 Резюме: ' + (t.resumes || 0) + ' • 📌 Трекер: ' + (t.tracker || 0) + ' • 💳 Платежей: ' + (t.payments || 0) + ' • 💬 Отзывов: ' + (t.feedback || 0) + '</div>';
+                    '<div class="info-box">📁 Резюме: ' + (t.resumes || 0) + ' • 💳 Платежей: ' + (t.payments || 0) + ' • 💬 Отзывов: ' + (t.feedback || 0) + '</div>';
                 let html = '';
                 (d.users || []).forEach(u => {
                     html += '<div class="result-card">' +
                         '<div class="result-company">' + (u.username ? '@' + escapeHtml(u.username) : 'Без имени') + ' <span style="color:#4facfe;font-size:13px;">id ' + u.user_id + '</span></div>' +
-                        '<div class="result-title">Баланс: ' + u.balance + ' • Резюме: ' + u.resumes + ' • Трекер: ' + u.tracker + ' • Stars: ' + u.paid_stars + '</div>' +
+                        '<div class="result-title">Баланс: ' + u.balance + ' • Резюме: ' + u.resumes + ' • Stars: ' + u.paid_stars + '</div>' +
                         '<div class="result-title">' + (u.is_premium ? ('♾ Премиум до: ' + escapeHtml(u.unlimited_until || '—')) : 'Обычный аккаунт') + ' • Регистрация: ' + escapeHtml((u.created_at || '').slice(0, 10)) + '</div>' +
                         '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;">' +
                         '<button class="copy-btn" onclick="adminGrant(' + u.user_id + ',\'add_balance\',50)">+50 запросов</button>' +
@@ -1198,7 +1157,6 @@
             finally { showLoader('', false); }
         }
 
-        // ---------- 📤 ЭКСПОРТ WORD+PDF ----------
         async function exportResume() {
             if (!await ensureAuth()) return;
             showLoader('Готовлю Word и PDF...', true);
@@ -1213,7 +1171,7 @@
             }
         }
 
-        // ---------- ПОИСК ----------
+        // ---------- ПОИСК: ДО 70 ВАКАНСИЙ, ПАРТИИ ПО 10 ----------
         async function runSearch() {
             if (!await ensureAuth()) return;
             if (!userData || !userData.has_active_resume) {
@@ -1244,15 +1202,27 @@
         }
         function renderVacancies(list, box) {
             lastVacancies = list || [];
-            if (!list.length) {
+            vacShown = 0;
+            if (!lastVacancies.length) {
                 box.innerHTML = '<div class="empty-state"><div class="empty-state-icon">😔</div><div>Вакансий не найдено. Проверь резюме или попробуй позже.</div></div>';
                 return;
             }
-            let html = '<div class="result-section-title">Найдено: ' + list.length + ' вакансий (отсортировано по соответствию)</div>';
-            list.forEach((v, i) => {
+            box.innerHTML = '<div class="result-section-title">В подборке: ' + lastVacancies.length + ' вакансий — показываю партиями по ' + VAC_PAGE + '</div>' +
+                '<div id="vacList"></div><div id="vacMoreWrap" style="margin-top:12px;"></div>';
+            appendVacancies();
+        }
+        function appendVacancies() {
+            const listEl = document.getElementById('vacList');
+            const wrap = document.getElementById('vacMoreWrap');
+            if (!listEl) return;
+            const start = vacShown;
+            const end = Math.min(vacShown + VAC_PAGE, lastVacancies.length);
+            let html = '';
+            for (let i = start; i < end; i++) {
+                const v = lastVacancies[i];
                 const sc = v.match_score || 0;
                 const cls = sc >= 75 ? ' hot' : (sc >= 60 ? ' mid' : ' low');
-                html += '<div class="vacancy-card" style="animation-delay:' + (i * 0.05) + 's">' +
+                html += '<div class="vacancy-card">' +
                     '<div class="vacancy-header"><div class="vacancy-title">' + escapeHtml(v.title) + '</div><span class="vacancy-score' + cls + '">' + escapeHtml(sc) + '%</span></div>' +
                     '<div class="vacancy-company">🏢 ' + escapeHtml(v.company) + '</div>' +
                     (v.salary ? '<div class="vacancy-salary">' + escapeHtml(v.salary) + '</div>' : '') +
@@ -1260,11 +1230,22 @@
                     (v.url ? '<a class="link-item" href="' + escapeHtml(v.url) + '" target="_blank">🔗 Открыть вакансию</a>' : '') +
                     '<button class="copy-btn" onclick="openLetterFor(' + i + ')">✍️ Сопроводительное письмо</button>' +
                     '</div>';
-            });
-            box.innerHTML = html;
+            }
+            listEl.insertAdjacentHTML('beforeend', html);
+            vacShown = end;
+            if (wrap) {
+                if (vacShown < lastVacancies.length) {
+                    wrap.innerHTML = '<button class="action-button secondary" onclick="loadMoreVacancies()">▶ Показать ещё (' + vacShown + ' из ' + lastVacancies.length + ')</button>';
+                } else {
+                    wrap.innerHTML = '<div class="info-box">✅ Показаны все ' + lastVacancies.length + ' вакансий подборки</div>';
+                }
+            }
+        }
+        function loadMoreVacancies() {
+            appendVacancies();
         }
 
-        // ---------- 📊 SKILL GAP + ИСПРАВЛЕНИЕ ----------
+        // ---------- 📊 SKILL GAP + УЛУЧШЕНИЕ ----------
         async function runSkillGap() {
             const btn = document.getElementById('skillGapBtn');
             const box = document.getElementById('skillGapResult');
@@ -1272,11 +1253,10 @@
             btn.disabled = true;
             showLoader('Анализирую навыки по резюме...', true);
             box.innerHTML = '';
-            document.getElementById('fixResumeBtn').style.display = 'none';
             try {
                 const d = await api('/miniapp/skill-gap', { user_id: currentUserId });
                 box.innerHTML = '<div class="result-card"><div class="result-section-title">📊 Результат анализа</div><div class="analysis-block">' + escapeHtml(d.analysis) + '</div></div>';
-                document.getElementById('fixResumeBtn').style.display = 'flex';
+                toast('✅ Анализ готов — жми «Улучшить резюме»');
             } catch (e) {
                 box.innerHTML = errorBox(e.message, true);
             } finally {
@@ -1288,6 +1268,13 @@
 
         async function runFixResume() {
             if (!await ensureAuth()) return;
+            if (!userData || !userData.has_active_resume) {
+                showScreen('upload');
+                document.getElementById('uploadResult').innerHTML =
+                    errorBox('Для улучшения нужно резюме. Загрузи файл — и возвращайся к «📊 Анализ навыков».', false);
+                toast('📥 Сначала загрузи резюме');
+                return;
+            }
             const btn = document.getElementById('fixResumeBtn');
             const box = document.getElementById('fixResumeResult');
             btn.disabled = true;
@@ -1296,11 +1283,11 @@
             try {
                 const d = await api('/miniapp/fix-resume', { user_id: currentUserId });
                 box.innerHTML = '<div class="result-card">' +
-                    '<div class="result-section-title">💎 Исправленное резюме (копия текста)</div>' +
+                    '<div class="result-section-title">💎 Улучшенное резюме под hh.ru (копия текста)</div>' +
                     '<div class="analysis-block" id="fixOut">' + escapeHtml(d.text) + '</div>' +
                     '<button class="copy-btn" onclick="copyFix()">📋 Скопировать текст</button>' +
-                    '<div class="info-box">📎 Файлы Word и PDF отправлены в чат бота</div></div>';
-                toast('✅ Резюме исправлено, файлы в чате');
+                    '<div class="info-box">📎 Файлы Word и PDF отправлены в чат бота, резюме сохранено как активное</div></div>';
+                toast('✅ Резюме улучшено, файлы в чате');
                 setTimeout(openChat, 1200);
                 await loadUserData();
             } catch (e) {
@@ -1316,7 +1303,7 @@
             navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
         }
 
-        // ---------- 🛠 АДАПТАЦИЯ ПОД ВАКАНСИЮ ----------
+        // ---------- 🛠 АДАПТАЦИЯ ----------
         async function runAdapt() {
             const txt = document.getElementById('adaptInput').value.trim();
             const btn = document.getElementById('adaptBtn');
@@ -1444,52 +1431,6 @@
             const el = document.getElementById('pitchText');
             if (!el) return;
             navigator.clipboard.writeText(el.textContent).then(() => toast('✅ Скопировано!')).catch(() => alert('Выдели текст вручную'));
-        }
-
-        // ---------- ЛПР ----------
-        async function runFindLPR() {
-            const company = document.getElementById('lprCompany').value.trim();
-            const position = document.getElementById('lprPosition').value.trim();
-            const btn = document.getElementById('lprBtn');
-            const box = document.getElementById('lprResult');
-            if (!company) { alert('⚠️ Укажите компанию'); return; }
-            if (!await ensureAuth()) return;
-            btn.disabled = true;
-            startProgress(['🏢 Собираю данные о компании...', '🕵️ Ищу профили HR и ЛПР...', '✉️ Формирую контакты и шаблоны почт...']);
-            box.innerHTML = '';
-            try {
-                const d = await api('/miniapp/find-lpr', { user_id: currentUserId, company: company, position: position });
-                let html = '<div class="result-card"><div class="result-company">🏢 ' + escapeHtml(d.company) + '</div>' + (d.position ? '<div class="result-title">💼 ' + escapeHtml(d.position) + '</div>' : '') + '</div>';
-                if (d.contacts && d.contacts.length) {
-                    html += '<div class="result-card"><div class="result-section-title">✅ Контакты</div>';
-                    d.contacts.forEach(c => {
-                        html += '<div class="result-contact">' + (c.name ? '<strong>' + escapeHtml(c.name) + '</strong><br>' : '') +
-                            (c.email ? '📧 ' + escapeHtml(c.email) + '<br>' : '') +
-                            (c.phone ? '📱 ' + escapeHtml(c.phone) + '<br>' : '') +
-                            (c.url ? '<a href="' + escapeHtml(c.url) + '" target="_blank" style="color:#4facfe;">🔗 Профиль</a>' : '') + '</div>';
-                    });
-                    html += '</div>';
-                } else {
-                    html += '<div class="result-card"><div class="result-section-title">ℹ️ Прямых контактов не найдено</div><div class="analysis-block">Используй ссылки ниже для ручного поиска.</div></div>';
-                }
-                if (d.email_templates && d.email_templates.length) {
-                    html += '<div class="result-card"><div class="result-section-title">📧 Шаблоны почт</div>';
-                    d.email_templates.forEach(t => { html += '<div class="result-contact">' + escapeHtml(t) + '</div>'; });
-                    html += '</div>';
-                }
-                if (d.links && d.links.length) {
-                    html += '<div class="result-card"><div class="result-section-title">🔗 Быстрые ссылки</div>';
-                    d.links.forEach(l => { html += '<a class="link-item" href="' + escapeHtml(l.url) + '" target="_blank">' + escapeHtml(l.text) + '</a>'; });
-                    html += '</div>';
-                }
-                box.innerHTML = html;
-            } catch (e) {
-                box.innerHTML = errorBox(e.message, false);
-            } finally {
-                stopProgress();
-                btn.disabled = false;
-                await loadUserData();
-            }
         }
 
         // ---------- ПИТЧ ----------
